@@ -84,6 +84,8 @@ Terms used in this repository, the plugin and the generated docs. Which layer ow
 
 **Schema rules**: the RFLP rules in `docs/schemas.json`, such as `sysreq-verified`. `sphinx-build -W` fails when one is broken.
 
+**Gap**: one broken schema rule on one need. `sysml2kit gaps build/needs --layer L` lists the gaps of layer L and earlier, with the file and line to fix.
+
 **ubproject.toml**: need types, link types and fields, read by both Sphinx and ubCode.
 
 **ubCode**: the editor extension for sphinx-needs projects that reads the same configuration and rules.

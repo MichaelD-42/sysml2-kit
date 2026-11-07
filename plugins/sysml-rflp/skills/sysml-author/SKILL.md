@@ -18,4 +18,4 @@ description: Create and change SysML v2 models (.sysml files) - use cases, requi
 
 ## Rule
 
-The plugin runs `sysml check` after every `.sysml` write and shows errors; fix them before moving on (`sysml-lint` skill for the loop). Before finishing, run `make all` (or `make docs STRICT=` mid-workflow).
+The plugin runs `sysml check` after every `.sysml` write, then the bridge (`sysml export` + `sysml2kit needs`), and shows errors: language errors, duplicate ids, link ends without a short name, and requirement texts without exactly one `shall` or with a vague term. Fix them before moving on (`sysml-lint` skill for the loop). Before finishing, run `make all` (or `make docs STRICT=` mid-workflow).

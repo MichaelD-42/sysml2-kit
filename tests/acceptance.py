@@ -147,12 +147,11 @@ def main():
         "SR-003 shows its system test": re.search(
             r'id="SR-003".*?verified by.*?STC-003', html, re.DOTALL
         ),
-        "diagrams are embedded": all(
-            f"_images/{n}.svg" in html
-            for n in ("usecases-vehicle", "vehicle", "operateVehicle")
+        "internal diagrams are embedded": all(
+            f"_images/{n}.svg" in html for n in ("vehicle", "operateVehicle")
         ),
-        "trace graph is embedded": "_images/trace.svg"
-        in (work / "docs/_build/html/traceability.html").read_text(),
+        "use cases link to their needs": 'href="#UC-001"' in html,
+        **links_resolve(work / "docs/_build/html"),
     }
     for name, ok in checks.items():
         print(f"{'ok  ' if ok else 'FAIL'} baseline: {name}")
@@ -165,6 +164,23 @@ def main():
             failures += 1
             print(f"     exit {code}; expected /{expected}/ in output:\n{out[-2000:]}")
     return 1 if failures + incremental(work) + hook(work) else 0
+
+
+def links_resolve(html_dir):
+    """The inlined trace graph links every box to an anchor that exists on its page."""
+    page = (html_dir / "traceability.html").read_text()
+    links = re.findall(
+        r'<a href="([^"#]+\.html)#([^"]+)">\s*<rect class="s2k-box"', page
+    )
+    dead = [
+        f"{doc}#{need}"
+        for doc, need in links
+        if f'id="{need}"' not in (html_dir / doc).read_text()
+    ]
+    return {
+        f"trace graph links {len(links)} needs, none dead {dead}": len(links) > 20
+        and not dead
+    }
 
 
 def report(name, ok, detail=""):
@@ -188,7 +204,7 @@ def incremental(work):
         "a renamed subject's old diagram is gone, so the page pointing at it fails",
         result.returncode != 0
         and "usecases-vehicle.svg" in out
-        and "not readable" in out,
+        and "No such file or directory" in out,
         out,
     )
     use_cases.write_text(original)
@@ -233,11 +249,39 @@ def hook(work):
         )
 
     broken, other = run(target), run(work / "docs/index.rst")
-    return report(
+    failed = report(
         "lint hook reports a broken model with exit 2",
         broken.returncode == 2 and "propell` resolves to nothing" in broken.stderr,
         f"exit {broken.returncode}: {broken.stderr}",
     ) + report("lint hook ignores non-SysML files", other.returncode == 0, other.stderr)
+    original = target.read_text().replace(
+        "operateVehicle.propell", "operateVehicle.propel"
+    )
+    target.write_text(original)
+    clean = run(target)
+    failed += report(
+        "lint hook passes a clean model", clean.returncode == 0, clean.stderr
+    )
+    target.write_text(original.replace("<'LC-005'> chassis", "<'LC-004'> chassis"))
+    duplicate = run(target)
+    failed += report(
+        "lint hook reports a bridge error (duplicate id) that `sysml check` accepts",
+        duplicate.returncode == 2 and "duplicate id LC-004" in duplicate.stderr,
+        f"exit {duplicate.returncode}: {duplicate.stderr}",
+    )
+    target.write_text(original)
+    requirements = work / "model/requirements/system_requirements.sysml"
+    replace(
+        "model/requirements/system_requirements.sysml",
+        "shall not exceed 1800 kg",
+        "shall be TBD",
+    )(work)
+    vague = run(requirements)
+    return failed + report(
+        "lint hook reports a vague requirement text",
+        vague.returncode == 2 and "SR-003" in vague.stderr and "'TBD'" in vague.stderr,
+        f"exit {vague.returncode}: {vague.stderr}",
+    )
 
 
 if __name__ == "__main__":

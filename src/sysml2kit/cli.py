@@ -6,7 +6,8 @@ import re
 import sys
 from pathlib import Path
 
-from .needs import BridgeError, write_needs
+from .gaps import gaps
+from .needs import BridgeError, text_findings, write_needs
 from .render import trace_svg, use_case_svg, use_cases
 
 
@@ -30,12 +31,24 @@ def main(argv=None):
     )
     p.add_argument("needs_json")
     p.add_argument("output")
+    p = sub.add_parser(
+        "gaps",
+        help="RFLP rule violations by layer, from a `sphinx-build -b needs` output directory",
+    )
+    p.add_argument("needs_dir", help="holds needs.json and schema_violations.json")
+    p.add_argument(
+        "--layer",
+        choices="RFLV",
+        help="only rules gating this layer or an earlier one",
+    )
     args = parser.parse_args(argv)
 
     try:
         if args.command == "needs":
-            count = write_needs(args.export, args.output, args.model_files)
-            print(f"sysml2kit: {count} needs -> {args.output}")
+            needs = write_needs(args.export, args.output, args.model_files)
+            print(f"sysml2kit: {len(needs)} needs -> {args.output}")
+            for finding in text_findings(needs):
+                print(f"sysml2kit: warning: {finding}", file=sys.stderr)
         elif args.command == "usecases":
             out = Path(args.output_dir)
             out.mkdir(parents=True, exist_ok=True)
@@ -48,6 +61,16 @@ def main(argv=None):
             needs = data["versions"][data.get("current_version", "")]["needs"]
             Path(args.output).write_text(trace_svg(needs))
             print(f"sysml2kit: trace of {len(needs)} needs -> {args.output}")
+        elif args.command == "gaps":
+            out = Path(args.needs_dir)
+            data = json.loads((out / "needs.json").read_text())
+            needs = data["versions"][data.get("current_version", "")]["needs"]
+            violations = json.loads((out / "schema_violations.json").read_text())
+            found = gaps(violations, needs, args.layer)
+            for layer, rule, need_id, where, message in found:
+                print(f"{layer}  {rule}  {need_id}  {where}  {message}")
+            print(f"sysml2kit: {len(found)} gaps", file=sys.stderr)
+            sys.exit(1 if found else 0)
     except BridgeError as err:
         sys.exit(f"sysml2kit: {err}")
 

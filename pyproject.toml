@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sysml2kit"
-version = "0.1.2"
+version = "0.1.3"
 description = "Bridge SysML v2 models into sphinx-needs traceability and render use case and trace diagrams"
 readme = "README.md"
 license = "MIT"

@@ -38,6 +38,12 @@ COMMENT = re.compile(r'"(?:\\.|[^"\\])*"|//\*.*?\*/|/\*.*?\*/|//[^\n]*', re.DOTA
 # reStructuredText inline markup; doc text is plain text, so these are escaped
 RST_INLINE = re.compile(r"([\\*`_|])")
 
+# writing rules for system requirements that need no judgment (rflp-method structure.md)
+SHALL = re.compile(r"\bshall\b", re.IGNORECASE)
+VAGUE = re.compile(
+    r"\b(TBD|etc\.|as appropriate|user-friendly|fast)(?!\w)", re.IGNORECASE
+)
+
 
 class BridgeError(Exception):
     pass
@@ -207,6 +213,21 @@ def convert(elements, locations):
     return {"current_version": "", "versions": {"": {"needs": needs}}}
 
 
+def text_findings(needs):
+    """Warnings for system requirement texts: not exactly one `shall`, or a vague term."""
+    findings = []
+    for need_id, need in sorted(needs.items()):
+        if need["type"] != "sysreq":
+            continue
+        where = f"{need_id} ({need['source']})" if need.get("source") else need_id
+        shalls = len(SHALL.findall(need["content"]))
+        if shalls != 1:
+            findings.append(f"{where}: {shalls} 'shall' in the text; state exactly one")
+        for term in sorted(set(VAGUE.findall(need["content"])), key=str.lower):
+            findings.append(f"{where}: vague term '{term}'")
+    return findings
+
+
 def write_needs(export_path, out_path, model_files):
     elements = json.loads(Path(export_path).read_text())
     if not isinstance(elements, list) or not all(
@@ -218,4 +239,4 @@ def write_needs(export_path, out_path, model_files):
     result = convert(elements, source_locations(model_files))
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     Path(out_path).write_text(json.dumps(result, indent=2, sort_keys=True))
-    return len(result["versions"][""]["needs"])
+    return result["versions"][""]["needs"]

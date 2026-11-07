@@ -1,23 +1,27 @@
 """SVG renderers for what the SysML diagram tool does not draw: use case diagrams and the RFLP trace graph."""
 
-from xml.sax.saxutils import escape
+from urllib.parse import quote
+from xml.sax.saxutils import escape, quoteattr
 
 from .needs import refs
 
 FONT = 'font-family="Arial, Helvetica, sans-serif" font-size="12"'
 CHAR_W = 7  # approximate width of one 12px Arial character
+# prefixed: the docs inline the SVG, so these rules apply to the whole HTML page
 STYLE = """<style>
-.box { fill: #ffffff; stroke: #333333; stroke-width: 1; }
-.line { fill: none; stroke: #333333; stroke-width: 1; }
-.muted { fill: #555555; font-size: 10px; }
-.title { font-weight: bold; }
+.s2k-box { fill: #ffffff; stroke: #333333; stroke-width: 1; }
+.s2k-line { fill: none; stroke: #333333; stroke-width: 1; }
+.s2k-muted { fill: #555555; font-size: 10px; }
+.s2k-title { font-weight: bold; }
+a:hover > .s2k-box { stroke: #1f6fb2; stroke-width: 2; }
+svg a { text-decoration: none; }
 </style>"""
 
 
 def _svg(width, height, body):
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
-        f'viewBox="0 0 {width} {height}" {FONT}>\n{STYLE}\n'
+        f'viewBox="0 0 {width} {height}" style="max-width: 100%; height: auto" {FONT}>\n{STYLE}\n'
         f'<rect width="{width}" height="{height}" fill="#ffffff"/>\n'
         + "\n".join(body)
         + "\n</svg>\n"
@@ -25,10 +29,17 @@ def _svg(width, height, body):
 
 
 def _text(x, y, text, cls="", anchor="middle"):
-    c = f' class="{cls}"' if cls else ""
+    c = f' class="s2k-{cls}"' if cls else ""
     return (
         f'<text x="{x:.0f}" y="{y:.0f}" text-anchor="{anchor}"{c}>{escape(text)}</text>'
     )
+
+
+def _link(href, items):
+    """Wrap items in a link to href (a need's anchor); no href, no link."""
+    if not href:
+        return items
+    return [f"<a href={quoteattr(href)}>", *items, "</a>"]
 
 
 # --- use case diagram -------------------------------------------------------------------------
@@ -99,30 +110,34 @@ def use_case_svg(subject, cases):
     box_w, box_h = oval_w + 80, 50 + len(cases) * (oval_h + gap)
     width, height = box_x + box_w + 20, max(box_y + box_h + 20, 60 + len(actors) * 110)
     body = [
-        f'<rect class="box" x="{box_x}" y="{box_y}" width="{box_w}" height="{box_h}"/>',
+        f'<rect class="s2k-box" x="{box_x}" y="{box_y}" width="{box_w}" height="{box_h}"/>',
         _text(box_x + box_w / 2, box_y + 22, subject, "title"),
     ]
     centers = []  # by position: ids may be empty
     for k, (need_id, name, _) in enumerate(cases):
         cx, cy = box_x + box_w / 2, box_y + 50 + oval_h / 2 + k * (oval_h + gap)
         centers.append((cx, cy))
-        body += [
-            f'<ellipse class="box" cx="{cx:.0f}" cy="{cy:.0f}" rx="{oval_w / 2:.0f}" ry="{oval_h / 2}"/>',
-            _text(cx, cy - 2, name, "title"),
-            _text(cx, cy + 14, need_id, "muted"),
-        ]
+        # shortcut: assumes the diagram is on the page that imports model-needs.json; pass a page if diagrams move
+        body += _link(
+            need_id and f"#{quote(need_id)}",
+            [
+                f'<ellipse class="s2k-box" cx="{cx:.0f}" cy="{cy:.0f}" rx="{oval_w / 2:.0f}" ry="{oval_h / 2}"/>',
+                _text(cx, cy - 2, name, "title"),
+                _text(cx, cy + 14, need_id, "muted"),
+            ],
+        )
     step = (height - 40) / max(len(actors), 1)
     for k, actor in enumerate(actors):
         x, y = actor_x, 20 + step * k + step / 2 - 30  # head center
         body += [
-            f'<circle class="box" cx="{x}" cy="{y:.0f}" r="9"/>',
-            f'<path class="line" d="M{x},{y + 9:.0f} v22 M{x - 14},{y + 16:.0f} h28 M{x},{y + 31:.0f} l-12,18 M{x},{y + 31:.0f} l12,18"/>',
+            f'<circle class="s2k-box" cx="{x}" cy="{y:.0f}" r="9"/>',
+            f'<path class="s2k-line" d="M{x},{y + 9:.0f} v22 M{x - 14},{y + 16:.0f} h28 M{x},{y + 31:.0f} l-12,18 M{x},{y + 31:.0f} l12,18"/>',
             _text(x, y + 66, actor),
         ]
         for (_, _, acts), (cx, cy) in zip(cases, centers):
             if actor in acts:
                 body.append(
-                    f'<path class="line" d="M{x + 16},{y + 20:.0f} L{cx - oval_w / 2:.0f},{cy:.0f}"/>'
+                    f'<path class="s2k-line" d="M{x + 16},{y + 20:.0f} L{cx - oval_w / 2:.0f},{cy:.0f}"/>'
                 )
     return _svg(width, round(height), body)
 
@@ -148,7 +163,11 @@ EDGES = {
 
 
 def trace_svg(needs):
-    """Trace graph of the needs (id -> need dict, as in needs.json) across the RFLP columns."""
+    """Trace graph of the needs (id -> need dict, as in needs.json) across the RFLP columns.
+
+    Each box links to its need, by docname; the links are relative to the docs root, where the
+    trace graph's page (traceability.rst) is.
+    """
     box_w, box_h, col_gap, row_gap, top = 170, 36, 60, 18, 60
     columns = [c for c in COLUMNS if any(n["type"] == c for n in needs.values())]
     pos = {}
@@ -164,11 +183,15 @@ def trace_svg(needs):
             title = needs[need_id].get("title", "")
             max_chars = (box_w - 10) // CHAR_W
             title = title if len(title) <= max_chars else title[: max_chars - 1] + "…"
-            body += [
-                f'<rect class="box" x="{x}" y="{y}" width="{box_w}" height="{box_h}" rx="3"/>',
-                _text(x + 6, y + 14, need_id, "muted", "start"),
-                _text(x + 6, y + 29, title, "", "start"),
-            ]
+            docname = needs[need_id].get("docname")
+            body += _link(
+                docname and f"{quote(docname)}.html#{quote(need_id)}",
+                [
+                    f'<rect class="s2k-box" x="{x}" y="{y}" width="{box_w}" height="{box_h}" rx="3"/>',
+                    _text(x + 6, y + 14, need_id, "muted", "start"),
+                    _text(x + 6, y + 29, title, "", "start"),
+                ],
+            )
     edges = []
     for src, need in needs.items():
         for link, color in EDGES.items():
@@ -196,14 +219,16 @@ def trace_svg(needs):
                                 f"M{x1},{sy:.0f} H{x1 + step:.0f} V{lane:.0f} "
                                 f"H{x2 - step:.0f} V{dy:.0f} H{x2}"
                             )
-                    edges.append(f'<path class="line" style="stroke:{color}" d="{d}"/>')
+                    edges.append(
+                        f'<path class="s2k-line" style="stroke:{color}" d="{d}"/>'
+                    )
     rows = max(
         (sum(n["type"] == c for n in needs.values()) for c in columns), default=0
     )
     height = top + rows * (box_h + row_gap) + 50
     width = max(20 + len(columns) * (box_w + col_gap), 520)
     legend = [
-        f'<path class="line" style="stroke:{color}" d="M{20 + k * 130},{height - 22} h24"/>'
+        f'<path class="s2k-line" style="stroke:{color}" d="M{20 + k * 130},{height - 22} h24"/>'
         + _text(20 + k * 130 + 30, height - 18, link.replace("_", " "), "", "start")
         for k, (link, color) in enumerate(EDGES.items())
     ]
