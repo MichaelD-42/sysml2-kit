@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "sysml": { "command": "sysml", "args": ["mcp"] }
+  }
+}

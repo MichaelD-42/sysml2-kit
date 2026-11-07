@@ -1,0 +1,338 @@
+{
+  "schemas": [
+    {
+      "id": "crs-satisfied",
+      "message": "Customer requirement is not satisfied by any system requirement",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "crs"
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "satisfies": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "sysreq"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "crs-verified",
+      "message": "Customer requirement is not verified by any acceptance test",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "crs"
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "verifies": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "acctest"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "usecase-realizes",
+      "message": "Use case does not realize any customer requirement",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "usecase"
+          }
+        }
+      },
+      "validate": {
+        "network": {
+          "realizes": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "crs"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "usecase-realized",
+      "message": "Use case is not realized by any function",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "usecase"
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "realizes": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "function"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "usecase-verified",
+      "message": "Use case is not verified by any acceptance test",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "usecase"
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "verifies": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "acctest"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "sysreq-satisfies",
+      "message": "System requirement does not satisfy any customer requirement",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "sysreq"
+          }
+        }
+      },
+      "validate": {
+        "network": {
+          "satisfies": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "crs"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "sysreq-satisfied",
+      "message": "System requirement is not satisfied by any logical component",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "sysreq"
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "satisfies": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "component"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "sysreq-verified",
+      "message": "System requirement is not verified by any system test",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "sysreq"
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "verifies": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "systest"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "function-allocated",
+      "message": "Leaf function must be allocated to exactly one logical component",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "function"
+          },
+          "leaf": {
+            "const": true
+          }
+        }
+      },
+      "validate": {
+        "network": {
+          "allocated_to": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "component"
+                  }
+                }
+              }
+            },
+            "minContains": 1,
+            "maxContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "component-used",
+      "message": "Leaf logical component has no function allocated",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "component"
+          },
+          "leaf": {
+            "const": true
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "allocated_to": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "function"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "systest-verifies",
+      "message": "System test does not verify any system requirement",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "systest"
+          }
+        }
+      },
+      "validate": {
+        "network": {
+          "verifies": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "sysreq"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "acctest-verifies",
+      "message": "Acceptance test does not verify a customer requirement or use case",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "acctest"
+          }
+        }
+      },
+      "validate": {
+        "network": {
+          "verifies": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "crs",
+                      "usecase"
+                    ]
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    }
+  ]
+}

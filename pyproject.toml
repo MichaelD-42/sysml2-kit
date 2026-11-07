@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sysml2kit"
+version = "0.1.0"
+description = "Bridge SysML v2 models into sphinx-needs traceability and render use case and trace diagrams"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+sysml2kit = "sysml2kit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

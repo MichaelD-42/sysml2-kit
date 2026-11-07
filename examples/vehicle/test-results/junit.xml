@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+  <testsuite name="system-tests" tests="4" failures="0" errors="0" skipped="0" timestamp="2026-11-07T10:00:00">
+    <testcase classname="system" name="range_wltp" time="5400">
+      <properties><property name="verifies" value="STC-001"/></properties>
+    </testcase>
+    <testcase classname="system" name="seat_count" time="60">
+      <properties><property name="verifies" value="STC-002"/></properties>
+    </testcase>
+    <testcase classname="system" name="curb_weight" time="300">
+      <properties><property name="verifies" value="STC-003"/></properties>
+    </testcase>
+    <testcase classname="system" name="tie_down_pull" time="900">
+      <properties><property name="verifies" value="STC-004"/></properties>
+    </testcase>
+  </testsuite>
+  <testsuite name="acceptance-tests" tests="2" failures="0" errors="0" skipped="0" timestamp="2026-11-07T14:00:00">
+    <testcase classname="acceptance" name="commute_drive" time="7200">
+      <properties><property name="verifies" value="ATC-001"/></properties>
+    </testcase>
+    <testcase classname="acceptance" name="trailer_loading" time="1800">
+      <properties><property name="verifies" value="ATC-002"/></properties>
+    </testcase>
+  </testsuite>
+</testsuites>

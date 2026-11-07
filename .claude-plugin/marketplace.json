@@ -1,0 +1,12 @@
+{
+  "name": "sysml2-kit",
+  "description": "SysML v2 model-based systems engineering with sphinx-needs traceability",
+  "owner": { "name": "Michael Dold" },
+  "plugins": [
+    {
+      "name": "sysml-rflp",
+      "source": "./plugins/sysml-rflp",
+      "description": "Author, lint and render SysML v2 models, trace them to sphinx-needs, and run the RFLP method from customer requirements to acceptance tests"
+    }
+  ]
+}

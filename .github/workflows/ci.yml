@@ -1,0 +1,62 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+env:
+  SYSML_GIT: https://github.com/MichaelD-42/sysml-v2-rs
+  SYSML_REV: f54fbdeab358e1630bc2e7dc6182ee25ddf8088b
+
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: PYTHONPATH=src python -m unittest discover -s tests
+
+  plugin:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install -g @anthropic-ai/claude-code
+      - run: claude plugin validate . && claude plugin validate ./plugins/sysml-rflp
+
+  sysml:
+    runs-on: ubuntu-24.04
+    steps:
+      - id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/sysml
+          key: sysml-${{ env.SYSML_REV }}-${{ runner.os }}
+      - if: steps.cache.outputs.cache-hit != 'true'
+        run: cargo install --locked --git "$SYSML_GIT" --rev "$SYSML_REV" sysmlv2-cli
+      - uses: actions/upload-artifact@v4
+        with: { name: sysml, path: ~/.cargo/bin/sysml }
+
+  acceptance:
+    needs: sysml
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/download-artifact@v4
+        with: { name: sysml, path: bin }
+      - run: chmod +x bin/sysml && echo "$PWD/bin" >> "$GITHUB_PATH"
+      - run: pip install -e . -r examples/vehicle/requirements.txt
+      - run: python tests/acceptance.py
+
+  omg-corpus:
+    needs: sysml
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/download-artifact@v4
+        with: { name: sysml, path: bin }
+      - run: chmod +x bin/sysml && echo "$PWD/bin" >> "$GITHUB_PATH"
+      - run: python tests/omg_corpus.py
