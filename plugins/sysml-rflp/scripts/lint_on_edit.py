@@ -1,4 +1,5 @@
 """PostToolUse: after a .sysml file is written, run `sysml check` on its project's model/ and report errors to Claude."""
+
 import json
 import shutil
 import subprocess
@@ -12,7 +13,15 @@ if path.suffix != ".sysml" or not shutil.which("sysml"):
 model = next((p for p in path.resolve().parents if p.name == "model"), None)
 if model is None:
     sys.exit(0)
-result = subprocess.run(["sysml", "--color", "never", "check", str(model)], capture_output=True, text=True)
+result = subprocess.run(
+    ["sysml", "--color", "never", "check", str(model)],
+    check=False,
+    capture_output=True,
+    text=True,
+)
 if result.returncode != 0:
-    print(f"sysml check {model} failed after editing {path.name}:\n{result.stdout}{result.stderr}", file=sys.stderr)
+    print(
+        f"sysml check {model} failed after editing {path.name}:\n{result.stdout}{result.stderr}",
+        file=sys.stderr,
+    )
     sys.exit(2)  # feeds stderr back to Claude

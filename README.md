@@ -110,6 +110,7 @@ PYTHONPATH=src python -m unittest discover -s tests        # bridge and renderer
 python tests/acceptance.py                                  # example build + mutations (needs the tools)
 python tests/omg_corpus.py                                  # OMG release corpus through the pipeline
 claude plugin validate .                                    # marketplace and plugin manifests
+ruff check . && ruff format --check .                      # lint and format (CI pins ruff 0.17.4)
 ```
 
 ## License
