@@ -5,9 +5,8 @@ TEST_REPORTS ?= test-reports
 SPHINXBUILD  ?= sphinx-build
 # `make docs STRICT=` reports RFLP rule violations without failing (layer-by-layer work)
 STRICT       ?= -W --keep-going
-# sysmlv2-cli fork with the sequence-expression fix (keeps every need in @Realizes { need = ("A", "B"); })
+# sysmlv2-cli fork (sequence-expression fix, find/relations MCP tools); `make tools` installs its main
 SYSML_GIT     = https://github.com/MichaelD-42/sysml-v2-rs
-SYSML_REV     = f55ffbaaa1f107cc78bdd3a1f6003205050eb7e9
 
 MODEL    := $(shell find model -name '*.sysml' | sort)
 RESULTS  := $(wildcard test-results/*.xml)
@@ -23,7 +22,7 @@ DIAGRAMS :=
 all: lint docs
 
 tools:
-	cargo install --locked --git $(SYSML_GIT) --rev $(SYSML_REV) sysmlv2-cli
+	cargo install --locked --git $(SYSML_GIT) --branch main sysmlv2-cli
 	pip install -r requirements.txt
 
 lint:
