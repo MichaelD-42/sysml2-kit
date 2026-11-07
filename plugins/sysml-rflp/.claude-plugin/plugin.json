@@ -1,7 +1,7 @@
 {
   "name": "sysml-rflp",
   "displayName": "SysML v2 RFLP",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Author, lint and render SysML v2 models, trace them to sphinx-needs, and derive use cases, system requirements, functions and logical architecture from customer requirements (RFLP)",
   "author": { "name": "Michael Dold" },
   "repository": "https://github.com/MichaelD-42/sysml2-kit",
