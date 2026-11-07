@@ -42,6 +42,8 @@ $(GEN)/results-needs.json: $(RESULTS)
 
 render: build/model.json
 	@mkdir -p $(GEN)
+	# start empty: a renamed subject or a dropped DIAGRAMS entry must not leave its old picture behind
+	rm -f $(GEN)/*.svg
 	$(SYSML2KIT) usecases build/model.json $(GEN)
 	for d in $(DIAGRAMS); do $(SYSML) diagram --internal $$d model > $(GEN)/$$(echo $$d | sed 's/.*:://').svg || exit 1; done
 

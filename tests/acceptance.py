@@ -160,10 +160,23 @@ def report(name, ok, detail=""):
 def incremental(work):
     """Deleting a file between two builds must take its needs out of the docs (make cannot see deletions)."""
     remake = ["make", "-C", str(work), "all"] + [f"{k}={v}" for k, v in TOOLS.items()]
+    use_cases = work / "model/requirements/use_cases.sysml"
+    original = use_cases.read_text()
+    use_cases.write_text(original.replace("subject vehicle;", "subject car;"))  # every use case
+    result = subprocess.run(remake, capture_output=True, text=True)
+    out = result.stdout + result.stderr
+    failed = report(
+        "a renamed subject's old diagram is gone, so the page pointing at it fails",
+        result.returncode != 0
+        and "usecases-vehicle.svg" in out
+        and "not readable" in out,
+        out,
+    )
+    use_cases.write_text(original)
     (work / "test-results/junit.xml").unlink()
     result = subprocess.run(remake, capture_output=True, text=True)
     stale = "testresult" in (work / "docs/_generated/results-needs.json").read_text()
-    failed = report(
+    failed += report(
         "deleted test results disappear on rebuild",
         result.returncode == 0 and not stale,
         result.stdout + result.stderr,
