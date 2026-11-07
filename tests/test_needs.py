@@ -211,6 +211,15 @@ class SourceLocationsTest(unittest.TestCase):
             f.write(text)
         self.assertEqual(source_locations([f.name]), {"SR-9": f"{f.name}:5"})
 
+    def test_comment_markers_inside_strings_do_not_hide_declarations(self):
+        text = "package P {\n    attribute u = \"http://x\"; requirement <'SR-1'> r;\n    attribute v = \"/*\";\n    requirement <'SR-2'> s;\n}\n"
+        with tempfile.NamedTemporaryFile("w", suffix=".sysml", delete=False) as f:
+            f.write(text)
+        self.assertEqual(
+            source_locations([f.name]),
+            {"SR-1": f"{f.name}:2", "SR-2": f"{f.name}:4"},
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

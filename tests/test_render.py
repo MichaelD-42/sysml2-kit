@@ -171,6 +171,12 @@ class UseCaseSvgTest(unittest.TestCase):
         merged = use_cases(case("drive", "s1") + case("haul", "s2"))
         self.assertEqual(merged, [("vehicle", [("", "drive", []), ("", "haul", [])])])
 
+    def test_null_membership_list_is_no_members(self):
+        elements = [
+            {"@id": "a", "@type": "UseCaseUsage", "name": "x", "ownedMembership": None}
+        ]
+        self.assertEqual(use_cases(elements), [("system", [("", "x", [])])])
+
     def test_long_actor_names_stay_inside_the_image(self):
         actor = "maintenanceTechnicianOnDuty"
         root = ET.fromstring(use_case_svg("s", [("UC-001", "service", [actor])]))

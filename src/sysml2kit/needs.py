@@ -33,8 +33,8 @@ TRACE_METADATA = {
     "Trace::Realizes": "realizes",
     "Trace::Verifies": "verifies",
 }
-# multi-line note `//* */` first, or `//` would take only its first line
-COMMENT = re.compile(r"//\*.*?\*/|/\*.*?\*/|//[^\n]*", re.DOTALL)
+# strings first, so `"http://x"` is not a comment; multi-line note `//* */` before `//`, or `//` would take only its first line
+COMMENT = re.compile(r'"(?:\\.|[^"\\])*"|//\*.*?\*/|/\*.*?\*/|//[^\n]*', re.DOTALL)
 # reStructuredText inline markup; doc text is plain text, so these are escaped
 RST_INLINE = re.compile(r"([\\*`_|])")
 
@@ -60,7 +60,12 @@ def source_locations(model_files):
     for path in model_files:
         # blank out comments (keeping newlines, so line numbers hold): a short name mentioned in a comment is not its declaration
         text = COMMENT.sub(
-            lambda m: re.sub(r"[^\n]", " ", m.group()), Path(path).read_text()
+            lambda m: (
+                m.group()
+                if m.group().startswith('"')
+                else re.sub(r"[^\n]", " ", m.group())
+            ),
+            Path(path).read_text(),
         )
         for lineno, line in enumerate(text.splitlines(), 1):
             for quoted, plain in re.findall(r"<'([^']+)'>|<([A-Za-z_][\w-]*)>", line):

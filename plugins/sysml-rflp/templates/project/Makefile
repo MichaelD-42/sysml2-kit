@@ -5,8 +5,9 @@ TEST_REPORTS ?= test-reports
 SPHINXBUILD  ?= sphinx-build
 # `make docs STRICT=` reports RFLP rule violations without failing (layer-by-layer work)
 STRICT       ?= -W --keep-going
-# sysmlv2-cli fork (sequence-expression fix, find/relations MCP tools); `make tools` installs its main
+# sysmlv2-cli fork (sequence-expression fix, find/relations MCP tools), pinned to a tag so every install gets the same checker
 SYSML_GIT     = https://github.com/MichaelD-42/sysml-v2-rs
+SYSML_TAG     = v0.1.4-kit.1
 
 MODEL    := $(shell find model -name '*.sysml' | sort)
 # make splits file names on spaces, so `my part.sysml` would become two missing files
@@ -24,7 +25,7 @@ DIAGRAMS :=
 all: lint docs
 
 tools:
-	cargo install --locked --git $(SYSML_GIT) --branch main sysmlv2-cli
+	cargo install --locked --git $(SYSML_GIT) --tag $(SYSML_TAG) sysmlv2-cli
 	pip install -r requirements.txt
 
 lint:

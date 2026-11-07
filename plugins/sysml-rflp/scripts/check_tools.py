@@ -7,7 +7,7 @@ from pathlib import Path
 
 project = Path(os.environ.get("CLAUDE_PROJECT_DIR", "."))
 nested = [trace.parent.parent for trace in project.glob("*/model/trace.sysml")]
-if not (project / "model").is_dir():
+if not (project / "model/trace.sysml").is_file():
     if not nested:
         sys.exit(0)
     # the plugin starts `sysml mcp --project model`, relative to where Claude was started

@@ -2,6 +2,8 @@
 
 from xml.sax.saxutils import escape
 
+from .needs import refs
+
 FONT = 'font-family="Arial, Helvetica, sans-serif" font-size="12"'
 CHAR_W = 7  # approximate width of one 12px Arial character
 STYLE = """<style>
@@ -41,20 +43,17 @@ def use_cases(elements):
     by_id = {e["@id"]: e for e in elements}
 
     def member(membership):
-        target = membership.get("ownedMemberElement") or membership.get(
-            "ownedRelatedElement"
+        targets = refs(membership, "ownedMemberElement") or refs(
+            membership, "ownedRelatedElement"
         )
-        target = target[0] if isinstance(target, list) and target else target
-        return by_id.get(target["@id"], {}) if target else {}
+        return by_id.get(targets[0], {}) if targets else {}
 
     def member_name(membership):
         return member(membership).get("name")
 
     def subject_key(membership):
         subject = member(membership)
-        types = subject.get("type") or []
-        types = types if isinstance(types, list) else [types]
-        typed = [by_id[t["@id"]] for t in types if t["@id"] in by_id]
+        typed = [by_id[t] for t in refs(subject, "type") if t in by_id]
         return subject.get("name"), (
             typed[0].get("qualifiedName") or typed[0].get("name") if typed else None
         )
@@ -63,9 +62,7 @@ def use_cases(elements):
     for e in elements:
         if e["@type"] not in ("UseCaseUsage", "UseCaseDefinition"):
             continue
-        memberships = [
-            by_id[m["@id"]] for m in e.get("ownedMembership", []) if m["@id"] in by_id
-        ]
+        memberships = [by_id[m] for m in refs(e, "ownedMembership") if m in by_id]
         name, type_ = next(
             (subject_key(m) for m in memberships if m["@type"] == "SubjectMembership"),
             (None, None),
