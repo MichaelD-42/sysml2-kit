@@ -55,7 +55,7 @@ Prefix package names with the system name; `UseCases`, `Requirements` and simila
 
 "Leaf" means no child of the same type (a component that owns only ports is a leaf).
 
-## Writing quality (reviewer checks these; the build does not)
+## Writing quality (the reviewer checks these; `sysml2kit` warns on an SR without exactly one `shall` or with TBD, etc., as appropriate, user-friendly, fast)
 
 - **CRS** are the customer's words. Do not rewrite them; ask when one is ambiguous.
 - **UC**: verb phrase from the actor's view (`commute`, `transportOnTrailer`), with subject and actors.

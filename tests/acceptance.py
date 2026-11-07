@@ -249,11 +249,39 @@ def hook(work):
         )
 
     broken, other = run(target), run(work / "docs/index.rst")
-    return report(
+    failed = report(
         "lint hook reports a broken model with exit 2",
         broken.returncode == 2 and "propell` resolves to nothing" in broken.stderr,
         f"exit {broken.returncode}: {broken.stderr}",
     ) + report("lint hook ignores non-SysML files", other.returncode == 0, other.stderr)
+    original = target.read_text().replace(
+        "operateVehicle.propell", "operateVehicle.propel"
+    )
+    target.write_text(original)
+    clean = run(target)
+    failed += report(
+        "lint hook passes a clean model", clean.returncode == 0, clean.stderr
+    )
+    target.write_text(original.replace("<'LC-005'> chassis", "<'LC-004'> chassis"))
+    duplicate = run(target)
+    failed += report(
+        "lint hook reports a bridge error (duplicate id) that `sysml check` accepts",
+        duplicate.returncode == 2 and "duplicate id LC-004" in duplicate.stderr,
+        f"exit {duplicate.returncode}: {duplicate.stderr}",
+    )
+    target.write_text(original)
+    requirements = work / "model/requirements/system_requirements.sysml"
+    replace(
+        "model/requirements/system_requirements.sysml",
+        "shall not exceed 1800 kg",
+        "shall be TBD",
+    )(work)
+    vague = run(requirements)
+    return failed + report(
+        "lint hook reports a vague requirement text",
+        vague.returncode == 2 and "SR-003" in vague.stderr and "'TBD'" in vague.stderr,
+        f"exit {vague.returncode}: {vague.stderr}",
+    )
 
 
 if __name__ == "__main__":

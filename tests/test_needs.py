@@ -1,7 +1,7 @@
 import tempfile
 import unittest
 
-from sysml2kit.needs import BridgeError, convert, source_locations
+from sysml2kit.needs import BridgeError, convert, source_locations, text_findings
 
 
 def el(id_, type_, short=None, name=None, owner=None, **fields):
@@ -184,6 +184,38 @@ class ConvertTest(unittest.TestCase):
             needs_of(model(doc=doc))["SR-1"]["content"],
             r"See note\_ and \*all \| \`x\` \\ y.",
         )
+
+
+class TextFindingsTest(unittest.TestCase):
+    def findings(self, text, type_="sysreq"):
+        need = {"id": "SR-1", "type": type_, "content": text, "source": "m.sysml:3"}
+        return text_findings({"SR-1": need})
+
+    def test_one_shall_and_no_vague_terms_is_clean(self):
+        self.assertEqual(
+            self.findings("The vehicle shall drive 120 km; faster is fine."), []
+        )
+
+    def test_shall_count(self):
+        self.assertEqual(
+            self.findings("The vehicle drives 120 km."),
+            ["SR-1 (m.sysml:3): 0 'shall' in the text; state exactly one"],
+        )
+        self.assertIn("2 'shall'", self.findings("It shall go and shall stop.")[0])
+
+    def test_vague_terms(self):
+        self.assertEqual(
+            self.findings("It shall be fast, user-friendly, etc. and TBD."),
+            [
+                "SR-1 (m.sysml:3): vague term 'etc.'",
+                "SR-1 (m.sysml:3): vague term 'fast'",
+                "SR-1 (m.sysml:3): vague term 'TBD'",
+                "SR-1 (m.sysml:3): vague term 'user-friendly'",
+            ],
+        )
+
+    def test_only_system_requirements_are_checked(self):
+        self.assertEqual(self.findings("Drives fast.", "function"), [])
 
 
 class SourceLocationsTest(unittest.TestCase):

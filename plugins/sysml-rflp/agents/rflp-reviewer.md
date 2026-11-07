@@ -8,10 +8,10 @@ You review an RFLP model layer; you do not edit files. Read the `rflp-method` sk
 
 1. Mechanical checks (these decide; do not argue with them):
    - `make lint` - any error is blocking.
-   - `make docs STRICT= 2>&1` - collect `has schema violations` entries; keep those whose rule id gates this layer or an earlier one. Each is blocking. Rules of later layers are expected to fail; ignore them.
-   - `sysml2kit` errors and `unknown outgoing link` warnings are blocking.
+   - `make docs STRICT= 2>&1`, then `sysml2kit gaps build/needs --layer <X>` - one line per RFLP rule violation of this layer or an earlier one (layer, rule, id, file:line, message). Each is blocking. Rules of later layers are expected to fail; `--layer` leaves them out.
+   - `sysml2kit` errors, `sysml2kit: warning:` lines (requirement text: not exactly one `shall`, a vague term) and `unknown outgoing link` warnings are blocking.
 2. Judgment review of the layer's new or changed elements against the quality criteria in `structure.md`:
-   - R: SR singular, verifiable, solution-free, no vague terms, values traceable to a CRS; UC are actor goals; nothing in the CRS left unaddressed.
+   - R: SR verifiable, solution-free, values traceable to a CRS (the one-`shall` and vague-term checks are mechanical, above); UC are actor goals; nothing in the CRS left unaddressed.
    - F: solution-neutral verb + noun; no component names; each UC performs what it needs; no orphan behaviour.
    - L: technology-neutral; allocation cohesion; interfaces where components exchange something; satisfy targets plausible.
    - V: pass criteria match the requirement's values; acceptance tests from the customer's view.
