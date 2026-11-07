@@ -194,6 +194,17 @@ class SourceLocationsTest(unittest.TestCase):
             source_locations([f.name]), {"B-001": f"{f.name}:2", "p1": f"{f.name}:3"}
         )
 
+    def test_mentions_in_comments_are_not_declarations(self):
+        files = []
+        for text in (
+            "package Trace {\n    doc /*\n     * e.g. use case <'UC-001'> x;\n     */\n    // or <'UC-001'>\n}\n",
+            "package U {\n\n    use case <'UC-001'> commute;\n}\n",
+        ):
+            with tempfile.NamedTemporaryFile("w", suffix=".sysml", delete=False) as f:
+                f.write(text)
+            files.append(f.name)
+        self.assertEqual(source_locations(files), {"UC-001": f"{files[1]}:3"})
+
 
 if __name__ == "__main__":
     unittest.main()

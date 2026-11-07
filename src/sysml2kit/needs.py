@@ -33,6 +33,7 @@ TRACE_METADATA = {
     "Trace::Realizes": "realizes",
     "Trace::Verifies": "verifies",
 }
+COMMENT = re.compile(r"/\*.*?\*/|//[^\n]*", re.S)
 # reStructuredText inline markup; doc text is plain text, so these are escaped
 RST_INLINE = re.compile(r"([\\*`_|])")
 
@@ -56,7 +57,11 @@ def source_locations(model_files):
     """Map short name -> 'file:line'. The export carries no source positions, so find `<'ID'>` in the text."""
     locations = {}
     for path in model_files:
-        for lineno, line in enumerate(Path(path).read_text().splitlines(), 1):
+        # blank out comments (keeping newlines, so line numbers hold): a short name mentioned in a comment is not its declaration
+        text = COMMENT.sub(
+            lambda m: re.sub(r"[^\n]", " ", m.group()), Path(path).read_text()
+        )
+        for lineno, line in enumerate(text.splitlines(), 1):
             for quoted, plain in re.findall(r"<'([^']+)'>|<([A-Za-z_][\w-]*)>", line):
                 locations.setdefault(quoted or plain, f"{path}:{lineno}")
     return locations
