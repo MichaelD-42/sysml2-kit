@@ -5,7 +5,7 @@ on:
 
 env:
   SYSML_GIT: https://github.com/MichaelD-42/sysml-v2-rs
-  SYSML_REV: f54fbdeab358e1630bc2e7dc6182ee25ddf8088b
+  SYSML_REV: f55ffbaaa1f107cc78bdd3a1f6003205050eb7e9
 
 jobs:
   unit:

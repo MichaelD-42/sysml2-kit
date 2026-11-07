@@ -7,7 +7,7 @@ SPHINXBUILD  ?= sphinx-build
 STRICT       ?= -W --keep-going
 # sysmlv2-cli fork with the sequence-expression fix (keeps every need in @Realizes { need = ("A", "B"); })
 SYSML_GIT     = https://github.com/MichaelD-42/sysml-v2-rs
-SYSML_REV     = f54fbdeab358e1630bc2e7dc6182ee25ddf8088b
+SYSML_REV     = f55ffbaaa1f107cc78bdd3a1f6003205050eb7e9
 
 MODEL    := $(shell find model -name '*.sysml' | sort)
 RESULTS  := $(wildcard test-results/*.xml)
