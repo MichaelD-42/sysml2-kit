@@ -33,7 +33,7 @@ Need types, link types, fields and the RFLP rules live in `docs/ubproject.toml` 
 
 | Tool | Version | Role |
 |---|---|---|
-| `sysml` (sysmlv2-cli) | fork [MichaelD-42/sysml-v2-rs](https://github.com/MichaelD-42/sysml-v2-rs) at `f54fbde` (0.1.4 + fix) | parse, resolve, validate, export, internal diagrams, MCP server |
+| `sysml` (sysmlv2-cli) | fork [MichaelD-42/sysml-v2-rs](https://github.com/MichaelD-42/sysml-v2-rs) `main` (0.1.4 + fixes, `find`/`relations` MCP tools) | parse, resolve, validate, export, internal diagrams, MCP server |
 | sphinx-needs | 9.2.0 | needs, links, schema rules |
 | ub-test-reports | 2.0.0 | JUnit → needs |
 | sysml2kit | this repo | export → needs, use case and trace diagrams |

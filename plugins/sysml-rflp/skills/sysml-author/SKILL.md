@@ -5,7 +5,7 @@ description: Create and change SysML v2 models (.sysml files) - use cases, requi
 
 # SysML v2 authoring
 
-`references/patterns.sysml` is a checked example of every construct the pipeline maps; copy from it. The `sysml` MCP server answers syntax and name questions: `notation` (how to write a construct), `visible_names` (what resolves at a point), `outline`, `library_search`, `check`.
+`references/patterns.sysml` is a checked example of every construct the pipeline maps; copy from it. The `sysml` MCP server answers syntax and name questions: `notation` (how to write a construct), `visible_names` (what resolves at a point), `outline`, `library_search`, `check`. To read an existing model, use `find` (elements by kind, namespace, name, or a relation they lack: `kind: RequirementUsage, without: verifies`) and `relations` (every link of one element both ways, by qualified or short name) instead of opening files.
 
 ## Conventions
 
