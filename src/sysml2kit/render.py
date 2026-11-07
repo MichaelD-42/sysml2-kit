@@ -33,15 +33,31 @@ def _text(x, y, text, cls="", anchor="middle"):
 
 
 def use_cases(elements):
-    """[(subject name, [(use case need id, name, [actor names])])] from SysML interchange JSON."""
+    """[(subject title, [(use case need id, name, [actor names])])] from SysML interchange JSON.
+
+    Use cases are grouped by subject name and type: untyped `subject vehicle;` in several use
+    cases is one subject, while `vehicle : Car` and `vehicle : Truck` are two, titled with their type.
+    """
     by_id = {e["@id"]: e for e in elements}
 
-    def member_name(membership):
+    def member(membership):
         target = membership.get("ownedMemberElement") or membership.get(
             "ownedRelatedElement"
         )
         target = target[0] if isinstance(target, list) and target else target
-        return by_id.get(target["@id"], {}).get("name") if target else None
+        return by_id.get(target["@id"], {}) if target else {}
+
+    def member_name(membership):
+        return member(membership).get("name")
+
+    def subject_key(membership):
+        subject = member(membership)
+        types = subject.get("type") or []
+        types = types if isinstance(types, list) else [types]
+        typed = [by_id[t["@id"]] for t in types if t["@id"] in by_id]
+        return subject.get("name"), (
+            typed[0].get("qualifiedName") or typed[0].get("name") if typed else None
+        )
 
     subjects = {}
     for e in elements:
@@ -50,17 +66,11 @@ def use_cases(elements):
         memberships = [
             by_id[m["@id"]] for m in e.get("ownedMembership", []) if m["@id"] in by_id
         ]
-        subject = (
-            next(
-                (
-                    member_name(m)
-                    for m in memberships
-                    if m["@type"] == "SubjectMembership"
-                ),
-                None,
-            )
-            or "system"
+        name, type_ = next(
+            (subject_key(m) for m in memberships if m["@type"] == "SubjectMembership"),
+            (None, None),
         )
+        subject = (name or "system", type_)
         actors = [
             member_name(m) for m in memberships if m["@type"] == "ActorMembership"
         ]
@@ -72,7 +82,12 @@ def use_cases(elements):
                 [a for a in actors if a],
             )
         )
-    return sorted((s, sorted(ucs)) for s, ucs in subjects.items())
+    names = [name for name, _ in subjects]
+    # the type goes into the title only where the name alone would merge two subjects
+    return sorted(
+        (f"{name} : {type_}" if type_ and names.count(name) > 1 else name, sorted(ucs))
+        for (name, type_), ucs in subjects.items()
+    )
 
 
 def use_case_svg(subject, cases):

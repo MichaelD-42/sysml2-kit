@@ -1,4 +1,4 @@
 sphinx==9.1.1
 sphinx-needs==9.2.0
 ub-test-reports==2.0.0
-sysml2kit @ git+https://github.com/MichaelD-42/sysml2-kit@v0.1.0
+sysml2kit @ git+https://github.com/MichaelD-42/sysml2-kit@v0.1.1

@@ -14,8 +14,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
-from sysml2kit.needs import BridgeError, convert  # noqa: E402
-from sysml2kit.render import use_case_svg, use_cases  # noqa: E402
+from sysml2kit.needs import BridgeError, convert
+from sysml2kit.render import use_case_svg, use_cases
 
 RELEASE_TAG = "2026-09.1"
 SYSML = os.environ.get("SYSML", "sysml")
@@ -45,6 +45,7 @@ def main():
         root = release / "sysml" / "src" / folder
         check = subprocess.run(
             [SYSML, "--color", "never", "check", str(root)],
+            check=False,
             capture_output=True,
             text=True,
         )
@@ -58,7 +59,7 @@ def main():
         failures += not ok
         files = sorted(str(p) for p in root.rglob("*.sysml"))
         export = subprocess.run(
-            [SYSML, "export", *files], capture_output=True, text=True
+            [SYSML, "export", *files], check=False, capture_output=True, text=True
         )
         if export.returncode != 0:
             print(f"FAIL export {folder}: {export.stderr[-500:]}")

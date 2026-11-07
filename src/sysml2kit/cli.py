@@ -13,14 +13,21 @@ from .render import trace_svg, use_case_svg, use_cases
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="sysml2kit", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    p = sub.add_parser("needs", help="interchange JSON (`sysml export`) -> sphinx-needs needs.json")
+    p = sub.add_parser(
+        "needs", help="interchange JSON (`sysml export`) -> sphinx-needs needs.json"
+    )
     p.add_argument("export")
     p.add_argument("output")
-    p.add_argument("model_files", nargs="+", help="the .sysml files, for source locations")
+    p.add_argument(
+        "model_files", nargs="+", help="the .sysml files, for source locations"
+    )
     p = sub.add_parser("usecases", help="one use case diagram SVG per subject")
     p.add_argument("export")
     p.add_argument("output_dir")
-    p = sub.add_parser("trace", help="RFLP trace graph SVG from a sphinx-needs needs.json (`sphinx-build -b needs`)")
+    p = sub.add_parser(
+        "trace",
+        help="RFLP trace graph SVG from a sphinx-needs needs.json (`sphinx-build -b needs`)",
+    )
     p.add_argument("needs_json")
     p.add_argument("output")
     args = parser.parse_args(argv)

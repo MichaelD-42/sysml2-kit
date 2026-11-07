@@ -1,13 +1,25 @@
-"""SessionStart: in an RFLP project, say which pipeline tools are missing (silent when all are there)."""
+"""SessionStart: in an RFLP project, say which pipeline tools are missing and whether the MCP server can see the model."""
+
 import os
 import shutil
 import sys
 from pathlib import Path
 
 project = Path(os.environ.get("CLAUDE_PROJECT_DIR", "."))
-if not (project / "model").is_dir() and not list(project.glob("*/model/trace.sysml")):
-    sys.exit(0)
-missing = [tool for tool in ("sysml", "sysml2kit", "test-reports", "sphinx-build") if not shutil.which(tool)]
+nested = [trace.parent.parent for trace in project.glob("*/model/trace.sysml")]
+if not (project / "model").is_dir():
+    if not nested:
+        sys.exit(0)
+    # the plugin starts `sysml mcp --project model`, relative to where Claude was started
+    print(
+        f"sysml-rflp: the model is in a subdirectory; start Claude in {' or '.join(map(str, nested))} "
+        "so the sysml MCP server (find, relations, outline) sees it."
+    )
+missing = [
+    tool
+    for tool in ("sysml", "sysml2kit", "test-reports", "sphinx-build")
+    if not shutil.which(tool)
+]
 if missing:
     print(
         f"sysml-rflp: missing on PATH: {', '.join(missing)}. "

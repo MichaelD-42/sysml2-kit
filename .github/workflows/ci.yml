@@ -15,6 +15,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: PYTHONPATH=src python -m unittest discover -s tests
+      - run: pip install ruff==0.17.4 && ruff check . && ruff format --check .
 
   plugin:
     runs-on: ubuntu-24.04
@@ -27,7 +28,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       # track the fork main; key the cache on the commit it is at now, so a new commit rebuilds
-      - run: echo "SYSML_REV=$(git ls-remote "$SYSML_GIT" refs/heads/main | cut -f1)" >> "$GITHUB_ENV"
+      - run: rev=$(git ls-remote "$SYSML_GIT" refs/heads/main | cut -f1) && test -n "$rev" && echo "SYSML_REV=$rev" >> "$GITHUB_ENV"
       - id: cache
         uses: actions/cache@v4
         with:
