@@ -9,7 +9,7 @@ SVG = "{http://www.w3.org/2000/svg}"
 
 
 def need(type_, **links):
-    return {"type": type_, "title": type_, **links}
+    return {"type": type_, "title": type_, "docname": "model", **links}
 
 
 def segments(d):
@@ -51,11 +51,30 @@ class TraceSvgTest(unittest.TestCase):
     def test_every_link_is_drawn(self):
         self.assertEqual(len(self.edges()), 6)
 
+    def test_each_box_links_to_its_need(self):
+        links = {
+            a.get("href"): [t.text for t in a.iter(f"{SVG}text")]
+            for a in self.root.iter(f"{SVG}a")
+        }
+        self.assertEqual(len(links), len(self.NEEDS))
+        self.assertEqual(links["model.html#SR-001"][0], "SR-001")
+
+    def test_a_need_without_a_page_is_not_linked(self):
+        needs = {
+            "CRS-001": {**need("crs"), "docname": "customer/requirements"},
+            "X-1": {**need("crs"), "docname": None},
+        }
+        root = ET.fromstring(trace_svg(needs))
+        self.assertEqual(
+            [a.get("href") for a in root.iter(f"{SVG}a")],
+            ["customer/requirements.html#CRS-001"],
+        )
+
     def test_routed_edges_never_run_through_a_box(self):
         boxes = [
             tuple(float(r.get(k)) for k in ("x", "y", "width", "height"))
             for r in self.root.iter(f"{SVG}rect")
-            if r.get("class") == "box"
+            if r.get("class") == "s2k-box"
         ]
         routed = [d for d in self.edges() if "C" not in d]
         self.assertTrue(routed, "the fixture must contain an edge that skips a column")
@@ -110,6 +129,9 @@ class UseCaseSvgTest(unittest.TestCase):
             ["UC-001", "commute", "driver", "vehicle"],
         )
         self.assertEqual(len(list(root.iter(f"{SVG}ellipse"))), 1)
+        link = next(root.iter(f"{SVG}a"))
+        self.assertEqual(link.get("href"), "#UC-001")
+        self.assertEqual(len(list(link.iter(f"{SVG}ellipse"))), 1)
 
     def test_use_cases_without_an_id_are_still_drawn(self):
         elements = [
@@ -122,6 +144,7 @@ class UseCaseSvgTest(unittest.TestCase):
         )
         root = ET.fromstring(use_case_svg(*cases[0]))
         self.assertEqual(len(list(root.iter(f"{SVG}ellipse"))), 2)
+        self.assertEqual(list(root.iter(f"{SVG}a")), [], "no id, nothing to link to")
 
     def test_subjects_with_one_name_but_different_types_get_separate_diagrams(self):
         def case(uc, subject, type_id=None):

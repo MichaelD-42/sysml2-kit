@@ -22,7 +22,7 @@ It is not a modeling GUI and it does not simulate. The physical layer (software,
 ## What you get
 
 - **Plugin `sysml-rflp`** ([`plugins/sysml-rflp/`](plugins/sysml-rflp)): skills to scaffold (`sysml-init`), author (`sysml-author`), lint (`sysml-lint`) and document (`sysml-docs`) a model, and to run the RFLP workflow (`rflp`, `rflp-method`). There is an agent per layer plus a reviewer, a hook that runs `sysml check` after every edit, a session-start check for missing tools, the `sysml` MCP server, and a project template.
-- **Python package `sysml2kit`** ([`src/`](src/sysml2kit)): turns `sysml export` JSON into sphinx-needs needs, and renders use case diagrams and the RFLP trace graph as SVG. Standard library only.
+- **Python package `sysml2kit`** ([`src/`](src/sysml2kit)): turns `sysml export` JSON into sphinx-needs needs, and renders use case diagrams and the RFLP trace graph as SVG, where a click on an element opens its need in the docs. Standard library only.
 - **Example [`examples/vehicle/`](examples/vehicle)**: a complete chain from CRS to test results, and the acceptance fixture for the toolkit.
 
 The docs build is the traceability report. Need tables, the trace graph and internal diagrams come out of the model, and `sphinx-build -W` fails on any RFLP rule the model breaks: a customer requirement nothing satisfies, a function allocated to no component, a requirement no test verifies.

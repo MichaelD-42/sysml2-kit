@@ -6,8 +6,8 @@ Generated from ``model/**/*.sysml``. Change the model, not this page.
 Use cases
 ---------
 
-.. image:: _generated/usecases-vehicle.svg
-   :alt: Use cases of the vehicle
+.. raw:: html
+   :file: _generated/usecases-vehicle.svg
 
 Functional architecture
 -----------------------

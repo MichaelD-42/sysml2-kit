@@ -1,8 +1,9 @@
 Traceability
 ============
 
-.. image:: _generated/trace.svg
-   :alt: RFLP trace graph
+.. inlined, not an image: click a box to go to its need
+.. raw:: html
+   :file: _generated/trace.svg
 
 Customer requirements
 ---------------------

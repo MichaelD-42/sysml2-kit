@@ -147,12 +147,11 @@ def main():
         "SR-003 shows its system test": re.search(
             r'id="SR-003".*?verified by.*?STC-003', html, re.DOTALL
         ),
-        "diagrams are embedded": all(
-            f"_images/{n}.svg" in html
-            for n in ("usecases-vehicle", "vehicle", "operateVehicle")
+        "internal diagrams are embedded": all(
+            f"_images/{n}.svg" in html for n in ("vehicle", "operateVehicle")
         ),
-        "trace graph is embedded": "_images/trace.svg"
-        in (work / "docs/_build/html/traceability.html").read_text(),
+        "use cases link to their needs": 'href="#UC-001"' in html,
+        **links_resolve(work / "docs/_build/html"),
     }
     for name, ok in checks.items():
         print(f"{'ok  ' if ok else 'FAIL'} baseline: {name}")
@@ -165,6 +164,23 @@ def main():
             failures += 1
             print(f"     exit {code}; expected /{expected}/ in output:\n{out[-2000:]}")
     return 1 if failures + incremental(work) + hook(work) else 0
+
+
+def links_resolve(html_dir):
+    """The inlined trace graph links every box to an anchor that exists on its page."""
+    page = (html_dir / "traceability.html").read_text()
+    links = re.findall(
+        r'<a href="([^"#]+\.html)#([^"]+)">\s*<rect class="s2k-box"', page
+    )
+    dead = [
+        f"{doc}#{need}"
+        for doc, need in links
+        if f'id="{need}"' not in (html_dir / doc).read_text()
+    ]
+    return {
+        f"trace graph links {len(links)} needs, none dead {dead}": len(links) > 20
+        and not dead
+    }
 
 
 def report(name, ok, detail=""):
@@ -188,7 +204,7 @@ def incremental(work):
         "a renamed subject's old diagram is gone, so the page pointing at it fails",
         result.returncode != 0
         and "usecases-vehicle.svg" in out
-        and "not readable" in out,
+        and "No such file or directory" in out,
         out,
     )
     use_cases.write_text(original)

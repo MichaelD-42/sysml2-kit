@@ -21,7 +21,7 @@ description: Build the sphinx-needs documentation from the SysML model, report R
 
 - Use case diagrams are generated per subject: `docs/_generated/usecases-<subject>.svg`.
 - Internal structure of a usage tree (functions grouped by use case, components with ports and connections): add its qualified name to `DIAGRAMS` in the `Makefile` → `docs/_generated/<name>.svg`.
-- Embed with `.. image:: _generated/<file>.svg` and an `:alt:` in `docs/model.rst`.
+- Embed in `docs/model.rst`: use case diagrams with `.. raw:: html` and `:file: _generated/usecases-<subject>.svg`, so each use case links to its need (an `.. image::` would make the links dead); internal diagrams with `.. image:: _generated/<name>.svg` and an `:alt:`.
 
 ## Test results
 
