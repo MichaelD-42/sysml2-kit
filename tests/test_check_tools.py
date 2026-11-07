@@ -33,7 +33,14 @@ class CheckToolsTest(unittest.TestCase):
     def test_a_model_at_the_root_needs_no_hint(self):
         with tempfile.TemporaryDirectory() as root:
             (Path(root) / "model").mkdir()
+            (Path(root) / "model/trace.sysml").write_text("package Trace;\n")
             self.assertNotIn("start Claude in", run(root))
+
+    def test_a_model_directory_without_sysml_is_not_an_rflp_project(self):
+        with tempfile.TemporaryDirectory() as root:
+            (Path(root) / "model").mkdir()
+            (Path(root) / "model/user.py").write_text("class User: ...\n")
+            self.assertEqual(run(root), "")
 
 
 if __name__ == "__main__":

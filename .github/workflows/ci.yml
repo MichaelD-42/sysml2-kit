@@ -27,15 +27,16 @@ jobs:
   sysml:
     runs-on: ubuntu-24.04
     steps:
-      # track the fork main; key the cache on the commit it is at now, so a new commit rebuilds
-      - run: rev=$(git ls-remote "$SYSML_GIT" refs/heads/main | cut -f1) && test -n "$rev" && echo "SYSML_REV=$rev" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      # build the tag the template pins, so CI tests what `make tools` installs
+      - run: tag=$(sed -n 's/^SYSML_TAG *= *//p' plugins/sysml-rflp/templates/project/Makefile) && test -n "$tag" && echo "SYSML_TAG=$tag" >> "$GITHUB_ENV"
       - id: cache
         uses: actions/cache@v4
         with:
           path: ~/.cargo/bin/sysml
-          key: sysml-${{ env.SYSML_REV }}-${{ runner.os }}
+          key: sysml-${{ env.SYSML_TAG }}-${{ runner.os }}
       - if: steps.cache.outputs.cache-hit != 'true'
-        run: cargo install --locked --git "$SYSML_GIT" --rev "$SYSML_REV" sysmlv2-cli
+        run: cargo install --locked --git "$SYSML_GIT" --tag "$SYSML_TAG" sysmlv2-cli
       - uses: actions/upload-artifact@v4
         with: { name: sysml, path: ~/.cargo/bin/sysml }
 

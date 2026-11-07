@@ -15,13 +15,13 @@ The <code>.sysml</code> files are the model; sphinx-needs is where traceability 
 
 SysML v2 was adopted in 2025, so a language model asked to write it produces something that looks right and names things that do not exist. And a model on its own does not tell you whether every customer requirement ends up satisfied by a component and verified by a test. sysml2-kit closes both gaps. Agents write the model with a checker in the loop, a hook lints every `.sysml` file they edit, and the model is exported into sphinx-needs, where the RFLP rules (Requirements → Functional → Logical) fail the docs build when a link is missing.
 
-The method is fixed and documented: customer requirements (CRS) → use cases and system requirements (UC/SR) → functions (F) → logical components (LC) → system and acceptance tests (STC/ATC) → test results. Each layer has its own agent, and the workflow stops for your approval between layers.
+The method is fixed and documented: customer requirements (CRS) → use cases and system requirements (UC/SR) → functions (F) → logical components (LC) → system and acceptance tests (STC/ATC) → test results. Each layer has its own agent, and the workflow stops for your approval between layers. Terms and abbreviations are in the [glossary](glossary.md).
 
 It is not a modeling GUI and it does not simulate. The physical layer (software, hardware, code) stays out of the SysML model; it lives in sphinx-needs next to the code. The toolchain is Python and Rust only, with no Java or Eclipse.
 
 ## What you get
 
-- **Plugin `sysml-rflp`** ([`plugins/sysml-rflp/`](plugins/sysml-rflp)): skills to scaffold (`sysml-init`), author (`sysml-author`), lint (`sysml-lint`) and document (`sysml-docs`) a model, and to run the RFLP workflow (`rflp`, `rflp-method`). There is an agent per layer plus a reviewer, a hook that runs `sysml check` after every edit, the `sysml` MCP server, and a project template.
+- **Plugin `sysml-rflp`** ([`plugins/sysml-rflp/`](plugins/sysml-rflp)): skills to scaffold (`sysml-init`), author (`sysml-author`), lint (`sysml-lint`) and document (`sysml-docs`) a model, and to run the RFLP workflow (`rflp`, `rflp-method`). There is an agent per layer plus a reviewer, a hook that runs `sysml check` after every edit, a session-start check for missing tools, the `sysml` MCP server, and a project template.
 - **Python package `sysml2kit`** ([`src/`](src/sysml2kit)): turns `sysml export` JSON into sphinx-needs needs, and renders use case diagrams and the RFLP trace graph as SVG. Standard library only.
 - **Example [`examples/vehicle/`](examples/vehicle)**: a complete chain from CRS to test results, and the acceptance fixture for the toolkit.
 
@@ -46,14 +46,14 @@ relations  { "element": "SR-001" }
 
 ## Quick start
 
-You need Rust (cargo) and Python 3.10+. In Claude Code:
+You need Rust (cargo), Python 3.10+ and make. In Claude Code:
 
 ```text
 /plugin marketplace add MichaelD-42/sysml2-kit
 /plugin install sysml-rflp@sysml2-kit
 ```
 
-Then ask Claude to set up a SysML project. `sysml-init` scaffolds the pipeline, and `make tools` installs the `sysml` CLI (built with cargo from the fork's `main`) and the Python requirements (Sphinx, sphinx-needs, ub-test-reports, sysml2kit). Add customer requirements and ask for the RFLP workflow; `make all` builds the docs and checks the rules.
+Then ask Claude to set up a SysML project. `sysml-init` scaffolds the pipeline, and `make tools` installs the `sysml` CLI (built with cargo from the fork at the tag the Makefile pins) and the Python requirements (Sphinx, sphinx-needs, ub-test-reports, sysml2kit). Add customer requirements and ask for the RFLP workflow; `make all` builds the docs and checks the rules.
 
 ## Pipeline
 
@@ -71,13 +71,13 @@ Need types, link types, fields and the RFLP rules live in `docs/ubproject.toml` 
 
 ### What `sysml export` gives the bridge
 
-A flat JSON array of elements with `@type`, `@id` and every metamodel property; references are `{"@id": ...}`. `sysml2kit needs` reads `declaredShortName` (not `shortName`, which implicit features inherit), `name`, `qualifiedName`, `owner`, `documentation`; `SatisfyRequirementUsage.satisfyingFeature/satisfiedRequirement`; `Verification*.verifiedRequirement`; `AllocationUsage.relatedFeature` (`[source, target]`); `PerformActionUsage` → `ReferenceSubsetting.referencedFeature`; `MetadataUsage` typed by `Trace::Realizes/Satisfies/Verifies` and the string literals under it. The export has no source positions; the bridge finds `<'ID'>` in the model text.
+A flat JSON array of elements with `@type`, `@id` and every metamodel property; references are `{"@id": ...}`. `sysml2kit needs` reads `declaredShortName` (not `shortName`, which implicit features inherit), `name`, `qualifiedName`, `owner`, `documentation`; `SatisfyRequirementUsage.satisfyingFeature/satisfiedRequirement`; `Verification*.verifiedRequirement`; `AllocationUsage.relatedFeature` (`[source, target]`); `PerformActionUsage` → `ReferenceSubsetting.referencedFeature`; `MetadataUsage` typed by `Trace::Realizes/Satisfies/Verifies` and the string literals under it. The export has no source positions; the bridge finds `<'ID'>` in the model text, skipping comments and string literals.
 
 ## Tools and versions
 
 | Tool | Version | Role |
 |---|---|---|
-| `sysml` (sysmlv2-cli) | fork [MichaelD-42/sysml-v2-rs](https://github.com/MichaelD-42/sysml-v2-rs) `main` (0.1.4 + fixes, `find`/`relations` MCP tools) | parse, resolve, validate, export, internal diagrams, MCP server |
+| `sysml` (sysmlv2-cli) | fork [MichaelD-42/sysml-v2-rs](https://github.com/MichaelD-42/sysml-v2-rs) tag `v0.1.4-kit.1` (0.1.4 + fixes, `find`/`relations` MCP tools) | parse, resolve, validate, export, internal diagrams, MCP server |
 | sphinx-needs | 9.2.0 | needs, links, schema rules |
 | ub-test-reports | 2.0.0 | JUnit → needs |
 | sysml2kit | this repo | export → needs, use case and trace diagrams |
@@ -101,7 +101,7 @@ There is no OMG Pilot Implementation gate (Java/Eclipse is out); the corpus run 
 - Its built-in standard library is 2026-05, not the 2026-09.1 release.
 - No derive/refine mapping: SysML v2 has no `refine` keyword.
 - ubCode support for `network_back` schema rules is untested here.
-- `make tools` and CI follow the fork's `main`, so a push there changes what every build installs.
+- `make tools` and CI build the fork tag in `SYSML_TAG`. To take a newer fork commit, tag it, change `SYSML_TAG` in both Makefiles and release; CI reads the tag from the template Makefile.
 
 ## Development
 
