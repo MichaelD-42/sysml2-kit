@@ -9,6 +9,8 @@ STRICT       ?= -W --keep-going
 SYSML_GIT     = https://github.com/MichaelD-42/sysml-v2-rs
 
 MODEL    := $(shell find model -name '*.sysml' | sort)
+# make splits file names on spaces, so `my part.sysml` would become two missing files
+$(if $(shell find model -name '*.sysml' -name '* *'),$(error model file names must not contain spaces; rename: $(shell find model -name '*.sysml' -name '* *')))
 RESULTS  := $(wildcard test-results/*.xml)
 GEN      := docs/_generated
 # Usages whose internal structure is drawn, by qualified name (e.g. MyLogical::system MyFunctions::operate)
@@ -45,6 +47,9 @@ render: build/model.json
 	# start empty: a renamed subject or a dropped DIAGRAMS entry must not leave its old picture behind
 	rm -f $(GEN)/*.svg
 	$(SYSML2KIT) usecases build/model.json $(GEN)
+	@# each diagram is saved under its last name segment, so two entries ending alike would overwrite each other
+	@dups=$$(for d in $(DIAGRAMS); do echo $${d##*::}; done | sort | uniq -d); \
+	if [ -n "$$dups" ]; then echo "DIAGRAMS: more than one entry ends in $$dups" >&2; exit 1; fi
 	for d in $(DIAGRAMS); do $(SYSML) diagram --internal $$d model > $(GEN)/$$(echo $$d | sed 's/.*:://').svg || exit 1; done
 
 # two passes: the trace graph needs the complete need set, RST needs included

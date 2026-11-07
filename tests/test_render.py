@@ -1,6 +1,7 @@
 import re
 import unittest
 import xml.etree.ElementTree as ET
+from typing import ClassVar
 
 from sysml2kit.render import CHAR_W, trace_svg, use_case_svg, use_cases
 
@@ -30,7 +31,7 @@ def segments(d):
 
 
 class TraceSvgTest(unittest.TestCase):
-    NEEDS = {
+    NEEDS: ClassVar = {
         "CRS-001": need("crs"),
         "SR-001": need("sysreq", satisfies=["CRS-001"]),
         "SR-002": need("sysreq", satisfies=["CRS-001"]),
@@ -121,6 +122,54 @@ class UseCaseSvgTest(unittest.TestCase):
         )
         root = ET.fromstring(use_case_svg(*cases[0]))
         self.assertEqual(len(list(root.iter(f"{SVG}ellipse"))), 2)
+
+    def test_subjects_with_one_name_but_different_types_get_separate_diagrams(self):
+        def case(uc, subject, type_id=None):
+            s = {"@id": subject, "@type": "ReferenceUsage", "name": "vehicle"}
+            if type_id:
+                s["type"] = [{"@id": type_id}]
+            return [
+                {
+                    "@id": uc,
+                    "@type": "UseCaseUsage",
+                    "name": uc,
+                    "ownedMembership": [{"@id": uc + "m"}],
+                },
+                {
+                    "@id": uc + "m",
+                    "@type": "SubjectMembership",
+                    "ownedMemberElement": {"@id": subject},
+                },
+                s,
+            ]
+
+        types = [
+            {
+                "@id": "car",
+                "@type": "PartDefinition",
+                "name": "Car",
+                "qualifiedName": "P::Car",
+            },
+            {
+                "@id": "truck",
+                "@type": "PartDefinition",
+                "name": "Truck",
+                "qualifiedName": "P::Truck",
+            },
+        ]
+        split = use_cases(
+            case("drive", "s1", "car") + case("haul", "s2", "truck") + types
+        )
+        self.assertEqual(
+            split,
+            [
+                ("vehicle : P::Car", [("", "drive", [])]),
+                ("vehicle : P::Truck", [("", "haul", [])]),
+            ],
+        )
+        # untyped subjects of one name are the same subject, as in the example model
+        merged = use_cases(case("drive", "s1") + case("haul", "s2"))
+        self.assertEqual(merged, [("vehicle", [("", "drive", []), ("", "haul", [])])])
 
     def test_long_actor_names_stay_inside_the_image(self):
         actor = "maintenanceTechnicianOnDuty"

@@ -4,6 +4,7 @@ Tools are taken from PATH, or from SYSML, SYSML2KIT, TEST_REPORTS, SPHINXBUILD (
 Run: python tests/acceptance.py
 """
 
+import json
 import os
 import re
 import shutil
@@ -29,7 +30,7 @@ def build(target, edit=None):
     if edit:
         edit(work)
     args = ["make", "-C", str(work), target] + [f"{k}={v}" for k, v in TOOLS.items()]
-    result = subprocess.run(args, capture_output=True, text=True)
+    result = subprocess.run(args, check=False, capture_output=True, text=True)
     return result.returncode, result.stdout + result.stderr, work
 
 
@@ -104,6 +105,22 @@ MUTATIONS = [
         r"unknown outgoing link 'STC-099'",
     ),
     (
+        "two diagrams ending in the same name fail instead of overwriting each other",
+        "render",
+        replace(
+            "Makefile",
+            "DIAGRAMS := VehicleLogical::vehicle",
+            "DIAGRAMS := VehicleLogical::vehicle Other::vehicle",
+        ),
+        r"more than one entry ends in vehicle",
+    ),
+    (
+        "a model file name with a space fails with what to rename",
+        "lint",
+        lambda work: (work / "model/my parts.sysml").write_text("package Spaced;\n"),
+        r"must not contain spaces; rename: model/my parts\.sysml",
+    ),
+    (
         "satisfy end without a short name fails the bridge",
         "all",
         replace(
@@ -125,10 +142,10 @@ def main():
     html = (work / "docs/_build/html/model.html").read_text()
     checks = {
         "SR-003 shows its satisfying component": re.search(
-            r'id="SR-003".*?satisfied by.*?LC-001', html, re.S
+            r'id="SR-003".*?satisfied by.*?LC-001', html, re.DOTALL
         ),
         "SR-003 shows its system test": re.search(
-            r'id="SR-003".*?verified by.*?STC-003', html, re.S
+            r'id="SR-003".*?verified by.*?STC-003', html, re.DOTALL
         ),
         "diagrams are embedded": all(
             f"_images/{n}.svg" in html
@@ -162,8 +179,10 @@ def incremental(work):
     remake = ["make", "-C", str(work), "all"] + [f"{k}={v}" for k, v in TOOLS.items()]
     use_cases = work / "model/requirements/use_cases.sysml"
     original = use_cases.read_text()
-    use_cases.write_text(original.replace("subject vehicle;", "subject car;"))  # every use case
-    result = subprocess.run(remake, capture_output=True, text=True)
+    use_cases.write_text(
+        original.replace("subject vehicle;", "subject car;")
+    )  # every use case
+    result = subprocess.run(remake, check=False, capture_output=True, text=True)
     out = result.stdout + result.stderr
     failed = report(
         "a renamed subject's old diagram is gone, so the page pointing at it fails",
@@ -174,7 +193,7 @@ def incremental(work):
     )
     use_cases.write_text(original)
     (work / "test-results/junit.xml").unlink()
-    result = subprocess.run(remake, capture_output=True, text=True)
+    result = subprocess.run(remake, check=False, capture_output=True, text=True)
     stale = "testresult" in (work / "docs/_generated/results-needs.json").read_text()
     failed += report(
         "deleted test results disappear on rebuild",
@@ -182,7 +201,7 @@ def incremental(work):
         result.stdout + result.stderr,
     )
     (work / "model/verification/system_tests.sysml").unlink()
-    result = subprocess.run(remake, capture_output=True, text=True)
+    result = subprocess.run(remake, check=False, capture_output=True, text=True)
     out = result.stdout + result.stderr
     return failed + report(
         "deleted model file fails the rebuild (sysreq-verified)",
@@ -202,9 +221,15 @@ def hook(work):
     )(work)
 
     def run(path):
-        event = '{"tool_name": "Edit", "tool_input": {"file_path": "%s"}}' % path
+        event = json.dumps(
+            {"tool_name": "Edit", "tool_input": {"file_path": str(path)}}
+        )
         return subprocess.run(
-            [sys.executable, str(script)], input=event, capture_output=True, text=True
+            [sys.executable, str(script)],
+            input=event,
+            check=False,
+            capture_output=True,
+            text=True,
         )
 
     broken, other = run(target), run(work / "docs/index.rst")
