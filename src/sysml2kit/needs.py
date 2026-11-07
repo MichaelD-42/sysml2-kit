@@ -33,7 +33,8 @@ TRACE_METADATA = {
     "Trace::Realizes": "realizes",
     "Trace::Verifies": "verifies",
 }
-COMMENT = re.compile(r"/\*.*?\*/|//[^\n]*", re.DOTALL)
+# multi-line note `//* */` first, or `//` would take only its first line
+COMMENT = re.compile(r"//\*.*?\*/|/\*.*?\*/|//[^\n]*", re.DOTALL)
 # reStructuredText inline markup; doc text is plain text, so these are escaped
 RST_INLINE = re.compile(r"([\\*`_|])")
 

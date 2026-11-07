@@ -205,6 +205,12 @@ class SourceLocationsTest(unittest.TestCase):
             files.append(f.name)
         self.assertEqual(source_locations(files), {"UC-001": f"{files[1]}:3"})
 
+    def test_a_declaration_inside_a_multi_line_note_is_not_the_declaration(self):
+        text = "package P {\n    //* old:\n        requirement <'SR-9'> gone;\n    */\n    requirement <'SR-9'> kept;\n}\n"
+        with tempfile.NamedTemporaryFile("w", suffix=".sysml", delete=False) as f:
+            f.write(text)
+        self.assertEqual(source_locations([f.name]), {"SR-9": f"{f.name}:5"})
+
 
 if __name__ == "__main__":
     unittest.main()
