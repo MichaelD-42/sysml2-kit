@@ -7,7 +7,7 @@ SPHINXBUILD  ?= sphinx-build
 STRICT       ?= -W --keep-going
 # sysmlv2-cli fork (sequence-expression fix, find/relations MCP tools), pinned to a tag so every install gets the same checker
 SYSML_GIT     = https://github.com/MichaelD-42/sysml-v2-rs
-SYSML_TAG     = v0.1.4-kit.1
+SYSML_TAG     = v0.1.4-kit.2
 
 MODEL    := $(shell find model -name '*.sysml' | sort)
 # make splits file names on spaces, so `my part.sysml` would become two missing files

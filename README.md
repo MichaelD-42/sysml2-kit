@@ -77,7 +77,7 @@ A flat JSON array of elements with `@type`, `@id` and every metamodel property; 
 
 | Tool | Version | Role |
 |---|---|---|
-| `sysml` (sysmlv2-cli) | fork [MichaelD-42/sysml-v2-rs](https://github.com/MichaelD-42/sysml-v2-rs) tag `v0.1.4-kit.1` (0.1.4 + fixes, `find`/`relations` MCP tools) | parse, resolve, validate, export, internal diagrams, MCP server |
+| `sysml` (sysmlv2-cli) | fork [MichaelD-42/sysml-v2-rs](https://github.com/MichaelD-42/sysml-v2-rs) tag `v0.1.4-kit.2` (0.1.4 + fixes, accepts ids on variant members, `find`/`relations` MCP tools) | parse, resolve, validate, export, internal diagrams, MCP server |
 | sphinx-needs | 9.2.0 | needs, links, schema rules |
 | ub-test-reports | 2.0.0 | JUnit → needs |
 | sysml2kit | this repo | export → needs, use case and trace diagrams |
