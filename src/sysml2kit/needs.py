@@ -9,6 +9,8 @@ import json
 import re
 from pathlib import Path
 
+from sysml2kit.reuse import reuse
+
 # SysML metaclass -> need type. A short-named element of any other kind is an error.
 NEED_TYPES = {
     "UseCaseDefinition": "usecase",
@@ -325,6 +327,10 @@ def convert(elements, locations, platform_files=()):
             need[key] = sorted(set(need[key]))
         # leaf functions/components carry allocation rules (see schemas.json)
         need["leaf"] = need["id"] not in children
+
+    status = reuse(needs)
+    for need in needs.values():
+        need["reuse"] = status.get(need["id"], "")
 
     if errors:
         raise BridgeError("\n".join(errors))
