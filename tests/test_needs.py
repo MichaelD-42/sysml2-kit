@@ -345,5 +345,131 @@ class SourceLocationsTest(unittest.TestCase):
         )
 
 
+def rel(id_, type_, specific, general, **fields):
+    return el(
+        id_, type_, specific={"@id": specific}, general={"@id": general}, **fields
+    )
+
+
+def matches(id_, target, need="CRS-1", partial=None):
+    """`@Matches { need = ...; partial = ...; }` on `target`."""
+    children = {f"{id_}s": {"@id": f"{id_}s", "@type": "LiteralString", "value": need}}
+    if partial is not None:
+        children[f"{id_}b"] = {
+            "@id": f"{id_}b",
+            "@type": "LiteralBoolean",
+            "value": partial,
+        }
+    return {
+        id_: el(
+            id_,
+            "MetadataUsage",
+            type=ids("defMatches"),
+            annotatedElement=ids(target),
+            ownedElement=ids(*children),
+        ),
+        "defMatches": {
+            **el("defMatches", "MetadataDefinition", name="Matches"),
+            "qualifiedName": "Trace::Matches",
+        },
+        **children,
+    }
+
+
+class PlatformVariantTest(unittest.TestCase):
+    def test_platform_flag_from_source_file(self):
+        n = convert(
+            model(
+                pc=el("pc", "PartUsage", "PLT1-PC-1", "board", owner="pkg"),
+                **keyword("kw", "Electrical", "pc"),
+            ),
+            {"PLT1-PC-1": "platform/model/p.sysml:3", "LC-1": "model/a.sysml:1"},
+            platform_files={"platform/model/p.sysml"},
+        )["versions"][""]["needs"]
+        self.assertTrue(n["PLT1-PC-1"]["platform"])
+        self.assertFalse(n["LC-1"]["platform"])
+
+    def test_platform_needs_drop_outside_links(self):
+        elements = model(
+            feat=el("feat", "ActionUsage", "PLT1-FEAT-1", "drive", owner="pkg"),
+            md=el(
+                "md",
+                "MetadataUsage",
+                owner="feat",
+                type=ids("realizes"),
+                annotatedElement=ids("feat"),
+                ownedElement=ids("lit1"),
+            ),
+            **keyword("kw", "Feature", "feat"),
+            **matches("m", "feat"),
+        )
+        locations = {"PLT1-FEAT-1": "p.sysml:1"}
+        n = convert(elements, locations, platform_files={"p.sysml"})
+        n = n["versions"][""]["needs"]["PLT1-FEAT-1"]
+        self.assertEqual((n["realizes"], n["matches"]), ([], []))
+        # a model need keeps them
+        full = needs_of(elements, locations)["PLT1-FEAT-1"]
+        self.assertEqual((full["realizes"], full["matches"]), (["CRS-1"], ["CRS-1"]))
+
+    def test_variant_member_is_marked(self):
+        n = needs_of(
+            model(
+                vm=el("vm", "VariantMembership", owner="pkg"),
+                pc=el(
+                    "pc",
+                    "PartUsage",
+                    "PC-1",
+                    "board",
+                    owner="pkg",
+                    owningRelationship={"@id": "vm"},
+                ),
+                **keyword("kw", "Electrical", "pc"),
+            )
+        )
+        self.assertTrue(n["PC-1"]["variant"])
+        self.assertFalse(n["LC-1"]["variant"])
+
+
+class SpecializesMatchesTest(unittest.TestCase):
+    def test_specializes_from_subsetting_redefinition_typing(self):
+        n = needs_of(
+            model(
+                a=el("a", "PartUsage", "LC-3", "a", owner="pkg"),
+                r1=rel("r1", "Redefinition", "lc2", "lc1"),
+                r2=rel("r2", "Subsetting", "a", "lc1"),
+                r3=rel("r3", "Subclassification", "lc1", "a"),
+                r4=rel("r4", "FeatureTyping", "li", "lc1"),
+                implied=rel("implied", "Subsetting", "lc1", "lc2", isImplied=True),
+                nameless=rel("nameless", "Subsetting", "lc1", "unnamed"),
+                unnamed=el("unnamed", "PartUsage", None, "u", owner="pkg"),
+            )
+        )
+        self.assertEqual(n["LC-2"]["specializes"], ["LC-1"])
+        self.assertEqual(n["LC-3"]["specializes"], ["LC-1"])
+        self.assertEqual(n["LC-1"]["specializes"], ["LC-3"])
+        self.assertEqual(n["LI-1"]["specializes"], ["LC-1"])
+
+    def test_matches_and_partial(self):
+        feat = el("feat", "ActionUsage", "FEAT-1", "drive", owner="pkg")
+        n = needs_of(
+            model(feat=feat, **keyword("kw", "Feature", "feat"), **matches("m", "feat"))
+        )["FEAT-1"]
+        self.assertEqual((n["matches"], n["partial_matches"]), (["CRS-1"], []))
+        n = needs_of(
+            model(
+                feat=feat,
+                **keyword("kw", "Feature", "feat"),
+                **matches("m", "feat", partial=True),
+            )
+        )["FEAT-1"]
+        self.assertEqual((n["matches"], n["partial_matches"]), (["CRS-1"], ["CRS-1"]))
+
+    def test_matches_on_a_non_feature_is_an_error(self):
+        with self.assertRaisesRegex(
+            BridgeError, "only a feature matches a customer requirement"
+        ):
+            needs_of(model(**matches("m", "uc")))
+
+
 if __name__ == "__main__":
     unittest.main()

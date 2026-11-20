@@ -22,6 +22,12 @@ def main(argv=None):
     p.add_argument(
         "model_files", nargs="+", help="the .sysml files, for source locations"
     )
+    p.add_argument(
+        "--platform",
+        nargs="*",
+        default=[],
+        help="the .sysml files that belong to the platform",
+    )
     p = sub.add_parser("usecases", help="one use case diagram SVG per subject")
     p.add_argument("export")
     p.add_argument("output_dir")
@@ -45,7 +51,9 @@ def main(argv=None):
 
     try:
         if args.command == "needs":
-            needs = write_needs(args.export, args.output, args.model_files)
+            needs = write_needs(
+                args.export, args.output, args.model_files, args.platform
+            )
             print(f"sysml2kit: {len(needs)} needs -> {args.output}")
             for finding in text_findings(needs):
                 print(f"sysml2kit: warning: {finding}", file=sys.stderr)

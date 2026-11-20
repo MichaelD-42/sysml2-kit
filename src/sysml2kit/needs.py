@@ -69,12 +69,24 @@ KIND_NAMES = {
     "physinterface": "a physical interface",
     "systest": "a system test",
 }
-LINK_TYPES = ("satisfies", "realizes", "verifies", "allocated_to", "owned_by")
+LINK_TYPES = (
+    "satisfies",
+    "realizes",
+    "verifies",
+    "allocated_to",
+    "owned_by",
+    "specializes",
+    "matches",
+    "partial_matches",
+)
+# relationships whose `specific` end specializes the `general` end
+SPECIALIZATIONS = ("Subsetting", "Redefinition", "Subclassification", "FeatureTyping")
 # Trace metadata definition (qualified, so another library's `Satisfies` is not a trace link) -> link type
 TRACE_METADATA = {
     "Trace::Satisfies": "satisfies",
     "Trace::Realizes": "realizes",
     "Trace::Verifies": "verifies",
+    "Trace::Matches": "matches",
 }
 # strings first, so `"http://x"` is not a comment; multi-line note `//* */` before `//`, or `//` would take only its first line
 COMMENT = re.compile(r'"(?:\\.|[^"\\])*"|//\*.*?\*/|/\*.*?\*/|//[^\n]*', re.DOTALL)
@@ -122,7 +134,7 @@ def source_locations(model_files):
     return locations
 
 
-def convert(elements, locations):
+def convert(elements, locations, platform_files=()):
     by_id = {e["@id"]: e for e in elements}
     errors = []
     needs = {}
@@ -189,6 +201,10 @@ def convert(elements, locations):
             "qualified_name": e.get("qualifiedName") or "",
             "sysml_kind": e["@type"],
             "source": locations.get(short, ""),
+            "platform": locations.get(short, "").rpartition(":")[0]
+            in set(platform_files),
+            "variant": by_id.get(ref(e, "owningRelationship"), {}).get("@type")
+            == "VariantMembership",
             **{link: [] for link in LINK_TYPES},
         }
         need_of[e["@id"]] = short
@@ -212,6 +228,14 @@ def convert(elements, locations):
             errors.append(
                 f"{via}: {link_type} end {name_of(missing)} has no short name, so the link cannot appear in the docs"
             )
+
+    def all_under(element_id):
+        """@ids of every element in the tree below element_id."""
+        e = by_id.get(element_id, {})
+        found = []
+        for child in refs(e, "ownedElement") + refs(e, "ownedRelationship"):
+            found += [child, *all_under(child)]
+        return found
 
     def strings_under(element_id):
         """All string literal values in an expression tree, in model order."""
@@ -263,10 +287,29 @@ def convert(elements, locations):
                     f"@{types[0]} on {name_of(annotated[0]) if annotated else '?'}: annotated element has no short name"
                 )
                 continue
+            if platform_files and needs[src]["platform"]:
+                continue  # the platform's own build checks these; outside ids do not exist in an RFQ build
             targets = strings_under(e["@id"])
             if not targets:
                 errors.append(f"{src}: @{types[0]} names no need")
+            if link_type == "matches":
+                if needs[src]["type"] != "feature":
+                    errors.append(
+                        f"{src}: only a feature matches a customer requirement"
+                    )
+                    continue
+                if any(
+                    by_id.get(c, {}).get("@type") == "LiteralBoolean"
+                    and by_id[c]["value"] is True
+                    for c in all_under(e["@id"])
+                ):
+                    needs[src]["partial_matches"] += targets
             needs[src][link_type] += targets
+        elif t in SPECIALIZATIONS and not e.get("isImplied"):
+            # an end without a short name is not a need, so there is nothing to link
+            src, dst = need_of.get(ref(e, "specific")), need_of.get(ref(e, "general"))
+            if src and dst:
+                needs[src]["specializes"].append(dst)
 
     children = set()
     for element_id, short in need_of.items():
@@ -303,7 +346,7 @@ def text_findings(needs):
     return findings
 
 
-def write_needs(export_path, out_path, model_files):
+def write_needs(export_path, out_path, model_files, platform_files=()):
     elements = json.loads(Path(export_path).read_text())
     if not isinstance(elements, list) or not all(
         "@id" in e and "@type" in e for e in elements
@@ -311,7 +354,7 @@ def write_needs(export_path, out_path, model_files):
         raise BridgeError(
             f"{export_path}: not SysML v2 interchange JSON (expected a list of elements with @id/@type)"
         )
-    result = convert(elements, source_locations(model_files))
+    result = convert(elements, source_locations(model_files), platform_files)
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     Path(out_path).write_text(json.dumps(result, indent=2, sort_keys=True))
     return result["versions"][""]["needs"]
