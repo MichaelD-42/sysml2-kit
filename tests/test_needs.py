@@ -186,6 +186,86 @@ class ConvertTest(unittest.TestCase):
         )
 
 
+def keyword(id_, meta, target):
+    """`#Meta` on `target`: a MetadataUsage typed by Trace::<meta>."""
+    return {
+        id_: el(
+            id_, "MetadataUsage", type=ids(f"def{meta}"), annotatedElement=ids(target)
+        ),
+        f"def{meta}": {
+            **el(f"def{meta}", "MetadataDefinition", name=meta),
+            "qualifiedName": f"Trace::{meta}",
+        },
+    }
+
+
+class KeywordTest(unittest.TestCase):
+    def test_feature_keyword_makes_a_feature(self):
+        n = needs_of(
+            model(
+                feat=el("feat", "ActionUsage", "FEAT-1", "drive", owner="pkg"),
+                f1=el("f1", "ActionUsage", "F-1", "operate", owner="feat"),
+                f2=el("f2", "ActionUsage", "F-2", "propel", owner="pkg"),
+                **keyword("kw", "Feature", "feat"),
+            )
+        )
+        self.assertEqual(n["FEAT-1"]["type"], "feature")
+        self.assertEqual(n["F-1"]["type"], "function")
+        self.assertEqual(n["F-1"]["owned_by"], ["FEAT-1"])
+        self.assertTrue(n["F-1"]["leaf"])
+
+    def test_domain_keyword_makes_a_physical_component(self):
+        n = needs_of(
+            model(
+                pc=el("pc", "PartUsage", "PC-1", "board", owner="pkg"),
+                pi=el("pi", "PortUsage", "PI-1", "bus", owner="pc"),
+                **keyword("k1", "Electrical", "pc"),
+                **keyword("k2", "Mechanical", "pi"),
+            )
+        )
+        self.assertEqual((n["PC-1"]["type"], n["PC-1"]["domain"]), ("physical", "EE"))
+        self.assertEqual(
+            (n["PI-1"]["type"], n["PI-1"]["domain"]), ("physinterface", "ME")
+        )
+
+    def test_two_domains_is_an_error(self):
+        with self.assertRaises(BridgeError) as cm:
+            needs_of(
+                model(
+                    pc=el("pc", "PartUsage", "PC-1", "board", owner="pkg"),
+                    **keyword("k1", "Electrical", "pc"),
+                    **keyword("k2", "Software", "pc"),
+                )
+            )
+        msg = str(cm.exception)
+        self.assertIn("PC-1", msg)
+        self.assertIn("Trace::Electrical", msg)
+        self.assertIn("Trace::Software", msg)
+
+    def test_prefix_must_match_type(self):
+        with self.assertRaisesRegex(
+            BridgeError, "LC-1: a physical component's id starts with PC-"
+        ):
+            needs_of(
+                model(
+                    lc1=el("lc1", "PartUsage", "LC-1", "board", owner="pkg"),
+                    **keyword("k1", "Electrical", "lc1"),
+                )
+            )
+        n = needs_of(
+            model(
+                pc=el("pc", "PartUsage", "PLT1-PC-1", "board", owner="pkg"),
+                **keyword("k1", "Electrical", "pc"),
+            )
+        )
+        self.assertEqual(n["PLT1-PC-1"]["type"], "physical")
+
+    def test_untagged_model_converts_as_before(self):
+        n = needs_of(model())
+        self.assertEqual(n["LC-1"]["type"], "component")
+        self.assertEqual({v["domain"] for v in n.values()}, {""})
+
+
 class TextFindingsTest(unittest.TestCase):
     def findings(self, text, type_="sysreq"):
         need = {"id": "SR-1", "type": type_, "content": text, "source": "m.sysml:3"}

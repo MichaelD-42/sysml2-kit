@@ -26,6 +26,49 @@ NEED_TYPES = {
     "VerificationCaseDefinition": "systest",
     "VerificationCaseUsage": "systest",
 }
+# (metaclass, `#keyword` metadata) -> need type, where the keyword changes the type NEED_TYPES gives
+KEYWORD_TYPES = {
+    ("ActionUsage", "Trace::Feature"): "feature",
+    ("ActionDefinition", "Trace::Feature"): "feature",
+    **{
+        (kind, domain): need
+        for domain in ("Trace::Mechanical", "Trace::Electrical", "Trace::Software")
+        for kind, need in (
+            ("PartUsage", "physical"),
+            ("PartDefinition", "physical"),
+            ("PortUsage", "physinterface"),
+            ("PortDefinition", "physinterface"),
+        )
+    },
+}
+DOMAINS = {
+    "Trace::Mechanical": "ME",
+    "Trace::Electrical": "EE",
+    "Trace::Software": "SW",
+}
+# need type -> id prefix; an id may carry a platform tag in front (`PLT1-PC-1`)
+PREFIXES = {
+    "usecase": "UC",
+    "sysreq": "SR",
+    "feature": "FEAT",
+    "function": "F",
+    "component": "LC",
+    "interface": "LI",
+    "physical": "PC",
+    "physinterface": "PI",
+    "systest": "STC",
+}
+KIND_NAMES = {
+    "usecase": "a use case",
+    "sysreq": "a system requirement",
+    "feature": "a feature",
+    "function": "a function",
+    "component": "a logical component",
+    "interface": "a logical interface",
+    "physical": "a physical component",
+    "physinterface": "a physical interface",
+    "systest": "a system test",
+}
 LINK_TYPES = ("satisfies", "realizes", "verifies", "allocated_to", "owned_by")
 # Trace metadata definition (qualified, so another library's `Satisfies` is not a trace link) -> link type
 TRACE_METADATA = {
@@ -89,16 +132,45 @@ def convert(elements, locations):
         e = by_id.get(element_id, {})
         return e.get("qualifiedName") or e.get("name") or element_id
 
+    keywords = {}  # element @id -> qualified names of the metadata applied to it
+    for e in elements:
+        if e["@type"] == "MetadataUsage":
+            names = {by_id.get(m, {}).get("qualifiedName") for m in refs(e, "type")}
+            for annotated in refs(e, "annotatedElement"):
+                keywords.setdefault(annotated, set()).update(names)
+
     for e in elements:
         # declared, not derived: implicit features (e.g. allocation ends) inherit the shortName they reference
         short = e.get("declaredShortName")
         if not short:
             continue
         kind = NEED_TYPES.get(e["@type"])
+        tags = keywords.get(e["@id"], set())
+        kind = next(
+            (
+                KEYWORD_TYPES[e["@type"], k]
+                for k in sorted(tags)
+                if (e["@type"], k) in KEYWORD_TYPES
+            ),
+            kind,
+        )
+        domains = sorted(tags & DOMAINS.keys())
+        if len(domains) > 1:
+            errors.append(
+                f"{short}: one domain keyword allowed, found {' and '.join(domains)}"
+            )
+            continue
         if kind is None:
             errors.append(
                 f"{short} ({e.get('qualifiedName')}): no need type for {e['@type']}; "
                 f"add it to NEED_TYPES or remove the short name"
+            )
+            continue
+        if kind in PREFIXES and not re.fullmatch(
+            rf"([A-Z][A-Z0-9]*-)?{PREFIXES[kind]}-\d+", short
+        ):
+            errors.append(
+                f"{short}: {KIND_NAMES[kind]}'s id starts with {PREFIXES[kind]}-"
             )
             continue
         if short in needs:
@@ -110,6 +182,7 @@ def convert(elements, locations):
         needs[short] = {
             "id": short,
             "type": kind,
+            "domain": DOMAINS[domains[0]] if domains else "",
             "title": e.get("name") or short,
             "content": RST_INLINE.sub(r"\\\1", "\n\n".join(docs)),
             "qualified_name": e.get("qualifiedName") or "",
@@ -176,6 +249,7 @@ def convert(elements, locations):
                     )
         elif t == "MetadataUsage":
             types = [by_id.get(m, {}).get("qualifiedName") for m in refs(e, "type")]
+            # keyword metadata (`#Feature`) types a need above; it is not a trace link
             link_type = next(
                 (TRACE_METADATA[n] for n in types if n in TRACE_METADATA), None
             )
