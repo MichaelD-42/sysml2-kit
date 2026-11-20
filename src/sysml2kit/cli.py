@@ -52,7 +52,7 @@ def main(argv=None):
     p.add_argument("needs_dir", help="holds needs.json and schema_violations.json")
     p.add_argument(
         "--layer",
-        choices="RFLV",
+        choices="RFLPV",
         help="only rules gating this layer or an earlier one",
     )
     args = parser.parse_args(argv)

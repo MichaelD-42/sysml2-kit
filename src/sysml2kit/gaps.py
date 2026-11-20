@@ -1,15 +1,19 @@
 """RFLP rule violations from a `sphinx-build -b needs` run, by layer, with where to fix them."""
 
-LAYERS = "RFLV?"  # ? = a rule not in RULE_LAYERS (one a project added); always reported
+# ? = a rule not in RULE_LAYERS (one a project added); always reported
+LAYERS = "RFLPV?"
 # rule id (docs/schemas.json) -> the layer it gates (rflp-method structure.md)
 RULE_LAYERS = {
     "crs-satisfied": "R",
     "usecase-realizes": "R",
     "sysreq-satisfies": "R",
     "usecase-realized": "F",
+    "feature-realizes": "F",
     "function-allocated": "L",
     "component-used": "L",
     "sysreq-satisfied": "L",
+    "logical-allocated": "P",
+    "physical-used": "P",
     "systest-verifies": "V",
     "acctest-verifies": "V",
     "sysreq-verified": "V",

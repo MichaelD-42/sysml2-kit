@@ -12,6 +12,8 @@ SYSML_TAG     = v0.1.4-kit.2
 MODEL    := $(shell find model -name '*.sysml' | sort)
 # make splits file names on spaces, so `my part.sysml` would become two missing files
 $(if $(shell find model -name '*.sysml' -name '* *'),$(error model file names must not contain spaces; rename: $(shell find model -name '*.sysml' -name '* *')))
+# the platform's model (git submodule platform/), without its trace.sysml: a second package Trace
+PLATFORM_MODEL := $(shell test -d platform/model && find platform/model -name '*.sysml' ! -path platform/model/trace.sysml | sort)
 RESULTS  := $(wildcard test-results/*.xml)
 GEN      := docs/_generated
 # Usages whose internal structure is drawn, by qualified name (e.g. MyLogical::system MyFunctions::operate)
@@ -29,14 +31,14 @@ tools:
 	pip install -r requirements.txt
 
 lint:
-	$(SYSML) check model
+	$(SYSML) check model $(PLATFORM_MODEL)
 
-build/model.json: $(MODEL)
+build/model.json: $(MODEL) $(PLATFORM_MODEL)
 	@mkdir -p $(@D)
-	$(SYSML) export $(MODEL) > $@
+	$(SYSML) export $(MODEL) $(PLATFORM_MODEL) > $@
 
 $(GEN)/model-needs.json: build/model.json
-	$(SYSML2KIT) needs $< $@ $(MODEL)
+	$(SYSML2KIT) needs $< $@ $(MODEL) $(PLATFORM_MODEL) --platform $(PLATFORM_MODEL)
 
 # test results become needs linked to their STC/ATC via a <property name="verifies" value="..."/>
 $(GEN)/results-needs.json: $(RESULTS)
@@ -53,10 +55,11 @@ render: build/model.json
 	if [ -n "$$dups" ]; then echo "DIAGRAMS: more than one entry ends in $$dups" >&2; exit 1; fi
 	for d in $(DIAGRAMS); do $(SYSML) diagram --internal $$d model > $(GEN)/$$(echo $$d | sed 's/.*:://').svg || exit 1; done
 
-# two passes: the trace graph needs the complete need set, RST needs included
+# two passes: the trace graph and the compliance table need the complete need set, Markdown and RST needs included
 docs: $(GEN)/model-needs.json $(GEN)/results-needs.json render
 	$(SPHINXBUILD) -q -b needs docs build/needs
 	$(SYSML2KIT) trace build/needs/needs.json $(GEN)/trace.svg
+	$(SYSML2KIT) compliance build/needs/needs.json $(GEN)/compliance.md $(if $(STRICT),,--warn-only)
 	$(SPHINXBUILD) $(STRICT) -b html docs docs/_build/html
 
 clean:

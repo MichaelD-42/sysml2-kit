@@ -5,4 +5,5 @@ RFLP model
    :maxdepth: 2
 
    traceability
+   compliance
    model

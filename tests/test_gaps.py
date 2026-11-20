@@ -62,6 +62,20 @@ class GapsTest(unittest.TestCase):
     def test_no_violations_no_gaps(self):
         self.assertEqual(gaps({"validation_warnings": {}}, NEEDS), [])
 
+    def test_physical_rules_are_in_p(self):
+        self.assertEqual(
+            (RULE_LAYERS["logical-allocated"], RULE_LAYERS["physical-used"]),
+            ("P", "P"),
+        )
+        found = {
+            "validation_warnings": {
+                "PC-001": [violation("physical-used")],
+                "STC-004": [violation("systest-verifies")],
+            }
+        }
+        self.assertEqual([g[0] for g in gaps(found, NEEDS)], ["P", "V"])
+        self.assertEqual([g[1] for g in gaps(found, NEEDS, "P")], ["physical-used"])
+
     def test_every_rule_in_the_schema_has_a_layer(self):
         schemas = json.loads(
             (

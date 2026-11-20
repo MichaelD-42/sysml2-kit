@@ -6,7 +6,10 @@
       "select": {
         "properties": {
           "type": {
-            "const": "crs"
+            "enum": [
+              "crs",
+              "prq"
+            ]
           }
         }
       },
@@ -33,7 +36,10 @@
       "select": {
         "properties": {
           "type": {
-            "const": "crs"
+            "enum": [
+              "crs",
+              "prq"
+            ]
           }
         }
       },
@@ -61,6 +67,9 @@
         "properties": {
           "type": {
             "const": "usecase"
+          },
+          "platform": {
+            "const": false
           }
         }
       },
@@ -71,7 +80,10 @@
               "local": {
                 "properties": {
                   "type": {
-                    "const": "crs"
+                    "enum": [
+                      "crs",
+                      "prq"
+                    ]
                   }
                 }
               }
@@ -83,11 +95,14 @@
     },
     {
       "id": "usecase-realized",
-      "message": "Use case is not realized by any function",
+      "message": "Use case is not realized by any feature",
       "select": {
         "properties": {
           "type": {
             "const": "usecase"
+          },
+          "platform": {
+            "const": false
           }
         }
       },
@@ -98,7 +113,37 @@
               "local": {
                 "properties": {
                   "type": {
-                    "const": "function"
+                    "const": "feature"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "feature-realizes",
+      "message": "Feature does not realize any use case",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "feature"
+          },
+          "platform": {
+            "const": false
+          }
+        }
+      },
+      "validate": {
+        "network": {
+          "realizes": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "usecase"
                   }
                 }
               }
@@ -115,6 +160,9 @@
         "properties": {
           "type": {
             "const": "usecase"
+          },
+          "platform": {
+            "const": false
           }
         }
       },
@@ -142,6 +190,9 @@
         "properties": {
           "type": {
             "const": "sysreq"
+          },
+          "platform": {
+            "const": false
           }
         }
       },
@@ -152,7 +203,10 @@
               "local": {
                 "properties": {
                   "type": {
-                    "const": "crs"
+                    "enum": [
+                      "crs",
+                      "prq"
+                    ]
                   }
                 }
               }
@@ -169,6 +223,9 @@
         "properties": {
           "type": {
             "const": "sysreq"
+          },
+          "platform": {
+            "const": false
           }
         }
       },
@@ -196,6 +253,9 @@
         "properties": {
           "type": {
             "const": "sysreq"
+          },
+          "platform": {
+            "const": false
           }
         }
       },
@@ -226,6 +286,9 @@
           },
           "leaf": {
             "const": true
+          },
+          "platform": {
+            "const": false
           }
         }
       },
@@ -257,6 +320,9 @@
           },
           "leaf": {
             "const": true
+          },
+          "platform": {
+            "const": false
           }
         }
       },
@@ -278,12 +344,81 @@
       }
     },
     {
+      "id": "logical-allocated",
+      "message": "Leaf logical component is not allocated to any physical component",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "component"
+          },
+          "leaf": {
+            "const": true
+          },
+          "platform": {
+            "const": false
+          }
+        }
+      },
+      "validate": {
+        "network": {
+          "allocated_to": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "physical"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "physical-used",
+      "message": "Leaf physical component has no logical component allocated",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "physical"
+          },
+          "leaf": {
+            "const": true
+          },
+          "platform": {
+            "const": false
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "allocated_to": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "component"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
       "id": "systest-verifies",
       "message": "System test does not verify any system requirement",
       "select": {
         "properties": {
           "type": {
             "const": "systest"
+          },
+          "platform": {
+            "const": false
           }
         }
       },
@@ -323,6 +458,7 @@
                   "type": {
                     "enum": [
                       "crs",
+                      "prq",
                       "usecase"
                     ]
                   }

@@ -10,5 +10,6 @@ system and acceptance tests verify them, and test results close the loop.
 
    customer/requirements
    traceability
+   compliance
    model
    acceptance/tests

@@ -12,6 +12,7 @@ SAME = [
     "docs/ubproject.toml",
     "docs/schemas.json",
     "docs/traceability.rst",
+    "docs/compliance.md",
     "model/trace.sysml",
     ".gitignore",
 ]
