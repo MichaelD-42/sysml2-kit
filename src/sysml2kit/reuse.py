@@ -13,14 +13,14 @@ def closure(needs, start, link):
     return seen
 
 
-def function_pcs(needs, feature_id):
-    """Per leaf function of a feature (own or inherited): the physical need ids it reaches."""
+def descendants(needs):
+    """Return below(start): start plus its owned_by descendants."""
     kids = {}
     for n, v in needs.items():
         for parent in v.get("owned_by", []):
             kids.setdefault(parent, []).append(n)
 
-    def below(start):  # start plus its owned_by descendants
+    def below(start):
         seen, todo = set(), [start]
         while todo:
             n = todo.pop()
@@ -28,6 +28,13 @@ def function_pcs(needs, feature_id):
                 seen.add(n)
                 todo += kids.get(n, [])
         return seen
+
+    return below
+
+
+def function_components(needs, feature_id):
+    """Per leaf function of a feature (own or inherited): the components it is allocated to."""
+    below = descendants(needs)
 
     def of_type(ids, type_, leaf=False):
         return {
@@ -47,13 +54,34 @@ def function_pcs(needs, feature_id):
             components |= of_type([target], "component") | of_type(
                 below(target), "component", leaf=True
             )
+        out[fn] = components
+    return out
+
+
+def chain_components(needs, feature_id):
+    """Components in a feature's chain: those its leaf functions reach, plus their descendants."""
+    below = descendants(needs)
+    return set().union(
+        *(
+            below(lc)
+            for lcs in function_components(needs, feature_id).values()
+            for lc in lcs
+        )
+    )
+
+
+def function_pcs(needs, feature_id):
+    """Per leaf function of a feature (own or inherited): the physical need ids it reaches."""
+    below = descendants(needs)
+    out = {}
+    for fn, components in function_components(needs, feature_id).items():
         pcs = set()
         for lc in components:
             for part in below(lc):
-                for pc in of_type(needs[part].get("allocated_to", []), "physical"):
-                    pcs |= of_type(
-                        below(pc), "physical"
-                    )  # an assembly reaches its parts
+                for pc in needs[part].get("allocated_to", []):
+                    if needs[pc]["type"] == "physical":
+                        # an assembly reaches its parts
+                        pcs |= {i for i in below(pc) if needs[i]["type"] == "physical"}
         out[fn] = pcs
     return out
 

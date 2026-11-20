@@ -6,6 +6,7 @@ import re
 import sys
 from pathlib import Path
 
+from .compliance import compliance, table_md
 from .gaps import gaps
 from .needs import BridgeError, text_findings, write_needs
 from .render import trace_svg, use_case_svg, use_cases
@@ -38,6 +39,13 @@ def main(argv=None):
     p.add_argument("needs_json")
     p.add_argument("output")
     p = sub.add_parser(
+        "compliance",
+        help="requirement compliance table from a sphinx-needs needs.json",
+    )
+    p.add_argument("needs_json")
+    p.add_argument("output")
+    p.add_argument("--warn-only", action="store_true", help="exit 0 despite findings")
+    p = sub.add_parser(
         "gaps",
         help="RFLP rule violations by layer, from a `sphinx-build -b needs` output directory",
     )
@@ -69,6 +77,15 @@ def main(argv=None):
             needs = data["versions"][data.get("current_version", "")]["needs"]
             Path(args.output).write_text(trace_svg(needs))
             print(f"sysml2kit: trace of {len(needs)} needs -> {args.output}")
+        elif args.command == "compliance":
+            data = json.loads(Path(args.needs_json).read_text())
+            needs = data["versions"][data.get("current_version", "")]["needs"]
+            rows, findings = compliance(needs)
+            Path(args.output).write_text(table_md(rows))
+            print(f"sysml2kit: compliance of {len(rows)} requirements -> {args.output}")
+            for finding in findings:
+                print(finding)
+            sys.exit(1 if findings and not args.warn_only else 0)
         elif args.command == "gaps":
             out = Path(args.needs_dir)
             data = json.loads((out / "needs.json").read_text())
