@@ -13,8 +13,8 @@ def closure(needs, start, link):
     return seen
 
 
-def reused_pcs(needs, feature_id):
-    """Physical need ids a feature reaches through its (inherited) functions and components."""
+def function_pcs(needs, feature_id):
+    """Per leaf function of a feature (own or inherited): the physical need ids it reaches."""
     kids = {}
     for n, v in needs.items():
         for parent in v.get("owned_by", []):
@@ -39,15 +39,28 @@ def reused_pcs(needs, feature_id):
     functions = set()
     for f in closure(needs, feature_id, "specializes"):
         functions |= of_type(below(f), "function", leaf=True)
-    components = set()
+    out = {}
     for fn in functions:
+        components = set()
         for target in needs[fn].get("allocated_to", []):
-            components |= of_type(below(target), "component", leaf=True)
-    pcs = set()
-    for lc in components:
-        for part in below(lc):
-            pcs |= of_type(needs[part].get("allocated_to", []), "physical")
-    return pcs
+            # a composite target keeps its own allocation; its leaf descendants add theirs
+            components |= of_type([target], "component") | of_type(
+                below(target), "component", leaf=True
+            )
+        pcs = set()
+        for lc in components:
+            for part in below(lc):
+                for pc in of_type(needs[part].get("allocated_to", []), "physical"):
+                    pcs |= of_type(
+                        below(pc), "physical"
+                    )  # an assembly reaches its parts
+        out[fn] = pcs
+    return out
+
+
+def reused_pcs(needs, feature_id):
+    """Physical need ids a feature reaches through its (inherited) functions and components."""
+    return set().union(*function_pcs(needs, feature_id).values())
 
 
 def reuse(needs):
@@ -60,9 +73,10 @@ def reuse(needs):
     for fid, feature in needs.items():
         if feature["type"] != "feature":
             continue
-        pcs = reused_pcs(needs, fid)
+        per_function = function_pcs(needs, fid).values()
+        pcs = set().union(*per_function)
         platform = [any(n["platform"] for n in chain(pc)) for pc in pcs]
-        if not pcs:
+        if not pcs or not all(per_function):
             out[fid] = "incomplete"
         elif all(platform):
             variant = any(n["variant"] for pc in pcs for n in chain(pc))

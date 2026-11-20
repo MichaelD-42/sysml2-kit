@@ -73,6 +73,37 @@ class ReuseTest(unittest.TestCase):
         }
         self.assertEqual(reused_pcs(needs, "F"), {"PC"})
 
+    def test_composite_component_keeps_own_allocation(self):
+        needs = {
+            "F": need("feature"),
+            "FN": need("function", owned_by=["F"], allocated_to=["LC"]),
+            "LC": need("component", leaf=False, allocated_to=["PP"]),
+            "LC1": need("component", owned_by=["LC"], allocated_to=["PN"]),
+            "PP": need("physical", platform=True),
+            "PN": need("physical"),
+        }
+        self.assertEqual(reuse(needs), {"F": "modified"})
+
+    def test_unbacked_function_makes_feature_incomplete(self):
+        needs = {
+            **chain(["PC"]),
+            "PC": need("physical", platform=True),
+            "FN2": need("function", owned_by=["F"]),
+        }
+        self.assertEqual(reuse(needs), {"F": "incomplete"})
+        needs["FN2"]["allocated_to"] = ["LC2"]
+        needs["LC2"] = need("component")
+        self.assertEqual(reuse(needs), {"F": "incomplete"})
+
+    def test_assembly_allocation_reaches_parts(self):
+        needs = {
+            **chain(["PA"]),
+            "PA": need("physical", platform=True, leaf=False),
+            "PC": need("physical", owned_by=["PA"]),
+        }
+        self.assertEqual(reuse(needs), {"F": "modified"})
+        self.assertEqual(reused_pcs(needs, "F"), {"PA", "PC"})
+
     def test_cycle_terminates(self):
         needs = {
             "A": need("feature", specializes=["B", "A"], owned_by=["B"]),
