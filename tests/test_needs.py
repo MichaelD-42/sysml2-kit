@@ -260,6 +260,18 @@ class KeywordTest(unittest.TestCase):
         )
         self.assertEqual(n["PLT1-PC-1"]["type"], "physical")
 
+    def test_unresolved_metadata_type_is_ignored(self):
+        n = needs_of(
+            model(
+                pc=el("pc", "PartUsage", "PC-1", "board", owner="pkg"),
+                **keyword("k1", "Electrical", "pc"),
+                k2=el(
+                    "k2", "MetadataUsage", type=ids("gone"), annotatedElement=ids("pc")
+                ),
+            )
+        )
+        self.assertEqual(n["PC-1"]["domain"], "EE")
+
     def test_untagged_model_converts_as_before(self):
         n = needs_of(model())
         self.assertEqual(n["LC-1"]["type"], "component")

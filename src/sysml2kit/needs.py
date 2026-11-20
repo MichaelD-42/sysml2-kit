@@ -136,6 +136,7 @@ def convert(elements, locations):
     for e in elements:
         if e["@type"] == "MetadataUsage":
             names = {by_id.get(m, {}).get("qualifiedName") for m in refs(e, "type")}
+            names.discard(None)  # type not in the export or unnamed
             for annotated in refs(e, "annotatedElement"):
                 keywords.setdefault(annotated, set()).update(names)
 
