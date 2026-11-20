@@ -1,4 +1,4 @@
-"""Acceptance test: build examples/vehicle, then break it in specific ways and check each break is caught.
+"""Acceptance test: build examples/edrive-platform and examples/vehicle, then break them in specific ways and check each break is caught.
 
 Tools are taken from PATH, or from SYSML, SYSML2KIT, TEST_REPORTS, SPHINXBUILD (passed on to make).
 Run: python tests/acceptance.py
@@ -14,6 +14,7 @@ import tempfile
 from pathlib import Path
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "vehicle"
+PLATFORM = EXAMPLE.parent / "edrive-platform"
 TOOLS = {
     k: os.environ[k]
     for k in ("SYSML", "SYSML2KIT", "TEST_REPORTS", "SPHINXBUILD")
@@ -21,11 +22,11 @@ TOOLS = {
 }
 
 
-def build(target, edit=None):
+def build(target, edit=None, example=EXAMPLE):
     """Copy the example, apply edit(project_dir), run make target; return (exit code, output, project dir)."""
-    work = Path(tempfile.mkdtemp(prefix="sysml2kit-acc-")) / "vehicle"
+    work = Path(tempfile.mkdtemp(prefix="sysml2kit-acc-")) / example.name
     shutil.copytree(
-        EXAMPLE, work, ignore=shutil.ignore_patterns("build", "_build", "_generated")
+        example, work, ignore=shutil.ignore_patterns("build", "_build", "_generated")
     )
     if edit:
         edit(work)
@@ -45,6 +46,19 @@ def replace(relpath, old, new):
 
 
 # (description, make target, edit, regex the output must match)
+PLATFORM_MUTATIONS = [
+    (
+        "platform: a physical part without its domain keyword fails the bridge",
+        "all",
+        replace(
+            "model/physical/components.sysml",
+            "#Mechanical part <'EDU-PC-006'> housing",
+            "part <'EDU-PC-006'> housing",
+        ),
+        r"EDU-PC-006: a logical component's id starts with LC-",
+    ),
+]
+
 MUTATIONS = [
     (
         "broken model reference fails lint",
@@ -133,8 +147,28 @@ MUTATIONS = [
 ]
 
 
-def main():
+def mutations(cases, example):
     failures = 0
+    for name, target, edit, expected in cases:
+        code, out, _ = build(target, edit, example)
+        ok = code != 0 and re.search(expected, out)
+        print(f"{'ok  ' if ok else 'FAIL'} {name}")
+        if not ok:
+            failures += 1
+            print(f"     exit {code}; expected /{expected}/ in output:\n{out[-2000:]}")
+    return failures
+
+
+def platform():
+    """The e-drive product line builds clean on its own (PRQ in the CRS role), and a break is caught."""
+    code, out, _ = build("all", example=PLATFORM)
+    failed = report("platform baseline: make all", code == 0, out)
+    return failed + mutations(PLATFORM_MUTATIONS, PLATFORM)
+
+
+def main():
+    # the platform reports on its own, so a broken vehicle build does not hide its result
+    failures = platform()
     code, out, work = build("all")
     if code != 0:
         print(f"FAIL baseline: make all exited {code}\n{out[-3000:]}")
@@ -156,13 +190,7 @@ def main():
     for name, ok in checks.items():
         print(f"{'ok  ' if ok else 'FAIL'} baseline: {name}")
         failures += not ok
-    for name, target, edit, expected in MUTATIONS:
-        code, out, _ = build(target, edit)
-        ok = code != 0 and re.search(expected, out)
-        print(f"{'ok  ' if ok else 'FAIL'} {name}")
-        if not ok:
-            failures += 1
-            print(f"     exit {code}; expected /{expected}/ in output:\n{out[-2000:]}")
+    failures += mutations(MUTATIONS, EXAMPLE)
     return 1 if failures + incremental(work) + hook(work) else 0
 
 

@@ -1,4 +1,4 @@
-"""The vehicle example must be the project template plus content; shared files may not drift apart."""
+"""Each example must be the project template plus content; shared files may not drift apart."""
 
 import json
 import re
@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "plugins/sysml-rflp/templates/project"
-EXAMPLE = ROOT / "examples/vehicle"
+EXAMPLES = [ROOT / "examples/vehicle", ROOT / "examples/edrive-platform"]
 SAME = [
     "docs/ubproject.toml",
     "docs/schemas.json",
@@ -20,16 +20,22 @@ SAME = [
 
 class TemplateSyncTest(unittest.TestCase):
     def test_shared_files_are_identical(self):
-        for name in SAME:
-            self.assertEqual(
-                (TEMPLATE / name).read_text(), (EXAMPLE / name).read_text(), name
-            )
+        for example in EXAMPLES:
+            for name in SAME:
+                self.assertEqual(
+                    (TEMPLATE / name).read_text(),
+                    (example / name).read_text(),
+                    f"{example.name}/{name}",
+                )
 
     def test_makefile_differs_only_in_diagrams(self):
         def strip(path):
             return re.sub(r"^DIAGRAMS :=.*$", "", path.read_text(), flags=re.MULTILINE)
 
-        self.assertEqual(strip(TEMPLATE / "Makefile"), strip(EXAMPLE / "Makefile"))
+        for example in EXAMPLES:
+            self.assertEqual(
+                strip(TEMPLATE / "Makefile"), strip(example / "Makefile"), example.name
+            )
 
 
 class ReleaseVersionTest(unittest.TestCase):
