@@ -59,7 +59,7 @@ class ComplianceTest(unittest.TestCase):
         needs["CST-1"] = need("cst", answers=["CRS-1"], compliance="comply")
         rows, findings = compliance(needs)
         self.assertEqual(rows[0][2], ["F"])
-        self.assertEqual(rows[0][5], ["CST-1"])
+        self.assertEqual(rows[0][5], [("CST-1", "comply")])
         self.assertEqual(findings, [])
 
     def test_statement_alone_answers(self):
@@ -104,3 +104,15 @@ class ComplianceTest(unittest.TestCase):
         self.assertIn("{need}`F`", out)
         self.assertIn("{need}`CST-1`", out)
         self.assertIn("mech", out)
+
+    def test_table_shows_statement_value(self):
+        needs = {
+            "CRS-1": need("crs"),
+            "CST-1": need("cst", answers=["CRS-1"], compliance="not-comply"),
+        }
+        self.assertIn("{need}`CST-1` (not-comply)", table_md(compliance(needs)[0]))
+
+    def test_table_escapes_pipes(self):
+        needs = {"CRS-1": need("crs", "a | b")}
+        out = table_md(compliance(needs)[0])
+        self.assertIn("a \\| b", out)

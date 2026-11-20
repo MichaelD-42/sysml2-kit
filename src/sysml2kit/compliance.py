@@ -22,7 +22,7 @@ def compliance(needs):
         part = [f for f in status if crs in needs[f].get("partial_matches", [])]
         features = sorted(set(full + part))
         statements = sorted(
-            c
+            (c, n.get("compliance", ""))
             for c, n in needs.items()
             if n["type"] == "cst" and crs in n.get("answers", [])
         )
@@ -59,8 +59,14 @@ def _gap_stated(needs, crs, feature):
 def table_md(rows):
     """MyST Markdown table, every need linked with the need role."""
 
+    def cell(text):
+        return str(text).replace("|", "\\|")
+
     def links(ids):
         return ", ".join(f"{{need}}`{i}`" for i in ids)
+
+    def statement_links(statements):
+        return ", ".join(f"{{need}}`{i}` ({value})" for i, value in statements)
 
     out = [
         "| Requirement | Title | Features | Reuse | Partial | Statements | Domains |",
@@ -68,7 +74,7 @@ def table_md(rows):
     ]
     for crs, title, features, worst, partial, statements, domains in rows:
         out.append(
-            f"| {links([crs])} | {title} | {links(features)} | {worst} "
-            f"| {'yes' if partial else ''} | {links(statements)} | {', '.join(domains)} |"
+            f"| {links([crs])} | {cell(title)} | {links(features)} | {worst} "
+            f"| {'yes' if partial else ''} | {statement_links(statements)} | {cell(', '.join(domains))} |"
         )
     return "\n".join(out) + "\n"
