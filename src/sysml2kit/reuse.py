@@ -87,7 +87,13 @@ def _function_reach(needs, feature_id):
                         pcs |= {
                             i for i in assembly(pc) if needs[i]["type"] == "physical"
                         }
-        out[fn] = (pcs, pcs & variations)
+        unselected = set()
+        for pc in pcs:
+            # a part that is or specializes a variation, but no variant of it, selects nothing
+            chain = closure(needs, pc, "specializes")
+            if not any(needs[i]["variant"] for i in chain):
+                unselected |= chain & variations
+        out[fn] = (pcs, unselected)
     return out
 
 

@@ -130,6 +130,19 @@ class ReuseTest(unittest.TestCase):
         self.assertEqual(reused_pcs(needs, "F"), {"PC"})
         self.assertEqual(unselected_variations(needs, "F"), set())
 
+    def test_part_subsetting_the_variation_is_unselected(self):
+        needs = self.variation(["PC"])
+        needs["PC"] = need("physical", specializes=["PV"])
+        self.assertEqual(reuse(needs), {"F": "incomplete"})
+        self.assertEqual(unselected_variations(needs, "F"), {"PV"})
+
+    def test_part_subsetting_a_variant_of_the_variation_is_selected(self):
+        needs = self.variation(["PC"])
+        needs["PV1"]["specializes"] = ["PV"]
+        needs["PC"] = need("physical", specializes=["PV1"])
+        self.assertEqual(reuse(needs), {"F": "variant"})
+        self.assertEqual(unselected_variations(needs, "F"), set())
+
     def test_allocation_to_a_variant_reaches_its_parts(self):
         needs = self.variation(["PV1"])
         needs["PV1P"] = need("physical", platform=True, owned_by=["PV1"])
