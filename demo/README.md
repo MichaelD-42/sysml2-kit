@@ -8,7 +8,7 @@ You need the kit's tools on `PATH` (`sysml`, `sysml2kit`, `sphinx-build`, `make 
 
 ```sh
 export NEO4J_PASSWORD=...     # the password Neo4j is created with; never commit it
-make -C demo setup            # uv sync, and downloads the embedding model once (about 130 MB)
+make -C demo setup            # uv sync, and downloads the embedding model once
 make -C demo demo             # http://127.0.0.1:8000
 ```
 
