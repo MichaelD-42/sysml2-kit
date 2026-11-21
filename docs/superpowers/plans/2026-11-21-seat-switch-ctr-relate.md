@@ -213,6 +213,35 @@ Content:
 - [ ] **Step 2: Run** → FAIL. **Step 3: Implement.** **Step 4: Run** demo suite → PASS; check the view in the browser.
 - [ ] **Step 5: Commit** `feat(demo): meta-model view`.
 
+## Part 4b — Owner feedback from the demo walk (runs before Part 5)
+
+Owner input, 2026-11-21. Definitions (verbatim): a use case describes what you can do with the system; a feature is a capability/property of the system to fulfil a use case, someone finds valuable (usually a noun); a function is how a feature is implemented (needs a verb); a logical component is an abstract, solution-free component of the system; a physical component is a physical component of the system that is part of the solution. SW architecture and design are physical components: SW components and SW units (owner: "components and units").
+
+### Task 13: Method: definitions, use case titles, SW architecture and design
+
+**Files:**
+- Modify: `glossary.md`, `plugins/sysml-rflp/skills/rflp-method/references/structure.md`, `plugins/sysml-rflp/agents/{requirements-analyst,functional-architect,logical-architect,physical-architect}.md` (whichever exist), `plugins/sysml-rflp/skills/sysml-author/references/patterns.sysml`; kit code only if a rule or the bridge blocks the pattern (then a failing test first).
+
+Content: the five definitions verbatim; use case title pattern "The <actor> wants to <goal>" (e.g. "The driver wants to adjust the seat position") as the need title, the short identifier stays the model name; software as physical components: `#Software` SW components owned by the firmware part, `#Software` SW units owned by their component, SW component interfaces as ports and connections, logical components allocated to SW components, each software requirement (SWR) linked to the SW component or unit implementing it, unit verification by SWR tests (JUnit). `patterns.sysml` gains a firmware with one component and two units; `sysml check` clean.
+
+- [ ] Step 1: tests first for any kit change (bridge/rules) the SW pattern needs; Step 2: docs; Step 3: checks (unit suite, acceptance, plugin validate, `sysml check` patterns); Step 4: commit `docs: definitions, use case titles, software architecture and design as physical components`.
+
+### Task 14: Seat-switch examples: use case titles, electrical detail, connector, SW architecture and design
+
+**Files:** `examples/seat-switch-platform/**`, `examples/seat-switch-rfq/**`, `tests/acceptance.py` if anchors move.
+
+Content: every use case (platform and RFQ) titled by the pattern; every element checked against the definitions; electrical physical components at the level of switch contacts, microcontroller, LEDs and LED drivers, Hall sensors, LIN transceiver, supply/protection; a vehicle connector (`#Electrical`) with pins and a defined pin mapping (supply KL30, ground KL31, LIN), pins bound to the PCB supply and the LIN transceiver, the assembly's `lin`/`supply` ports reaching the vehicle through the connector, RFQ context showing the harness connection; firmware broken into SW components (boot manager/secure boot, input processing, illumination control, LIN stack, diagnostics incl. security access, update manager) and SW units under each, with ports/connections, LC allocations, SWRs linked to components/units, SWR tests on units. Both `make all` green, no compliance finding, acceptance green.
+
+- [ ] Step 1: platform; Step 2: RFQ; Step 3: all kit checks; Step 4: commit `feat(examples): use case titles, electrical detail, connector pin mapping, software architecture and design`.
+
+### Task 15: Demo: diagrams per element type, platform section, System Architecture title
+
+**Files:** `demo/explorer/views.py`, `demo/explorer/server.py` (tree kind `platform`), `demo/static/{index.html,js/*}`, `demo/tests/*`.
+
+Content: offer only the view kinds that apply to the selected element (use case: use cases, traceability; feature/function: activity, traceability; logical component: context, boundary, interfaces, composition, traceability; physical component incl. SW components/units and the connector: boundary, interfaces, composition, variants, traceability; requirement/constraint/CTR: traceability, V-model; compliance, V-model overview and meta-model always); check each element type renders sensibly in each offered view and fix what does not (e.g. pins and the pin mapping in boundary/interfaces, SW components and units in composition); left column: Requirements, System Architecture (renamed from "Model: use case > …", the RFQ's own RFLP tree), Platform (the platform's RFLP tree). Tests pinned on seat-switch ids; JS tests for the applicability map.
+
+- [ ] Step 1: failing tests; Step 2: implement; Step 3: demo suite, JS tests, browser walk; Step 4: commit `feat(demo): views per element type, platform section`.
+
 ## Part 5 — ASPICE review
 
 ### Task 12: ASPICE review document
