@@ -88,3 +88,12 @@ test("ELK lays out a toElk graph and fromElk returns every key", async () => {
   assert.ok(m.x > u.x && m.x + m.width < u.x + u.width, "the child sits inside its frame");
   for (const e of out.edges) assert.ok(e.points.length >= 2);
 });
+
+test("toElk shows an attribute without a value as its name only", () => {
+  const g = toElk({
+    kind: "trace",
+    nodes: [node("R", "RequirementUsage", null, { compartments: { attributes: [{ name: "t", value: "", unit: null }, { name: "u", value: null, unit: null }], ports: [] } })],
+    edges: [],
+  });
+  assert.deepEqual(g.children[0].meta.lines, ["t", "u"]);
+});

@@ -44,9 +44,7 @@ async function label(nodes) {
     nodes
       .filter((n) => n.name === n.key && /^[0-9a-f]{8}-/.test(n.key))
       .map(async (n) => {
-        const { node } = await api.element(n.key);
-        n.name = node.expression ?? node.value ?? keyword(n.kind);
-        names.set(n.key, n.name);
+        n.name = await panels.nameOf(n.key, names); // stays the uid if the fetch fails
       }),
   );
 }
@@ -92,13 +90,16 @@ async function show(kind, key) {
       // the focus has no such view: show the default one and say why
       const { node } = await api.element(key).catch(() => ({ node: {} }));
       const fitting = drillKind(node, kind);
-      why = `${esc(view.reason)}; showing the default ${esc(KINDS[kind].toLowerCase())}.
-        ${fitting !== kind ? `<button type="button" data-open="${fitting}" data-with="focus">${esc(KINDS[fitting])} of ${esc(names.get(key) ?? key)}</button>` : ""}`;
+      const name = await panels.nameOf(key, names);
+      const reason = view.reason.startsWith(key) ? name + view.reason.slice(key.length) : view.reason;
+      why = `${esc(reason)}; showing the default ${esc(KINDS[kind].toLowerCase())}.
+        ${fitting !== kind ? `<button type="button" data-open="${fitting}" data-with="focus">${esc(KINDS[fitting])} of ${esc(name)}</button>` : ""}`;
       view = await api.view(kind, null);
     }
     if (mine !== token) return;
     note.innerHTML = why;
     await label(view.nodes);
+    if (mine !== token) return;
     current.view = view;
     current.keys = new Set(view.nodes.flatMap((n) => [n.key, ...(n.compartments?.ports ?? []).map((p) => p.key)]));
     view.nodes.forEach((n) => names.has(n.key) || names.set(n.key, n.name));
@@ -201,6 +202,7 @@ function wire() {
       const { nodes, edges } = await api.reload();
       status.textContent = `loaded ${nodes} nodes, ${edges} edges`;
       await loadModel();
+      if (focus.get()) panels.revealInTree($("#tree"), focus.get());
       await show(current.kind, focus.get());
     } catch (err) {
       status.textContent = "";
@@ -231,6 +233,6 @@ wire();
 focus.subscribe(onFocus);
 await loadModel();
 panels.mountSearch($("#search"), names);
-panels.mountAsk($("#ask"), knownKeys);
+panels.mountAsk($("#ask"), knownKeys, names);
 panels.mountCypher($("#cypher"), knownKeys).catch((e) => console.error(`Cypher examples: ${e.message}`));
 await show("context", null);

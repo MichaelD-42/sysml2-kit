@@ -28,7 +28,7 @@ function describe(node, actors, compound) {
           ? "action"
           : "block";
   const { attributes = [], ports = [] } = node.compartments ?? {};
-  const lines = attributes.map((a) => (a.value == null ? a.name : `${a.name} = ${a.value}${a.unit ? ` ${a.unit}` : ""}`));
+  const lines = attributes.map((a) => (a.value == null || a.value === "" ? a.name : `${a.name} = ${a.value}${a.unit ? ` ${a.unit}` : ""}`));
   if (node.kind === "InterfaceDefinition") lines.push(...ports.map((p) => `end ${p.name}`));
   const tags = [];
   if (node.platform) tags.push("platform");

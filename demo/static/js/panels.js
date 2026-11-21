@@ -3,26 +3,56 @@
 import * as api from "./api.js";
 import { esc } from "./render.js";
 
-const ID = /^\S+$/;
+// what the agent cites: need ids (PC-001, EDU-PC-003), uids, test result ids
+const KEY_SHAPED = /^(EDU-)?[A-Z]+(-[A-Z]+)*-\d+$|^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$|^testresult__\S+$/;
+const UID = /^[0-9a-f]{8}-/;
 
 export const keyLink = (key, label) =>
   `<a href="#" class="key" data-key="${esc(key)}">${esc(label ?? key)}</a>`;
 
-/** Answer text as HTML: backticked known keys become focus links, unknown ids are marked. */
-export function linkCitations(text, knownKeys) {
+/** Display name for a key: cached, else the element's name, title or expression; the key on failure. */
+export async function nameOf(key, names) {
+  const known = names.get(key);
+  if (known && known !== key) return known;
+  try {
+    const { node } = await api.element(key);
+    const name = node.name ?? node.title ?? node.expression ?? key;
+    names.set(key, name);
+    return name;
+  } catch {
+    return key;
+  }
+}
+
+/** Fill every [data-name-of] element under `root` with that key's display name. */
+export function fillNames(root, names) {
+  for (const el of root.querySelectorAll("[data-name-of]"))
+    nameOf(el.dataset.nameOf, names).then((name) => (el.textContent = name));
+}
+
+/** Answer text as HTML: backticked known keys become focus links (uids show their name),
+ * unknown key-shaped tokens are marked unresolved. */
+export function linkCitations(text, knownKeys, names = new Map()) {
   return String(text)
     .split(/```\w*\n?([\s\S]*?)```/)
-    .map((part, i) => (i % 2 ? `<pre><code>${esc(part)}</code></pre>` : inline(part, knownKeys)))
+    .map((part, i) => (i % 2 ? `<pre><code>${esc(part)}</code></pre>` : inline(part, knownKeys, names)))
     .join("");
 }
 
-function inline(text, knownKeys) {
+function citation(key, names) {
+  if (!UID.test(key)) return keyLink(key);
+  const name = names.get(key);
+  if (name && name !== key) return keyLink(key, name);
+  return `<a href="#" class="key" data-key="${esc(key)}" data-name-of="${esc(key)}">${esc(key)}</a>`;
+}
+
+function inline(text, knownKeys, names) {
   return text
     .split(/`([^`]*)`/)
     .map((part, i) => {
       if (i % 2 === 0) return esc(part);
-      if (knownKeys.has(part)) return keyLink(part);
-      return ID.test(part)
+      if (knownKeys.has(part)) return citation(part, names);
+      return KEY_SHAPED.test(part)
         ? `<code class="unresolved" title="not found in the model">${esc(part)}</code>`
         : `<code>${esc(part)}</code>`;
     })
@@ -84,8 +114,9 @@ export function mountSearch(el, names) {
         hits.innerHTML = found
           .map((h) => `<li>${keyLink(h.key, h.name ?? h.key)}
             <span class="kind">${esc(h.kind)}</span>${h.shortName ? ` <span class="id">${esc(h.shortName)}</span>` : ""}
-            ${h.owner ? `<span class="owner">in ${esc(names.get(h.owner) ?? h.owner)}</span>` : ""}</li>`)
+            ${h.owner ? `<span class="owner">in <span data-name-of="${esc(h.owner)}">${esc(names.get(h.owner) ?? "…")}</span></span>` : ""}</li>`)
           .join("");
+        fillNames(hits, names);
       } catch (e) {
         status.innerHTML = `<span class="error">${esc(e.message)}</span>`;
       }
@@ -130,7 +161,7 @@ export async function mountCypher(el, knownKeys) {
   query.onkeydown = (e) => e.key === "Enter" && (e.ctrlKey || e.metaKey) && go();
 }
 
-export function mountAsk(el, knownKeys) {
+export function mountAsk(el, knownKeys, names) {
   el.innerHTML = `<div class="log" aria-live="polite"></div>
     <form><label for="ask-q">Ask about the product</label>
     <textarea id="ask-q" rows="3" placeholder="Which constraints apply to the drive motor, and where do they come from?"></textarea>
@@ -157,7 +188,8 @@ export function mountAsk(el, knownKeys) {
         if (ev.type === "text") {
           texts.push(ev.text);
           answer.classList.remove("pending");
-          answer.innerHTML = linkCitations(texts.join("\n\n"), knownKeys);
+          answer.innerHTML = linkCitations(texts.join("\n\n"), knownKeys, names);
+          fillNames(answer, names);
         } else if (ev.type === "tool") {
           tools.insertAdjacentHTML("beforeend", `<li><span class="tool">${esc(ev.name.replace(/^mcp__\w+?__/, ""))}</span> ${esc(ev.summary)}</li>`);
         } else if (ev.type === "error") {
