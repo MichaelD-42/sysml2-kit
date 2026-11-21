@@ -17,7 +17,7 @@
       <properties><property name="verifies" value="SSW-SWR-005"/></properties>
     </testcase>
   </testsuite>
-  <testsuite name="system-tests" tests="17" failures="0" errors="0" skipped="0" timestamp="2026-11-20T10:00:00">
+  <testsuite name="system-tests" tests="21" failures="0" errors="0" skipped="0" timestamp="2026-11-20T10:00:00">
     <testcase classname="system" name="adjustment_directions" time="600">
       <properties><property name="verifies" value="SSW-STC-001"/></properties>
     </testcase>
@@ -68,6 +68,18 @@
     </testcase>
     <testcase classname="system" name="lin_conformance" time="2400">
       <properties><property name="verifies" value="SSW-STC-017"/></properties>
+    </testcase>
+    <testcase classname="system" name="end_of_line_cycle_time" time="900">
+      <properties><property name="verifies" value="SSW-STC-018"/></properties>
+    </testcase>
+    <testcase classname="system" name="marking_inspection" time="600">
+      <properties><property name="verifies" value="SSW-STC-019"/></properties>
+    </testcase>
+    <testcase classname="system" name="workshop_reflash" time="300">
+      <properties><property name="verifies" value="SSW-STC-020"/></properties>
+    </testcase>
+    <testcase classname="system" name="side_keyed_assembly" time="300">
+      <properties><property name="verifies" value="SSW-STC-021"/></properties>
     </testcase>
   </testsuite>
   <testsuite name="acceptance-tests" tests="5" failures="0" errors="0" skipped="0" timestamp="2026-11-20T14:00:00">

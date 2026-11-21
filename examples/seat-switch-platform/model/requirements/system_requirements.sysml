@@ -6,7 +6,7 @@ package SeatSwitchRequirements {
 
     requirement <'SSW-SR-001'> adjustmentDirections {
         @Satisfies { need = "SSW-PRQ-001"; }
-        doc /* The switch shall report fore, aft, up, down, recline forward, recline back, lumbar in and lumbar out as eight distinct requests while the knob is held in that direction. */
+        doc /* The switch shall report seat fore, aft, up, down, recline forward and recline back, and lumbar up, down, in and out, as ten distinct requests while the knob or lumbar pad is held in that direction. */
     }
     requirement <'SSW-SR-002'> comfortKeySteps {
         @Satisfies { need = "SSW-PRQ-002"; }
@@ -30,7 +30,7 @@ package SeatSwitchRequirements {
     }
     requirement <'SSW-SR-007'> protectedWrite {
         @Satisfies { need = "SSW-PRQ-007"; }
-        doc /* The switch shall reject every diagnostic write and flash request until a security access exchange has succeeded. */
+        doc /* The switch shall reject every diagnostic write and flash request until the tester has passed certificate-based authentication. */
     }
     requirement <'SSW-SR-008'> endOfLineTestMode {
         @Satisfies { need = "SSW-PRQ-008"; }
@@ -43,5 +43,9 @@ package SeatSwitchRequirements {
     requirement <'SSW-SR-010'> mirroredMounting {
         @Satisfies { need = "SSW-PRQ-017"; }
         doc /* Each switch shall fit only the seat trim opening of its own side, left or right, and no opening of the other side. */
+    }
+    requirement <'SSW-SR-011'> sideKeyedAssembly {
+        @Satisfies { need = "SSW-PRQ-021"; }
+        doc /* Each housing shall accept the knob carrier and keymat of its own side only. */
     }
 }

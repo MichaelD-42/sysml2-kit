@@ -2,15 +2,18 @@
 
 What the seat-switch product line offers every vehicle program. In this project they take the
 place of customer requirements: use cases realize them, system requirements and constraints
-satisfy them. Environmental values follow the supplier's qualification plan QP-SSW-01, which
+satisfy them. SSW-PRQ-001 to -017 describe what the product line offers a customer;
+SSW-PRQ-018 to -021 are our own production and workshop requirements, set by internal standards
+SSW-PRD-04 (production) and SSW-SRV-02 (service). Environmental values follow the supplier's qualification plan QP-SSW-01, which
 covers the fictional OEM standards OEM-ENV-100 and OEM-EMC-200.
 
 :::{prq} Seat adjustment input
 :id: SSW-PRQ-001
 :class: functional
 
-The switch shall let the occupant request seat fore/aft, height, recline and lumbar adjustment
-from one knob, for as long as the knob is held.
+The switch shall let the occupant request seat fore/aft, height and recline adjustment from a
+seat-shaped two-part knob (cushion and backrest), and lumbar support adjustment from a 4-way pad,
+for as long as the knob or pad is held.
 :::
 
 :::{prq} Comfort function input by button set
@@ -57,8 +60,8 @@ the supplier.
 :class: functional
 :tags: cybersecurity
 
-Diagnostic services that write data or flash firmware shall be locked until the tester has
-authenticated.
+Diagnostic services that write data or flash firmware shall be locked until the tester has passed
+certificate-based authentication.
 :::
 
 :::{prq} End-of-line test and variant coding
@@ -115,7 +118,7 @@ IP5K4 when mounted in the seat trim.
 :id: SSW-PRQ-015
 :class: constraint
 
-±8 kV contact and air discharge on every touchable surface.
+±8 kV contact discharge and ±15 kV air discharge on every touchable surface.
 :::
 
 :::{prq} LIN version
@@ -132,4 +135,40 @@ LIN 2.2A.
 
 Housings for the left and right seat side shall be mirror images, and a housing shall not be
 fittable on the wrong side.
+:::
+
+:::{prq} End-of-line test cycle time
+:id: SSW-PRQ-018
+:class: non-functional
+:tags: production
+
+Our end-of-line station requires the complete key, LED and coding test of one switch to finish
+within 12 s, to hold the line's cycle time.
+:::
+
+:::{prq} Traceability marking
+:id: SSW-PRQ-019
+:class: constraint
+:tags: production
+
+Production requires every switch to carry a laser-marked Data Matrix code with part number,
+variant and serial number, per SSW-PRD-04.
+:::
+
+:::{prq} Workshop reflash time
+:id: SSW-PRQ-020
+:class: non-functional
+:tags: workshop
+
+Our service process (SSW-SRV-02) requires a full firmware reflash over LIN, with the fault memory
+read before and after, to finish within 120 s.
+:::
+
+:::{prq} Side-keyed assembly
+:id: SSW-PRQ-021
+:class: constraint
+:tags: production
+
+Our assembly line requires that left-hand and right-hand inner parts cannot be assembled into a
+housing of the other side.
 :::

@@ -6,7 +6,7 @@ package SeatSwitchSystemTests {
     private import SeatSwitchRequirements::*;
 
     verification <'SSW-STC-001'> adjustmentDirectionTest {
-        doc /* Push the knob in each of the eight directions on the HIL bench; pass if each yields its own request on LIN while held and none after release. */
+        doc /* Push the cushion and backrest knob parts and the lumbar pad in each of the ten directions on the HIL bench; pass if each yields its own request on LIN while held and none after release. */
         objective { verify adjustmentDirections; }
     }
     verification <'SSW-STC-002'> comfortKeyTest {
@@ -30,7 +30,7 @@ package SeatSwitchSystemTests {
         objective { verify signedFirmware; }
     }
     verification <'SSW-STC-007'> securityAccessTest {
-        doc /* Send write and flash requests without, with a wrong and with a correct security access key; pass if only the last is accepted. */
+        doc /* Send write and flash requests without authentication, with an expired, a foreign and a valid tester certificate; pass if only the last is accepted. */
         objective { verify protectedWrite; }
     }
     verification <'SSW-STC-008'> endOfLineTest {
@@ -68,10 +68,26 @@ package SeatSwitchSystemTests {
     }
     verification <'SSW-STC-016'> esdTest {
         @Verifies { need = "SSW-CON-008"; }
-        doc /* Discharge 8 kV contact and air on every touchable surface, powered and unpowered; pass without reset or damage. */
+        doc /* Discharge ±8 kV contact and ±15 kV air on every touchable surface, powered and unpowered; pass without reset or damage. */
     }
     verification <'SSW-STC-017'> linConformanceTest {
         @Verifies { need = "SSW-CON-009"; }
         doc /* Run the LIN 2.2A protocol conformance test suite; pass if every case passes. */
+    }
+    verification <'SSW-STC-018'> endOfLineCycleTimeTest {
+        @Verifies { need = "SSW-CON-010"; }
+        doc /* Run 50 switches of each button set through the end-of-line station; pass if no test cycle exceeds 12 s. */
+    }
+    verification <'SSW-STC-019'> markingInspection {
+        @Verifies { need = "SSW-CON-011"; }
+        doc /* Read the Data Matrix of 50 switches with the line scanner after the temperature test; pass if every code reads at grade B or better per SSW-PRD-04. */
+    }
+    verification <'SSW-STC-020'> workshopReflashTest {
+        @Verifies { need = "SSW-CON-012"; }
+        doc /* With the workshop tester on the vehicle LIN, read the fault memory, reflash, and read it again; pass if the sequence takes at most 120 s. */
+    }
+    verification <'SSW-STC-021'> sideKeyedAssemblyCheck {
+        doc /* Try to assemble each housing with the knob carrier and keymat of the other side; pass if no combination can be assembled. */
+        objective { verify sideKeyedAssembly; }
     }
 }

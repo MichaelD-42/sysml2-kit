@@ -20,10 +20,15 @@ package SeatSwitchPhysical {
         attribute minOperatingTemperature : ThermodynamicTemperatureValue;
         attribute maxOperatingTemperature : ThermodynamicTemperatureValue;
         attribute ipRating : String;
-        attribute esdLevel : ElectricPotentialDifferenceValue;
+        attribute esdContactLevel : ElectricPotentialDifferenceValue;
+        attribute esdAirLevel : ElectricPotentialDifferenceValue;
         attribute durabilityCycles : Integer;
         attribute symbolLuminance : LuminanceValue;
         attribute linVersion : String;
+        // set by our own production and workshop requirements, not by a customer
+        attribute endOfLineTestTime : DurationValue;
+        attribute partMarking : String;
+        attribute reflashTime : DurationValue;
 
         constraint <'SSW-CON-001'> actuationForceWindow {
             @Satisfies { need = "SSW-PRQ-009"; }
@@ -62,13 +67,28 @@ package SeatSwitchPhysical {
         }
         constraint <'SSW-CON-008'> esdImmunity {
             @Satisfies { need = "SSW-PRQ-015"; }
-            doc /* The switch shall withstand electrostatic discharge of at least 8 kV on every touchable surface. */
-            esdLevel >= 8000 [V]
+            doc /* The switch shall withstand electrostatic discharge of ±8 kV contact and ±15 kV air on every touchable surface. */
+            esdContactLevel >= 8000 [V] and esdAirLevel >= 15000 [V]
         }
         constraint <'SSW-CON-009'> linProtocolVersion {
             @Satisfies { need = "SSW-PRQ-016"; }
             doc /* The switch shall implement LIN protocol version 2.2A. */
             linVersion == "2.2A"
+        }
+        constraint <'SSW-CON-010'> endOfLineCycleTime {
+            @Satisfies { need = "SSW-PRQ-018"; }
+            doc /* The end-of-line test of one switch shall take at most 12 s. */
+            endOfLineTestTime <= 12 [s]
+        }
+        constraint <'SSW-CON-011'> traceabilityMarking {
+            @Satisfies { need = "SSW-PRQ-019"; }
+            doc /* Every switch shall carry a laser-marked Data Matrix code. */
+            partMarking == "laser Data Matrix"
+        }
+        constraint <'SSW-CON-012'> workshopReflashTime {
+            @Satisfies { need = "SSW-PRQ-020"; }
+            doc /* A full reflash over LIN, with fault memory readout before and after, shall take at most 120 s. */
+            reflashTime <= 120 [s]
         }
     }
 
@@ -76,7 +96,8 @@ package SeatSwitchPhysical {
     part def Housing {
         doc /* Characteristics every housing variant states. */
         attribute side : String;
-        attribute clipPosition : String;
+        attribute clipPattern : String;
+        attribute codingRib : String;
     }
     part def ButtonSet {
         doc /* Characteristics every button set states. */
@@ -87,25 +108,28 @@ package SeatSwitchPhysical {
 
     // the housing is mirrored by seat side; an RFQ selects one variant per seat position
     #Mechanical variation part <'SSW-PC-001'> housing : Housing {
-        doc /* PBT-GF30 housing family with snap-fit clips into the seat side trim, BOM SSW-HSG-100. */
+        doc /* PBT-GF30 housing family: one forward-offset snap-fit clip pattern and a coding rib, mirrored left to right, so a housing fits only its own side's trim opening, BOM SSW-HSG-100. */
         variant #Mechanical part <'SSW-PC-002'> housingLH {
-            doc /* Left-hand housing, clips offset to the front so it fits only a left-hand trim, BOM SSW-HSG-110. */
+            doc /* Left-hand housing; its coding rib keys into the slot of the left-hand trim opening only, BOM SSW-HSG-110. */
             attribute :>> side = "left";
-            attribute :>> clipPosition = "front-offset";
+            attribute :>> clipPattern = "forward-offset";
+            attribute :>> codingRib = "left-hand";
             #Mechanical port <'SSW-PI-001'> clipsLH : ClipPort;
         }
         variant #Mechanical part <'SSW-PC-003'> housingRH {
-            doc /* Right-hand housing, mirror image of the left-hand one, clips offset to the rear, BOM SSW-HSG-120. */
+            doc /* Right-hand housing, mirror image of the left-hand one, clip pattern and coding rib included, BOM SSW-HSG-120. */
             attribute :>> side = "right";
-            attribute :>> clipPosition = "rear-offset";
+            attribute :>> clipPattern = "forward-offset";
+            attribute :>> codingRib = "right-hand";
             #Mechanical port <'SSW-PI-002'> clipsRH : ClipPort;
         }
     }
     #Mechanical part <'SSW-PC-004'> knob {
-        doc /* Seat-shaped two-part adjustment knob, cushion and backrest, BOM SSW-KNB-200. */
+        doc /* Seat-shaped two-part adjustment knob (cushion and backrest) and a 4-way lumbar pad, BOM SSW-KNB-200. */
     }
     #Mechanical part <'SSW-PC-005'> buttonCaps {
-        doc /* Laser-etched comfort key caps with night-design symbol windows, BOM SSW-CAP-300. */
+        doc /* Laser-etched comfort key caps with night-design symbol windows, BOM SSW-CAP-300.
+         * The caps and the housing's key openings follow the button set. */
     }
     #Mechanical part <'SSW-PC-006'> seal {
         doc /* Silicone keymat seal between caps and PCB, BOM SSW-SEL-400. */
@@ -116,7 +140,7 @@ package SeatSwitchPhysical {
         port supply : ~PowerPort;
     }
     #Electrical part <'SSW-PC-008'> hallSensors {
-        doc /* Four 3D hall sensors under the knob, BOM SSW-HAL-510. */
+        doc /* 3D hall sensors under the knob parts and the lumbar pad, BOM SSW-HAL-510. */
         port directions : KeyPort;
     }
     #Electrical part <'SSW-PC-009'> linTransceiver {
@@ -157,7 +181,7 @@ package SeatSwitchPhysical {
     }
 
     #Software part <'SSW-PC-016'> switchFirmware {
-        doc /* Switch firmware: secure boot, security access, LIN stack, diagnostics; module SSW-SW-700. */
+        doc /* Switch firmware: secure boot, tester authentication, LIN stack, diagnostics; module SSW-SW-700. */
         #Software port <'SSW-PI-004'> linStack : ~LinPort;
     }
 
@@ -170,10 +194,14 @@ package SeatSwitchPhysical {
         attribute :>> minOperatingTemperature = -40 ['°C'];
         attribute :>> maxOperatingTemperature = 85 ['°C'];
         attribute :>> ipRating = "IP5K4";
-        attribute :>> esdLevel = 8000 [V];
+        attribute :>> esdContactLevel = 8000 [V];
+        attribute :>> esdAirLevel = 15000 [V];
         attribute :>> durabilityCycles = 200000;
         attribute :>> symbolLuminance = 20 [cd/m^2];
         attribute :>> linVersion = "2.2A";
+        attribute :>> endOfLineTestTime = 9 [s];
+        attribute :>> partMarking = "laser Data Matrix";
+        attribute :>> reflashTime = 95 [s];
 
         ref part housing :> SeatSwitchPhysical::housing;
         ref part knob :> SeatSwitchPhysical::knob;

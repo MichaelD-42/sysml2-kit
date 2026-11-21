@@ -6,9 +6,9 @@ package SeatSwitchFeatures {
     private import SeatSwitchItems::*;
 
     #Feature action <'SSW-FEAT-001'> seatAdjustmentInput {
-        doc /* Seat fore/aft, height, recline and lumbar adjustment from one seat-shaped knob. */
+        doc /* Seat fore/aft, height and recline adjustment from a seat-shaped two-part knob, lumbar support from a 4-way pad. */
         action <'SSW-F-001'> senseKnobDirection {
-            doc /* Detect which of the eight directions the knob is pushed in. */
+            doc /* Detect which direction a knob part or the lumbar pad is pushed in. */
             out keyState : KeyState;
         }
         action <'SSW-F-002'> debounceAdjustmentInput {
@@ -16,7 +16,7 @@ package SeatSwitchFeatures {
             in keyState : KeyState;
         }
         action <'SSW-F-003'> mapToAdjustmentSignal { doc /* Map the accepted direction to its LIN signal. */ }
-        action <'SSW-F-004'> provideTactileFeedback { doc /* Guide knob and key travel and give a tactile click at the actuation point. */ }
+        action <'SSW-F-004'> provideTactileFeedback { doc /* Guide knob, pad and key travel and give a tactile click at the actuation point. */ }
 
         first senseKnobDirection then debounceAdjustmentInput;
         first debounceAdjustmentInput then mapToAdjustmentSignal;
@@ -62,7 +62,7 @@ package SeatSwitchFeatures {
         doc /* Fault memory, protected diagnostic access, end-of-line test and variant coding. */
         action <'SSW-F-014'> storeFaultCodes { doc /* Record stuck keys, LED faults and supply faults as diagnostic trouble codes. */ }
         action <'SSW-F-015'> answerDiagnosticRequests { doc /* Answer diagnostic read, clear and write requests. */ }
-        action <'SSW-F-016'> grantSecurityAccess { doc /* Unlock protected services after a successful seed-key exchange. */ }
+        action <'SSW-F-016'> grantSecurityAccess { doc /* Unlock protected services after the tester has authenticated with a valid certificate. */ }
         action <'SSW-F-017'> runEndOfLineTest { doc /* Report key states and drive LEDs on command from the end-of-line tester. */ }
         action <'SSW-F-018'> storeVariantCoding { doc /* Store the button-set variant code and enable only its keys. */ }
 

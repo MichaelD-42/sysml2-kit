@@ -13,14 +13,15 @@ The boot loader shall check the application image's ECDSA signature against the 
 write-protected flash at every start and stay in boot mode if the check fails.
 :::
 
-:::{swreq} Security access
+:::{swreq} Tester authentication
 :id: SSW-SWR-002
 :satisfies: SSW-SR-007
 :realizes: SSW-PC-016
 :tags: cybersecurity
 
-The diagnostic stack shall unlock write and flash services only after a correct seed-key response,
-and lock for 10 s after three wrong keys.
+The diagnostic stack shall unlock write and flash services only after the tester presents a
+certificate that chains to the root key in write-protected flash and proves possession of its
+private key, and shall refuse further attempts for 10 s after three failed ones.
 :::
 
 :::{swreq} LIN stack
@@ -37,7 +38,7 @@ received frames with a wrong checksum.
 :satisfies: SSW-SR-001, SSW-SR-002
 :realizes: SSW-PC-016
 
-The firmware shall accept a key or knob direction after 10 ms of stable input.
+The firmware shall accept a key, knob or lumbar pad direction after 10 ms of stable input.
 :::
 
 :::{swreq} Fault memory

@@ -4,15 +4,17 @@ package SeatSwitchLogical {
 
     private import SeatSwitchFeatures::*;
     private import SeatSwitchRequirements::*;
+    // typed by the assembly definition, so an RFQ component subsetting seatSwitch inherits its attributes
+    private import SeatSwitchPhysical::SwitchAssembly;
 
-    part <'SSW-LC-001'> seatSwitch {
+    part <'SSW-LC-001'> seatSwitch : SwitchAssembly {
         doc /* The seat adjustment switch as a whole. */
         part <'SSW-LC-002'> keypad {
             doc /* Turns comfort key presses into key states. */
             port <'SSW-LI-001'> keyStates;
         }
         part <'SSW-LC-003'> positionSensing {
-            doc /* Turns knob movement into direction states. */
+            doc /* Turns knob and lumbar pad movement into direction states. */
             port <'SSW-LI-002'> directionStates;
         }
         part <'SSW-LC-004'> switchController {
@@ -32,7 +34,7 @@ package SeatSwitchLogical {
             port <'SSW-LI-009'> lightDrive;
         }
         part <'SSW-LC-007'> enclosure {
-            doc /* Holds and seals the switch, guides knob and keys, mounts it in the seat trim. */
+            doc /* Holds and seals the switch, guides knob, lumbar pad and keys, mounts it in the seat trim. */
             port <'SSW-LI-010'> trimMount;
         }
 
@@ -74,4 +76,5 @@ package SeatSwitchLogical {
     satisfy endOfLineTestMode by seatSwitch.switchController;
     satisfy variantCoding by seatSwitch.switchController;
     satisfy mirroredMounting by seatSwitch.enclosure;
+    satisfy sideKeyedAssembly by seatSwitch.enclosure;
 }

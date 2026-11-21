@@ -8,7 +8,7 @@ package SeatSwitchUseCases {
     use case <'SSW-UC-001'> adjustSeat {
         @Realizes { need = "SSW-PRQ-001"; }
         @Realizes { need = "SSW-PRQ-004"; }
-        doc /* The occupant pushes the knob; the seat control unit moves the seat while the knob is held. */
+        doc /* The occupant pushes the seat knob or the lumbar pad; the seat control unit moves the seat while it is held. */
         subject seatSwitch;
         actor occupant;
         actor seatControlUnit;
