@@ -75,6 +75,33 @@ class ViewsTest(unittest.TestCase):
         keys = {n["key"] for n in self.view("trace", "CRS-003")["nodes"]}
         self.assertLessEqual({"SR-005", "LC-007", "PC-001", "STC-005"}, keys)
 
+    def test_trace_stops_at_other_requirements(self):
+        keys = {n["key"] for n in self.view("trace", "CRS-001")["nodes"]}
+        self.assertNotIn("CRS-002", keys)
+
+    def test_trace_shows_the_constraint(self):
+        v = self.view("trace", "CRS-003")
+        kinds = {n["key"]: n["kind"] for n in v["nodes"]}
+        required = [e["dst"] for e in v["edges"] if e["type"] == "REQUIRES"]
+        self.assertEqual(
+            [e["src"] for e in v["edges"] if e["type"] == "REQUIRES"], ["SR-005"]
+        )
+        self.assertEqual(kinds[required[0]], "ConstraintUsage")
+
+    def test_context_draws_each_thing_once(self):
+        v = self.view("context")
+        names = [n["name"] for n in v["nodes"]]
+        self.assertEqual(len(names), len(set(names)))
+        self.assertEqual([n["key"] for n in v["nodes"]].count(v["focus"]), 1)
+
+    def test_usecase_actors_once(self):
+        names = [n["name"] for n in self.view("usecases")["nodes"]]
+        self.assertEqual(len(names), len(set(names)))
+
+    def test_defaults_prefer_the_project_over_the_platform(self):
+        self.assertEqual(self.view("activity")["focus"], "FEAT-001")
+        self.assertEqual(self.view("usecases")["focus"], "UC-001")
+
     def test_compliance(self):
         table = (VEHICLE / "docs" / "_generated" / "compliance.md").read_text()
         expected = re.findall(r"^\| \{need\}`([^`]+)`", table, re.MULTILINE)

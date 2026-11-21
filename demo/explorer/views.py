@@ -16,7 +16,7 @@ KINDS = (
     "trace",
     "compliance",
 )
-NEED_LINKS = "SATISFIES|ALLOCATED_TO|VERIFIES|REALIZES|MATCHES|PARTIAL_MATCHES|ANSWERS|TESTS|OWNED_BY"
+NEED_LINKS = "SATISFIES|ALLOCATED_TO|VERIFIES|REALIZES|MATCHES|PARTIAL_MATCHES|ANSWERS|TESTS|REQUIRES"
 ROW = ("crs", "title", "features", "reuse", "partial", "statements", "domains")
 TREE_KINDS = [
     "Package",
@@ -31,7 +31,7 @@ TREE_KINDS = [
 # a view query binds `nodes` ([{key, parent, ...extras}]) and `edges`; these close it
 LABEL = (
     "coalesce(r.item, head(COLLECT { MATCH (end)-[:TYPED_BY]->(:PortDefinition)"
-    "-[:OWNS]->(:ItemUsage)-[:TYPED_BY]->(item) WHERE end IN [a, b] RETURN item.name }))"
+    "-[:OWNS]->(:ItemUsage)-[:TYPED_BY]->(item) WHERE end IN [startNode(r), endNode(r)] RETURN item.name }))"
 )
 
 
@@ -65,7 +65,8 @@ PORTS = """COLLECT {{
   RETURN {{n: q, parent: h}}
 }}"""
 
-CONTEXT = """
+CONTEXT = (
+    """
 MATCH (f:Node {key: $focus})
 WITH f, COLLECT { MATCH (p:PartUsage)-[:SPECIALIZES]->(f) RETURN p } AS uses
 WITH f, uses, COLLECT {
@@ -77,18 +78,30 @@ WITH f, uses, COLLECT {
 // shortcut: subjects are untyped references, matched to the focus by name; type them to drop this
 COLLECT {
   MATCH (uc:UseCaseUsage)-[:SUBJECT]->({name: f.name}), (uc)-[:OWNS]->(a:PartUsage)
-  RETURN {a: a, uc: uc}
+  RETURN {a: a, uc: uc.name}
 } AS actors
-WITH f, uses, others, actors,
-  [n IN [f] + uses + others + [x IN actors | x.a] | {key: n.key, parent: null}] AS nodes
-WITH nodes, [n IN nodes | n.key] AS keys,
-  [p IN uses | {src: p.key, dst: f.key, type: 'SPECIALIZES', label: null}]
-  + [x IN actors | {src: x.a.key, dst: f.key, type: 'ACTOR', label: x.uc.name}] AS extra
+// one node per actor name, the context's own part when it has one
+WITH f, uses, others, actors, COLLECT {
+  UNWIND actors AS x WITH x WHERE NOT x.a.name IN [o IN others | o.name]
+  WITH x.a.name AS name, collect(x.a)[0] AS a RETURN a
+} AS cast
+WITH f, uses, others + cast AS shown, actors
+// the usages that specialize the focus are drawn as the focus itself
+WITH f, [n IN [f] + shown | {key: n.key, parent: null}] AS nodes,
+  [n IN [f] + uses + shown | n.key] AS keys, [p IN uses | p.key] AS folded,
+  [x IN actors | {src: [n IN shown WHERE n.name = x.a.name][0].key, dst: f.key, type: 'ACTOR', label: x.uc}] AS extra
 RETURN nodes, COLLECT {
-  MATCH (a:Node)-[:OWNS*0..1]->(end1)-[r:CONNECTS|FLOW]->(end2)<-[:OWNS*0..1]-(b:Node)
+  MATCH (a:Node)-[:OWNS*0..1]->()-[r:CONNECTS|FLOW]->()<-[:OWNS*0..1]-(b:Node)
   WHERE a.key IN keys AND b.key IN keys AND a <> b
-  RETURN DISTINCT {src: a.key, dst: b.key, type: type(r), label: r.item}
+  RETURN DISTINCT {
+    src: CASE WHEN a.key IN folded THEN f.key ELSE a.key END,
+    dst: CASE WHEN b.key IN folded THEN f.key ELSE b.key END,
+    type: type(r), label: """
+    + LABEL
+    + """
+  }
 } + extra AS edges"""
+)
 
 BOUNDARY = (
     """
@@ -189,13 +202,23 @@ WITH s, COLLECT { MATCH (pkg)-[:OWNS]->(uc:UseCaseUsage) RETURN uc } AS ucs
 WITH s, ucs, COLLECT {
   UNWIND ucs AS uc MATCH (uc)-[:OWNS]->(a:PartUsage) RETURN {a: a, uc: uc}
 } AS actors
+// one node per actor name across the use cases
+WITH s, ucs, actors, COLLECT {
+  UNWIND actors AS x WITH x.a.name AS name, collect(x.a)[0] AS a RETURN a
+} AS cast
 RETURN [{key: s.key, parent: null}] + [uc IN ucs | {key: uc.key, parent: s.key}]
-  + [x IN actors | {key: x.a.key, parent: null}] AS nodes,
-  [x IN actors | {src: x.a.key, dst: x.uc.key, type: 'ACTOR', label: null}] AS edges"""
+  + [a IN cast | {key: a.key, parent: null}] AS nodes,
+  [x IN actors | {
+    src: [a IN cast WHERE a.name = x.a.name][0].key, dst: x.uc.key, type: 'ACTOR', label: null
+  }] AS edges"""
 
 TRACE = f"""
 MATCH (f:Node {{key: $focus}})
-WITH [f] + COLLECT {{ MATCH (f)-[:{NEED_LINKS}*1..6]-(n) RETURN DISTINCT n }} AS ns
+// another customer requirement ends the chain: the view is this requirement's RFLP chain
+WITH [f] + COLLECT {{
+  MATCH p = (f)-[:{NEED_LINKS}*1..6]-(n) WHERE none(x IN nodes(p)[1..] WHERE x:crs)
+  RETURN DISTINCT n
+}} AS ns
 WITH [n IN ns | {{key: n.key, parent: null}}] AS nodes""" + _close(NEED_LINKS)
 
 QUERIES = {
@@ -214,10 +237,10 @@ DEFAULTS = {
     "boundary": LOGICAL,
     "interfaces": LOGICAL,
     "composition": LOGICAL,
-    "activity": "MATCH (n:feature) RETURN n.key ORDER BY n.key LIMIT 1",
-    "variants": "MATCH (n:Node) WHERE n.isVariation RETURN n.key ORDER BY n.key LIMIT 1",
-    "usecases": "MATCH (n:UseCaseUsage) RETURN n.key ORDER BY n.key LIMIT 1",
-    "trace": "MATCH (n:crs) RETURN n.key ORDER BY n.key LIMIT 1",
+    "activity": "MATCH (n:feature) RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
+    "variants": "MATCH (n:Node) WHERE n.isVariation RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
+    "usecases": "MATCH (n:UseCaseUsage) RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
+    "trace": "MATCH (n:crs) RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
 }
 REASONS = {
     "activity": "has no actions",
@@ -275,13 +298,13 @@ def _nodes(driver, rows):
     return out
 
 
-def compliance_rows(needs_path: Path) -> list[dict]:
-    """The kit's compliance rows as dicts, then one `{"findings": [...]}`."""
+def compliance_rows(needs_path: Path) -> dict:
+    """The kit's compliance rows as dicts and its findings."""
     data = json.loads(needs_path.read_text())
     rows, findings = compliance(
         data["versions"][data.get("current_version", "")]["needs"]
     )
-    return [dict(zip(ROW, r)) for r in rows] + [{"findings": findings}]
+    return {"rows": [dict(zip(ROW, r)) for r in rows], "findings": findings}
 
 
 def view(driver, kind: str, focus: str | None, needs_path: Path | None = None) -> dict:
@@ -290,8 +313,8 @@ def view(driver, kind: str, focus: str | None, needs_path: Path | None = None) -
     if kind == "compliance":
         if needs_path is None:
             raise ValueError("the compliance view needs needs_path")
-        rows = compliance_rows(needs_path)
-        findings = rows.pop()["findings"]
+        table = compliance_rows(needs_path)
+        rows, findings = table["rows"], table["findings"]
         nodes = _nodes(driver, [{"key": r["crs"], "parent": None} for r in rows])
         return {
             "kind": kind,
