@@ -4,7 +4,9 @@
 LAYERS = "RFLPV?"
 # rule id (docs/schemas.json) -> the layer it gates (rflp-method structure.md)
 RULE_LAYERS = {
+    "crs-class": "R",
     "crs-satisfied": "R",
+    "constraint-satisfies": "R",
     "usecase-realizes": "R",
     "sysreq-satisfies": "R",
     "cst-compliance": "R",
@@ -16,6 +18,9 @@ RULE_LAYERS = {
     "logical-allocated": "P",
     "physical-used": "P",
     "systest-verifies": "V",
+    "systest-implements": "V",
+    "constraint-verified": "V",
+    "ctr-implemented": "V",
     "acctest-verifies": "V",
     "sysreq-verified": "V",
     "usecase-verified": "V",

@@ -159,6 +159,22 @@ MUTATIONS = [
         r"CRS-004.*\n.*\n.*\n.*crs-satisfied",
     ),
     (
+        "a customer requirement without a class violates crs-class",
+        "all",
+        replace("docs/customer/requirements.md", ":class: functional\n", ""),
+        r"crs-class",
+    ),
+    (
+        "a constraint satisfying no requirement violates constraint-satisfies",
+        "all",
+        replace(
+            "docs/customer/requirements.md",
+            "whichever comes first.\n:::\n",
+            "whichever comes first.\n:::\n\n:::{constraint} Unused limit\n:id: CON-099\n\nA limit.\n:::\n",
+        ),
+        r"constraint-satisfies",
+    ),
+    (
         "a compliance statement without a compliance value violates cst-compliance",
         "all",
         replace("docs/customer/statements.md", ":compliance: comply\n", ""),

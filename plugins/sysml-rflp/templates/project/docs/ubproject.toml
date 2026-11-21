@@ -230,7 +230,7 @@ description = "Compliance statement: comply, partial or not-comply"
 nullable = true
 schema = { type = "string", enum = ["comply", "partial", "not-comply"] }
 
-# set on customer requirements (CRS) only
+# set on customer and platform requirements (CRS, PRQ) only
 [needs.fields.class]
 description = "Requirement class: functional, non-functional, constraint or information"
 default = ""

@@ -1,8 +1,39 @@
 {
   "schemas": [
     {
+      "id": "crs-class",
+      "message": "Customer requirement has no class",
+      "select": {
+        "properties": {
+          "type": {
+            "enum": [
+              "crs",
+              "prq"
+            ]
+          }
+        }
+      },
+      "validate": {
+        "local": {
+          "properties": {
+            "class": {
+              "enum": [
+                "functional",
+                "non-functional",
+                "constraint",
+                "information"
+              ]
+            }
+          },
+          "required": [
+            "class"
+          ]
+        }
+      }
+    },
+    {
       "id": "crs-satisfied",
-      "message": "Customer requirement is not satisfied by any system requirement",
+      "message": "Customer requirement is not satisfied by any system requirement or constraint",
       "select": {
         "properties": {
           "type": {
@@ -13,6 +44,13 @@
           },
           "scope": {
             "const": ""
+          },
+          "class": {
+            "enum": [
+              "functional",
+              "non-functional",
+              "constraint"
+            ]
           }
         }
       },
@@ -23,7 +61,10 @@
               "local": {
                 "properties": {
                   "type": {
-                    "const": "sysreq"
+                    "enum": [
+                      "sysreq",
+                      "constraint"
+                    ]
                   }
                 }
               }
@@ -57,6 +98,39 @@
                 "properties": {
                   "type": {
                     "const": "acctest"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "ctr-implemented",
+      "message": "Customer test requirement is not implemented by any system or acceptance test",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "ctr"
+          },
+          "scope": {
+            "const": ""
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "implements": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "systest",
+                      "acctest"
+                    ]
                   }
                 }
               }
@@ -250,6 +324,39 @@
       }
     },
     {
+      "id": "constraint-satisfies",
+      "message": "Constraint does not satisfy any customer requirement",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "constraint"
+          },
+          "platform": {
+            "const": false
+          }
+        }
+      },
+      "validate": {
+        "network": {
+          "satisfies": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "crs",
+                      "prq"
+                    ]
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
       "id": "sysreq-satisfied",
       "message": "System requirement is not satisfied by any logical component",
       "select": {
@@ -286,6 +393,36 @@
         "properties": {
           "type": {
             "const": "sysreq"
+          },
+          "platform": {
+            "const": false
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "verifies": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "systest"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "constraint-verified",
+      "message": "Constraint is not verified by any system test",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "constraint"
           },
           "platform": {
             "const": false
@@ -444,7 +581,7 @@
     },
     {
       "id": "systest-verifies",
-      "message": "System test does not verify any system requirement",
+      "message": "System test does not verify any system requirement or constraint, nor implement a customer test requirement",
       "select": {
         "properties": {
           "type": {
@@ -452,6 +589,9 @@
           },
           "platform": {
             "const": false
+          },
+          "implements": {
+            "maxItems": 0
           }
         }
       },
@@ -462,7 +602,46 @@
               "local": {
                 "properties": {
                   "type": {
-                    "const": "sysreq"
+                    "enum": [
+                      "sysreq",
+                      "constraint"
+                    ]
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "systest-implements",
+      "message": "System test implements something other than a customer test requirement",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "systest"
+          },
+          "platform": {
+            "const": false
+          },
+          "implements": {
+            "minItems": 1
+          }
+        },
+        "required": [
+          "implements"
+        ]
+      },
+      "validate": {
+        "network": {
+          "implements": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "ctr"
                   }
                 }
               }
