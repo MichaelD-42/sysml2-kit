@@ -2,6 +2,8 @@ package VehicleRequirements {
     doc /* R layer: what the vehicle shall do, derived from customer requirements. */
 
     private import Trace::*;
+    private import ISQ::*;
+    private import SI::*;
 
     requirement <'SR-001'> range {
         @Satisfies { need = "CRS-001"; }
@@ -23,5 +25,8 @@ package VehicleRequirements {
     requirement <'SR-005'> acceleration {
         @Satisfies { need = "CRS-003"; }
         doc /* The vehicle shall accelerate from 0 to 100 km/h in at most 10 s. */
+        subject vehicle;
+        attribute accelerationTime : TimeValue;
+        require constraint { accelerationTime <= 10 [s] }
     }
 }

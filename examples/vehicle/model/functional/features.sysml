@@ -3,6 +3,7 @@ package VehicleFeatures {
      * owns, independent of how they are built. */
 
     private import Trace::*;
+    private import EDriveItems::*;
 
     #Feature action <'FEAT-001'> travelRange {
         @Matches { need = "CRS-001"; }
@@ -16,9 +17,17 @@ package VehicleFeatures {
         doc /* Traction from stored electrical energy. */
         action <'F-002'> propel {
             doc /* Convert stored energy into traction. */
-            action <'F-006'> convertPower { doc /* Turn battery power into motor power. */ }
-            action <'F-007'> produceTorque { doc /* Turn motor power into wheel torque. */ }
+            action <'F-006'> convertPower {
+                doc /* Turn battery power into motor power. */
+                out power : ElectricPower;
+            }
+            action <'F-007'> produceTorque {
+                doc /* Turn motor power into wheel torque. */
+                in power : ElectricPower;
+                out torque : ShaftTorque;
+            }
             first convertPower then produceTorque;
+            flow of ElectricPower from convertPower.power to produceTorque.power;
         }
     }
 

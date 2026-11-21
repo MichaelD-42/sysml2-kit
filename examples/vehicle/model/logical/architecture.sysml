@@ -4,6 +4,7 @@ package VehicleLogical {
 
     private import VehicleFeatures::*;
     private import VehicleRequirements::*;
+    private import EDriveItems::*;
 
     part <'LC-001'> vehicle {
         doc /* The vehicle as a whole. */
@@ -20,7 +21,7 @@ package VehicleLogical {
         part <'LC-004'> cabin { doc /* Occupant compartment. */ }
         part <'LC-005'> chassis { doc /* Load-bearing structure. */ }
 
-        connect energyStore.powerOut to powertrain.powerIn;
+        flow of ElectricPower from energyStore.powerOut to powertrain.powerIn;
     }
 
     allocate propulsion.propel.convertPower to vehicle.powertrain.inverter;
