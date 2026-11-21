@@ -1,4 +1,5 @@
 // Checked SysML v2 patterns for RFLP models. Validate: sysml check <this file> <project>/model/trace.sysml
+// The fragments illustrate each pattern; together they are not a rule-complete model (some needs lack links).
 // One package per layer and file; package names carry a system prefix (`Pump...`) because
 // unprefixed names like `UseCases` collide with standard library packages.
 package PumpPatterns {
@@ -96,7 +97,7 @@ package PumpPatterns {
     // --- P: software architecture and design are physical components: SW components and SW units ---
     // Firmware owns SW components, a SW component owns its SW units; each carries its own #Software.
     // A SW component's interfaces are ports, wired by connections. Software requirements (SWR, in the
-    // docs) realize the SW component or unit that implements them; unit tests verify the SWRs (JUnit).
+    // docs) are allocated to the SW component or unit that implements them (`:allocated_to:`); unit tests verify the SWRs (JUnit).
     #Software part <'PC-107'> pumpFirmware {
         doc /* Pump controller firmware, module PMP-FW-100. */
         #Software part <'PC-108'> motorControl {
@@ -104,12 +105,12 @@ package PumpPatterns {
             #Software port <'PI-102'> speedCommand;
             #Software part <'PC-109'> speedController {
                 doc /* SW unit: PI loop from speed set point to PWM duty. */
-                port setpoint;
-                port duty;
+                #Software port setpoint;
+                #Software port duty;
             }
             #Software part <'PC-110'> pwmDriver {
                 doc /* SW unit: drives the PWM timer. */
-                port duty;
+                #Software port duty;
             }
             bind speedCommand = speedController.setpoint;
             connect speedController.duty to pwmDriver.duty;

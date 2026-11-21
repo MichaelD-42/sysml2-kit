@@ -35,7 +35,7 @@ SW architecture and design are physical components: SW components and SW units.
 | V | System test case | `STC-nnn` | SysML `verification` | verifies → SR (native `verify`) or constraint (`@Verifies`); implements → CTR (`@Implements`) |
 | V | Acceptance test case | `ATC-nnn` | Markdown or RST `acctest` | verifies → CRS, UC; implements → CTR (`:implements:`) |
 | V | Test result | generated | JUnit XML, `<property name="verifies" value="STC-001"/>` | tests → STC/ATC/SWR |
-| P | Software requirement | `SWR-nnn` | Markdown or RST `swreq`, `docs/software/` | satisfies → SR, realizes → the SW component or unit implementing it (no rules) |
+| P | Software requirement | `SWR-nnn` | Markdown or RST `swreq`, `docs/software/` | satisfies → SR, allocated_to → the SW component or unit implementing it (no rules) |
 
 Keywords `#Feature`, `#Mechanical`, `#Electrical`, `#Software` and the metadata `@Matches`, `@Satisfies`, `@Verifies`, `@Implements` are in `model/trace.sysml` (package `Trace`). A part or port without a domain keyword is logical. The id prefix must agree with the kind (`PC-` on a domain part, `FEAT-` on a `#Feature` action); the bridge errors otherwise. Exactly one domain keyword per element.
 
@@ -78,7 +78,7 @@ The bridge takes the title from the objective's doc, otherwise from the name.
 Software is physical: the firmware is a `#Software part`, it owns its SW components (`#Software part`), and each SW component owns its SW units (`#Software part`). Every one of them carries its own `#Software` keyword and a `PC-` id; a nested part without a keyword is logical and the bridge rejects its `PC-` id. A SW component's interfaces are `#Software port`s (`PI-` ids where they are traced), wired with `connect` between units and `bind` from the component's port to the unit behind it.
 
 - Logical components are allocated to SW components (`allocate <LC> to <firmware>.<component>;`), not to units. Rule `swcomponent-used` requires one on every SW component; a SW unit needs none, since its trace runs through the component that owns it. A firmware not yet broken into SW components takes the LC itself (`software-used`). Keep the firmware top-level: a `#Software` PC owned by another PC counts as a SW component or unit.
-- Each software requirement (`swreq`, `SWR-nnn`, in `docs/software/`) `:realizes:` the SW component or unit that implements it and `:satisfies:` the SR it refines.
+- Each software requirement (`swreq`, `SWR-nnn`, in `docs/software/`) is allocated to the SW component or unit that implements it (`:allocated_to:`) and `:satisfies:` the SR it refines.
 - SW units are verified by SWR tests: unit test results in `test-results/*.xml` carry `<property name="verifies" value="SWR-nnn"/>` and become test results linked to the SWR (`tests`).
 
 ## Requirement classes, constraints, customer test requirements

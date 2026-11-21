@@ -9,7 +9,7 @@ Inputs: a BOM or parts list, the code repository, layouts, datasheets. For each 
 - `#Mechanical`, `#Electrical` or `#Software part <'EDU-PC-nnn'> name`, exactly one domain; the `doc` names the BOM item or code module. Mechanical and electrical items come from the BOM, software from the code repository.
 - Variants of one part (50 kW and 80 kW motor) are `#Electrical variation part` with `variant #Electrical part` members, each with its own id.
 - Physical interfaces (`port <'EDU-PI-nnn'>`: connector, flange, bus message) where another part attaches.
-- Software PCs get `swreq` needs in `docs/software/*.md` (`:realizes:` the PC) and links to code and tests.
+- Software PCs get `swreq` needs in `docs/software/*.md` (`:allocated_to:` the SW component or unit) and links to code and tests.
 
 Ask the user to confirm the list before going up; do not guess BOM structure from file names alone. Cite the file each PC came from.
 
