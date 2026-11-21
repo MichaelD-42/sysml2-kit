@@ -28,10 +28,10 @@ For each of R, F, L, P (the `rflp` steps 1 to 4):
 
 ## Matching
 
-When F and L are drafted, state what each customer requirement is met by: `@Matches { need = "CRS-001"; }` inside the feature that covers it, one per CRS; add `partial = true` when the feature meets it only in part (value not reached, condition excluded). A partial match needs an SR that states the gap, satisfied by a component in that feature's chain. Write only claims the user agrees with; the reuse status (platform, variant, modified, new, incomplete) is derived from the chain, never written.
+After P, when the reuse status is visible, the main session (not an agent) states with the user what each customer requirement is met by, and writes the claims the user agrees to into the features: `@Matches { need = "CRS-001"; }` inside the feature that covers it, one per CRS; add `partial = true` when the feature meets it only in part (value not reached, condition excluded). A partial match needs an SR that states the gap, satisfied by a component in that feature's chain. Write only claims the user agrees with; the reuse status (platform, variant, modified, new, incomplete) is derived from the chain, never written.
 
 A CRS no feature can meet (commercial terms, delivery, certification, or a technical gap) is answered by a compliance statement: a `cst` directive in `docs/customer/statements.md` with `:answers:` and `:compliance:` (`comply`, `partial`, `not-comply`). The compliance value is the user's decision.
 
 ## Finish
 
-Run the V layer (`test-designer`, review with `sysml2kit compliance`), then `make all`. Show the user `docs/_generated/compliance.md` (per CRS: matched features, reuse, partial, statements, domains) and the open questions that remain.
+Run the V layer like the others: `test-designer`, then `rflp-reviewer` (including `sysml2kit compliance`). Show the user the tests added, `docs/_generated/compliance.md` (per CRS: matched features, reuse, partial, statements, domains) and the open questions that remain. Ask for approval; only after a yes run the final `make all`.
