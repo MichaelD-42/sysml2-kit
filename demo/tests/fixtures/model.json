@@ -1,0 +1,518 @@
+[
+ {
+  "@type": "Package",
+  "@id": "pkg",
+  "qualifiedName": "Sys",
+  "name": "Sys",
+  "owner": null
+ },
+ {
+  "@type": "PartUsage",
+  "@id": "motor",
+  "qualifiedName": "Sys::motor",
+  "name": "motor",
+  "owner": {
+   "@id": "pkg"
+  },
+  "shortName": "PC-001",
+  "isVariation": true
+ },
+ {
+  "@type": "PartUsage",
+  "@id": "base",
+  "qualifiedName": "Sys::base",
+  "name": "base",
+  "owner": {
+   "@id": "pkg"
+  },
+  "shortName": "PC-000"
+ },
+ {
+  "@type": "Subsetting",
+  "@id": "sub-base",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "motor"
+  },
+  "subsettingFeature": {
+   "@id": "motor"
+  },
+  "subsettedFeature": {
+   "@id": "base"
+  },
+  "isImplied": false
+ },
+ {
+  "@type": "Documentation",
+  "@id": "doc1",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "motor"
+  },
+  "body": "Permanent-magnet drive motor."
+ },
+ {
+  "@type": "PartDefinition",
+  "@id": "Motor",
+  "qualifiedName": "Sys::Motor",
+  "name": "Motor",
+  "owner": {
+   "@id": "pkg"
+  }
+ },
+ {
+  "@type": "PartUsage",
+  "@id": "m50",
+  "qualifiedName": "Sys::motor::m50",
+  "name": "m50",
+  "owner": {
+   "@id": "motor"
+  }
+ },
+ {
+  "@type": "PartUsage",
+  "@id": "m80",
+  "qualifiedName": "Sys::motor::m80",
+  "name": "m80",
+  "owner": {
+   "@id": "motor"
+  },
+  "ownedElement": [
+   {
+    "@id": "ft"
+   },
+   {
+    "@id": "sub-m80"
+   }
+  ]
+ },
+ {
+  "@type": "FeatureTyping",
+  "@id": "ft",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "m80"
+  },
+  "typedFeature": {
+   "@id": "m80"
+  },
+  "type": {
+   "@id": "Motor"
+  },
+  "isImplied": false
+ },
+ {
+  "@type": "Subsetting",
+  "@id": "sub-m50",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "m50"
+  },
+  "subsettingFeature": {
+   "@id": "m50"
+  },
+  "subsettedFeature": {
+   "@id": "motor"
+  },
+  "isImplied": true
+ },
+ {
+  "@type": "Subsetting",
+  "@id": "sub-m80",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "m80"
+  },
+  "subsettingFeature": {
+   "@id": "m80"
+  },
+  "subsettedFeature": {
+   "@id": "motor"
+  },
+  "isImplied": false
+ },
+ {
+  "@type": "PortUsage",
+  "@id": "phase",
+  "qualifiedName": "Sys::motor::phase",
+  "name": "phase",
+  "owner": {
+   "@id": "motor"
+  }
+ },
+ {
+  "@type": "AttributeUsage",
+  "@id": "rated",
+  "qualifiedName": "Sys::motor::m80::ratedPower",
+  "name": "ratedPower",
+  "owner": {
+   "@id": "m80"
+  },
+  "ownedElement": [
+   {
+    "@id": "fv1"
+   }
+  ]
+ },
+ {
+  "@type": "FeatureValue",
+  "@id": "fv1",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "rated"
+  },
+  "featureWithValue": {
+   "@id": "rated"
+  },
+  "value": {
+   "@id": "ox1"
+  }
+ },
+ {
+  "@type": "OperatorExpression",
+  "@id": "ox1",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "fv1"
+  },
+  "textualRepresentation": [
+   {
+    "@id": "tr1"
+   }
+  ]
+ },
+ {
+  "@type": "TextualRepresentation",
+  "@id": "tr1",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "ox1"
+  },
+  "body": "80 [kW]"
+ },
+ {
+  "@type": "AttributeUsage",
+  "@id": "ip",
+  "qualifiedName": "Sys::motor::m80::ipRating",
+  "name": "ipRating",
+  "owner": {
+   "@id": "m80"
+  },
+  "ownedElement": [
+   {
+    "@id": "fv2"
+   }
+  ]
+ },
+ {
+  "@type": "FeatureValue",
+  "@id": "fv2",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "ip"
+  },
+  "featureWithValue": {
+   "@id": "ip"
+  },
+  "value": {
+   "@id": "ls"
+  }
+ },
+ {
+  "@type": "LiteralString",
+  "@id": "ls",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "fv2"
+  },
+  "value": "IP67"
+ },
+ {
+  "@type": "ActionUsage",
+  "@id": "drive",
+  "qualifiedName": "Sys::drive",
+  "name": "drive",
+  "owner": {
+   "@id": "pkg"
+  }
+ },
+ {
+  "@type": "ActionUsage",
+  "@id": "a",
+  "qualifiedName": "Sys::drive::convert",
+  "name": "convert",
+  "owner": {
+   "@id": "drive"
+  }
+ },
+ {
+  "@type": "ActionUsage",
+  "@id": "b",
+  "qualifiedName": "Sys::drive::produce",
+  "name": "produce",
+  "owner": {
+   "@id": "drive"
+  }
+ },
+ {
+  "@type": "SuccessionAsUsage",
+  "@id": "succ",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "drive"
+  },
+  "relatedFeature": [
+   {
+    "@id": "a"
+   },
+   {
+    "@id": "b"
+   }
+  ]
+ },
+ {
+  "@type": "ReferenceUsage",
+  "@id": "aout",
+  "qualifiedName": "Sys::drive::convert::power",
+  "name": "power",
+  "owner": {
+   "@id": "a"
+  }
+ },
+ {
+  "@type": "ReferenceUsage",
+  "@id": "bin",
+  "qualifiedName": "Sys::drive::produce::power",
+  "name": "power",
+  "owner": {
+   "@id": "b"
+  }
+ },
+ {
+  "@type": "ItemDefinition",
+  "@id": "Power",
+  "qualifiedName": "Sys::Power",
+  "name": "Power",
+  "owner": {
+   "@id": "pkg"
+  }
+ },
+ {
+  "@type": "FlowUsage",
+  "@id": "flow",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "drive"
+  },
+  "relatedFeature": [
+   {
+    "@id": "aout"
+   },
+   {
+    "@id": "bin"
+   }
+  ],
+  "ownedElement": [
+   {
+    "@id": "pf"
+   }
+  ]
+ },
+ {
+  "@type": "PayloadFeature",
+  "@id": "pf",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "flow"
+  },
+  "ownedElement": [
+   {
+    "@id": "pft"
+   }
+  ]
+ },
+ {
+  "@type": "FeatureTyping",
+  "@id": "pft",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "pf"
+  },
+  "typedFeature": {
+   "@id": "pf"
+  },
+  "type": {
+   "@id": "Power"
+  },
+  "isImplied": false
+ },
+ {
+  "@type": "PartUsage",
+  "@id": "pack",
+  "qualifiedName": "Sys::pack",
+  "name": "pack",
+  "owner": {
+   "@id": "pkg"
+  }
+ },
+ {
+  "@type": "ConnectionUsage",
+  "@id": "conn",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "pkg"
+  },
+  "relatedFeature": [
+   {
+    "@id": "pack"
+   },
+   {
+    "@id": "m80"
+   }
+  ]
+ },
+ {
+  "@type": "PerformActionUsage",
+  "@id": "perf",
+  "qualifiedName": "Sys::pack::perf",
+  "name": "perf",
+  "owner": {
+   "@id": "pack"
+  },
+  "ownedElement": [
+   {
+    "@id": "perf-rs"
+   }
+  ]
+ },
+ {
+  "@type": "ReferenceSubsetting",
+  "@id": "perf-rs",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "perf"
+  },
+  "target": [
+   {
+    "@id": "drive"
+   }
+  ]
+ },
+ {
+  "@type": "PartUsage",
+  "@id": "lc",
+  "qualifiedName": "Sys::lc",
+  "name": "lc",
+  "owner": {
+   "@id": "pkg"
+  },
+  "shortName": "LC-001"
+ },
+ {
+  "@type": "RequirementUsage",
+  "@id": "req",
+  "qualifiedName": "Sys::range",
+  "name": "range",
+  "owner": {
+   "@id": "pkg"
+  },
+  "shortName": "SR-001"
+ },
+ {
+  "@type": "Documentation",
+  "@id": "doc2",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "req"
+  },
+  "body": "Range requirement."
+ },
+ {
+  "@type": "RequirementConstraintMembership",
+  "@id": "rcm",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "req"
+  },
+  "ownedConstraint": {
+   "@id": "cu"
+  }
+ },
+ {
+  "@type": "ConstraintUsage",
+  "@id": "cu",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "req"
+  },
+  "ownedElement": [
+   {
+    "@id": "cex"
+   }
+  ]
+ },
+ {
+  "@type": "Expression",
+  "@id": "cex",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "cu"
+  },
+  "textualRepresentation": [
+   {
+    "@id": "tr2"
+   }
+  ]
+ },
+ {
+  "@type": "TextualRepresentation",
+  "@id": "tr2",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "cex"
+  },
+  "body": "peakTorque <= 310 [N*m]"
+ },
+ {
+  "@type": "SubjectMembership",
+  "@id": "sm",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "req"
+  },
+  "ownedSubjectParameter": {
+   "@id": "subj"
+  }
+ },
+ {
+  "@type": "ReferenceUsage",
+  "@id": "subj",
+  "qualifiedName": "Sys::range::vehicle",
+  "name": "vehicle",
+  "owner": {
+   "@id": "req"
+  }
+ }
+]
