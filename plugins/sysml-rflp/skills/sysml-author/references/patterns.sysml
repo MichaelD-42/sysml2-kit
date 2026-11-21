@@ -32,6 +32,7 @@ package PumpPatterns {
     // Plain values go here, never as a bare attribute. A constraint is owned by the part it limits.
     part <'LC-104'> pumpHousing {
         attribute mass : Real;
+        attribute speed : Real;
         constraint <'CON-101'> maxMass {
             @Satisfies { need = "CRS-103"; }
             doc /* The housing mass shall not exceed 2.5 kg. */
@@ -40,7 +41,6 @@ package PumpPatterns {
         constraint <'CON-102'> maxSpeed {
             @Satisfies { need = "CRS-104"; partial = true; }   // met in part: an SR must state the gap
             doc /* The pump shall run up to 4000 rpm. */
-            attribute speed : Real;
             speed <= 4000.0
         }
     }

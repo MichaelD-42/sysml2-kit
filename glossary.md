@@ -20,9 +20,9 @@ Terms used in this repository, the plugin and the generated docs. Which layer ow
 
 ## Artifacts and ids
 
-**CRS** (customer requirement, `CRS-nnn`): the customer's own words, written in Markdown (MyST). Not part of the SysML model. `:scope: commercial` (terms, delivery, warranty) or `:scope: not-offered` (a technical requirement the supplier does not meet at all) exempts it from `crs-satisfied` and from the not-verified compliance finding and requires a CST, `not-comply` for `not-offered`. Adding `:scope:` is the only edit the supplier makes to a CRS.
+**CRS** (customer requirement, `CRS-nnn`): the customer's own words, written in Markdown (MyST). Not part of the SysML model. `:scope: commercial` (terms, delivery, warranty) or `:scope: not-offered` (a technical requirement the supplier does not meet at all) exempts it from `crs-satisfied` and from the not-verified compliance finding and requires a CST, `not-comply` for `not-offered`. Adding `:scope:` and `:class:` (agreed with the user) are the only edits the supplier makes to a CRS; the text and every CTR stay untouched.
 
-**Requirement class**: `:class:` on every CRS and PRQ: `functional`, `non-functional`, `constraint` or `information`. Functional needs a matching feature and an SR or constraint; non-functional and constraint need a `CON-` constraint; information carries no obligation.
+**Requirement class**: `:class:` on every CRS and PRQ: `functional`, `non-functional`, `constraint` or `information`. Functional needs a matching feature and an SR or constraint; non-functional and constraint need a `CON-` constraint; information needs a class but nothing to satisfy, match, answer or verify it.
 
 **CON** (constraint, `CON-nnn`): a SysML `constraint` usage over a part attribute that satisfies a CRS with a plain value. Verified by a system test (`@Verifies`).
 

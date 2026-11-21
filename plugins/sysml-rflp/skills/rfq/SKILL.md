@@ -11,7 +11,7 @@ Precondition: an initialized project (`sysml-init`), `make lint` passing. Platfo
 
 ## Inputs
 
-- Customer requirements: `docs/customer/*.md`, `crs` directives (MyST) and customer test requirements (`ctr`). Never rewrite them; the one permitted edit is adding `:scope: commercial` or `:scope: not-offered` with the user's yes.
+- Customer requirements: `docs/customer/*.md`, `crs` directives (MyST) and customer test requirements (`ctr`). Never rewrite them; the only permitted edits are adding `:class:` and `:scope: commercial` or `:scope: not-offered`, each with the user's yes.
 - Platform: `platform/docs/platform/*.md` (PRQ), `platform/model/` (features, LCs, PCs, variants). Read it with the `find` and `relations` MCP tools, not by opening every file.
 - Other RFQ documents (PDF, Word, drawings, specs): read as context. Cite what you took from them when you ask ("the spec on page 4 gives 400 V; is that the supply?"). Never turn a fact from them into a requirement without the user's yes.
 
