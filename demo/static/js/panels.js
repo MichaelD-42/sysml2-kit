@@ -170,8 +170,8 @@ export function mountAsk(el, knownKeys, names) {
   input.onkeydown = (e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), form.requestSubmit());
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const question = input.value.trim();
-    if (!question || send.disabled) return;
+    const question = input.value.trim() || input.placeholder; // empty box: ask the example
+    if (send.disabled) return;
     const turn = document.createElement("div");
     turn.className = "turn";
     turn.innerHTML = `<p class="question">${esc(question)}</p><ul class="tools"></ul><div class="answer"></div><p class="error" hidden></p>`;
