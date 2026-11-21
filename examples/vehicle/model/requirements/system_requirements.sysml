@@ -19,4 +19,9 @@ package VehicleRequirements {
         @Satisfies { need = "CRS-002"; }
         doc /* The vehicle shall provide four tie-down points rated for 1000 kg each. */
     }
+    // states the gap of the partial match: the 80 kW platform motor does not reach the customer's 8 s
+    requirement <'SR-005'> acceleration {
+        @Satisfies { need = "CRS-003"; }
+        doc /* The vehicle shall accelerate from 0 to 100 km/h in at most 10 s. */
+    }
 }

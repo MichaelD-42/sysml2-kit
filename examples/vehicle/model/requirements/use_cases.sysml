@@ -1,9 +1,9 @@
 package VehicleUseCases {
     doc /* R layer: how actors use the vehicle. Each use case realizes customer requirements
-     * and is realized by the functions it performs. */
+     * and is realized by the features it performs. */
 
     private import Trace::*;
-    private import VehicleFunctions::*;
+    private import VehicleFeatures::*;
 
     use case <'UC-001'> commute {
         @Realizes { need = "CRS-001"; }
@@ -11,9 +11,9 @@ package VehicleUseCases {
         subject vehicle;
         actor driver;
         actor passenger;
-        perform operateVehicle.carryOccupants;
-        perform operateVehicle.storeEnergy;
-        perform operateVehicle.propel;
+        perform occupantSeating;
+        perform travelRange;
+        perform propulsion;
     }
 
     use case <'UC-002'> transportOnTrailer {
@@ -21,6 +21,6 @@ package VehicleUseCases {
         doc /* A towing driver loads the vehicle onto a car trailer and secures it. */
         subject vehicle;
         actor towingDriver;
-        perform operateVehicle.secureForTransport;
+        perform trailerTransport;
     }
 }

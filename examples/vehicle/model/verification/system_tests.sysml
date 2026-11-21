@@ -19,4 +19,8 @@ package VehicleSystemTests {
         doc /* Pull-test each tie-down point to 1000 kg. */
         objective { verify tieDownPoints; }
     }
+    verification <'STC-005'> accelerationTest {
+        doc /* Accelerate from standstill at full pedal on a level track; record the time to 100 km/h. */
+        objective { verify acceleration; }
+    }
 }

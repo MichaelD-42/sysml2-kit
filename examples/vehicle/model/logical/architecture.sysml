@@ -2,7 +2,7 @@ package VehicleLogical {
     doc /* L layer: technology-independent components, the functions allocated to them,
      * and the system requirements they satisfy. */
 
-    private import VehicleFunctions::*;
+    private import VehicleFeatures::*;
     private import VehicleRequirements::*;
 
     part <'LC-001'> vehicle {
@@ -10,6 +10,8 @@ package VehicleLogical {
         part <'LC-002'> powertrain {
             doc /* Produces traction from electrical power. */
             port <'LI-001'> powerIn;
+            part <'LC-006'> inverter { doc /* Supplies the motor from the energy store. */ }
+            part <'LC-007'> motor { doc /* Drives the wheels. */ }
         }
         part <'LC-003'> energyStore {
             doc /* Stores electrical energy. */
@@ -21,13 +23,15 @@ package VehicleLogical {
         connect energyStore.powerOut to powertrain.powerIn;
     }
 
-    allocate operateVehicle.propel to vehicle.powertrain;
-    allocate operateVehicle.storeEnergy to vehicle.energyStore;
-    allocate operateVehicle.carryOccupants to vehicle.cabin;
-    allocate operateVehicle.secureForTransport to vehicle.chassis;
+    allocate propulsion.propel.convertPower to vehicle.powertrain.inverter;
+    allocate propulsion.propel.produceTorque to vehicle.powertrain.motor;
+    allocate travelRange.storeEnergy to vehicle.energyStore;
+    allocate occupantSeating.carryOccupants to vehicle.cabin;
+    allocate trailerTransport.secureForTransport to vehicle.chassis;
 
     satisfy range by vehicle.energyStore;
     satisfy seating by vehicle.cabin;
     satisfy curbMass by vehicle;
     satisfy tieDownPoints by vehicle.chassis;
+    satisfy acceleration by vehicle.powertrain.motor;
 }

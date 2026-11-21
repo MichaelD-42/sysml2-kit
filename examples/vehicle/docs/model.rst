@@ -12,8 +12,8 @@ Use cases
 Functional architecture
 -----------------------
 
-.. image:: _generated/operateVehicle.svg
-   :alt: Functions, grouped by the use cases that perform them
+.. image:: _generated/propulsion.svg
+   :alt: The propulsion feature and its functions
 
 Logical architecture
 --------------------

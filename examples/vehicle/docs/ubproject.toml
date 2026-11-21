@@ -190,6 +190,13 @@ description = "Defined in the platform model"
 default = false
 schema = { type = "boolean" }
 
+# set on customer or platform requirements only: `commercial` for one no architecture element can
+# meet (warranty, delivery, process); a compliance statement answers it instead of a system requirement
+[needs.fields.scope]
+description = "Requirement scope: commercial, or empty for a technical requirement"
+default = ""
+schema = { type = "string", enum = ["", "commercial"] }
+
 # set on compliance statements (CST) only
 [needs.fields.compliance]
 description = "Compliance statement: comply, partial or not-comply"

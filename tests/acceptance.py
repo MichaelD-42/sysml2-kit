@@ -65,15 +65,15 @@ MUTATIONS = [
         "lint",
         replace(
             "model/logical/architecture.sysml",
-            "allocate operateVehicle.propel",
-            "allocate operateVehicle.propell",
+            "allocate propulsion.propel",
+            "allocate propulsion.propell",
         ),
-        r"propell` resolves to nothing",
+        r"propell::convertPower` resolves to nothing",
     ),
     (
         "trace metadata to a missing customer requirement fails the build",
         "all",
-        replace("docs/customer/requirements.rst", ":id: CRS-002", ":id: CRS-009"),
+        replace("docs/customer/requirements.md", ":id: CRS-002", ":id: CRS-009"),
         r"unknown outgoing link 'CRS-002'",
     ),
     (
@@ -87,7 +87,7 @@ MUTATIONS = [
         "all",
         replace(
             "model/requirements/use_cases.sysml",
-            "perform operateVehicle.secureForTransport;",
+            "perform trailerTransport;",
             "",
         ),
         r"usecase-realized",
@@ -97,7 +97,7 @@ MUTATIONS = [
         "all",
         replace(
             "model/logical/architecture.sysml",
-            "allocate operateVehicle.carryOccupants to vehicle.cabin;",
+            "allocate occupantSeating.carryOccupants to vehicle.cabin;",
             "",
         ),
         r"function-allocated",
@@ -144,6 +144,48 @@ MUTATIONS = [
         ),
         r"has no short name",
     ),
+    (
+        "a commercial requirement without its compliance statement is not answered",
+        "all",
+        lambda work: (work / "docs/customer/statements.md").write_text(
+            "# Compliance statements\n"
+        ),
+        r"CRS-004: not answered",
+    ),
+    (
+        "a commercial requirement not marked as such must have a system requirement",
+        "all",
+        replace("docs/customer/requirements.md", ":scope: commercial\n", ""),
+        r"CRS-004.*\n.*\n.*\n.*crs-satisfied",
+    ),
+    (
+        "leaf logical component without a physical component violates logical-allocated",
+        "all",
+        replace(
+            "model/physical/components.sysml", "allocate vehicle.cabin to body;", ""
+        ),
+        r"logical-allocated",
+    ),
+    (
+        "partial match without its gap system requirement fails the compliance table",
+        "all",
+        replace(
+            "model/requirements/system_requirements.sysml",
+            '@Satisfies { need = "CRS-003"; }',
+            "",
+        ),
+        r"CRS-003: partial match without a system requirement stating the gap",
+    ),
+    (
+        "a feature without its #Feature keyword fails the bridge",
+        "all",
+        replace(
+            "model/functional/features.sysml",
+            "#Feature action <'FEAT-002'> propulsion",
+            "action <'FEAT-002'> propulsion",
+        ),
+        r"FEAT-002: a function's id starts with F-",
+    ),
 ]
 
 
@@ -182,9 +224,10 @@ def main():
             r'id="SR-003".*?verified by.*?STC-003', html, re.DOTALL
         ),
         "internal diagrams are embedded": all(
-            f"_images/{n}.svg" in html for n in ("vehicle", "operateVehicle")
+            f"_images/{n}.svg" in html for n in ("vehicle", "propulsion")
         ),
         "use cases link to their needs": 'href="#UC-001"' in html,
+        **compliance_rows(work / "docs/_generated/compliance.md"),
         **links_resolve(work / "docs/_build/html"),
     }
     for name, ok in checks.items():
@@ -208,6 +251,21 @@ def links_resolve(html_dir):
     return {
         f"trace graph links {len(links)} needs, none dead {dead}": len(links) > 20
         and not dead
+    }
+
+
+def compliance_rows(table):
+    """The compliance table has a variant, a new, a partial and a statement-only row."""
+    rows = table.read_text().splitlines()[2:] if table.exists() else []
+    cells = [[c.strip() for c in row.strip("|").split("|")] for row in rows]
+    return {
+        f"compliance table has a {kind} row": any(test(c) for c in cells)
+        for kind, test in {
+            "variant": lambda c: c[3] == "variant",
+            "new": lambda c: c[3] == "new",
+            "partial": lambda c: c[4] == "yes",
+            "statement-only": lambda c: not c[2] and "CST-001" in c[5],
+        }.items()
     }
 
 
@@ -260,8 +318,8 @@ def hook(work):
     target = work / "model/logical/architecture.sysml"
     replace(
         "model/logical/architecture.sysml",
-        "allocate operateVehicle.propel",
-        "allocate operateVehicle.propell",
+        "allocate propulsion.propel",
+        "allocate propulsion.propell",
     )(work)
 
     def run(path):
@@ -279,12 +337,11 @@ def hook(work):
     broken, other = run(target), run(work / "docs/index.rst")
     failed = report(
         "lint hook reports a broken model with exit 2",
-        broken.returncode == 2 and "propell` resolves to nothing" in broken.stderr,
+        broken.returncode == 2
+        and "propell::convertPower` resolves to nothing" in broken.stderr,
         f"exit {broken.returncode}: {broken.stderr}",
     ) + report("lint hook ignores non-SysML files", other.returncode == 0, other.stderr)
-    original = target.read_text().replace(
-        "operateVehicle.propell", "operateVehicle.propel"
-    )
+    original = target.read_text().replace("propulsion.propell", "propulsion.propel")
     target.write_text(original)
     clean = run(target)
     failed += report(
