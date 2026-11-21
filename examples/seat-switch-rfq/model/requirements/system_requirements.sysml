@@ -61,10 +61,6 @@ package SeatSwitchRfqRequirements {
         @Satisfies { need = "CRS-604"; }
         doc /* The debug interface of every series switch shall be permanently disabled before delivery. */
     }
-    requirement <'SR-114'> emcLimits {
-        @Satisfies { need = "CRS-505"; }
-        doc /* The switch shall meet the emission and immunity limits of OEM-EMC-200, severity class 3. */
-    }
     requirement <'SR-115'> installationSpace {
         @Satisfies { need = "CRS-507"; }
         doc /* Each switch, knob included, shall fit within the installation space of the customer's seat trim drawing. */
@@ -80,6 +76,10 @@ package SeatSwitchRfqRequirements {
     requirement <'SR-118'> sparePartNumbers {
         @Satisfies { need = "CRS-805"; }
         doc /* Each combination of housing side and button set shall carry its own spare-part number. */
+    }
+    requirement <'SR-120'> traceabilityContent {
+        @Satisfies { need = "CRS-703"; }
+        doc /* The traceability code of every switch shall encode the OEM part number, the serial number and the production date. */
     }
     // states the gap of the partial satisfaction: the platform key is rated for 200 000 actuations, the OEM asks for 300 000
     requirement <'SR-119'> durabilityGap {

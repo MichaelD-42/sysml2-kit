@@ -1,7 +1,10 @@
 package SeatSwitchRfqFeatures {
     doc /* F layer: the platform features this vehicle's seat switches offer, each matching the customer
      * requirements it covers. A feature subsets the platform feature it reuses and inherits its functions;
-     * only the comfort keys add functions, one per seat position. */
+     * only the comfort keys add functions, one per seat position.
+     * Known compromise: F-101..104 exist because CRS-203 differs per seat position and each function is
+     * allocated to exactly one logical component (rule function-allocated), so each position switch gets
+     * its own function; the behaviour itself is the platform's. */
 
     private import Trace::*;
 

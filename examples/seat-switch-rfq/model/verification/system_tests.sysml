@@ -13,7 +13,8 @@ package SeatSwitchRfqSystemTests {
     }
     verification <'STC-102'> luminanceMeasurement {
         @Verifies { need = "CON-103"; }
-        doc /* Measure each lit symbol at full dimming level in a dark room; pass at 8 cd/m² to 40 cd/m². */
+        @Verifies { need = "CON-122"; }
+        doc /* Measure each lit symbol and level indicator at full dimming level in a dark room; pass at 8 cd/m² to 40 cd/m², with symbols white and indicators amber within the OEM colour limits. */
     }
     verification <'STC-103'> keyDurabilityTest {
         @Implements { need = "CTR-002"; }
@@ -25,7 +26,8 @@ package SeatSwitchRfqSystemTests {
         @Implements { need = "CTR-001"; }
         @Verifies { need = "CON-105"; }
         @Verifies { need = "CON-106"; }
-        doc /* Run the OEM-ENV-100 programme of CTR-001 on 6 samples, with function checks at 9 V, 13.5 V and 16 V and at -40 °C and +85 °C; pass if every function works at every check. */
+        @Verifies { need = "CON-123"; }
+        doc /* Run the OEM-ENV-100 programme of CTR-001 on 6 samples, with function checks at 9 V, 13.5 V and 16 V and at -40 °C and +85 °C, and the quiescent current measured at 13.5 V with the bus asleep; pass if every function works at every check and the current is at most 100 µA. */
     }
     verification <'STC-105'> ingressTest {
         @Implements { need = "CTR-006"; }
@@ -39,8 +41,8 @@ package SeatSwitchRfqSystemTests {
     }
     verification <'STC-107'> emcTest {
         @Implements { need = "CTR-004"; }
+        @Verifies { need = "CON-121"; }
         doc /* Run the OEM-EMC-200 class 3 emission and immunity tests of CTR-004 in an accredited laboratory; pass if every limit is met. */
-        objective { verify emcLimits; }
     }
     verification <'STC-108'> linConformanceTest {
         @Implements { need = "CTR-008"; }
@@ -50,7 +52,8 @@ package SeatSwitchRfqSystemTests {
     }
     verification <'STC-109'> markingInspection {
         @Verifies { need = "CON-110"; }
-        doc /* Read the Data Matrix of 50 switches with the customer's scanner type after the environmental test; pass if every code reads. */
+        doc /* Read the Data Matrix of 50 switches with the customer's scanner type after the environmental test; pass if every code reads and holds the part number, serial number and production date. */
+        objective { verify traceabilityContent; }
     }
     verification <'STC-110'> workshopUpdateTest {
         @Verifies { need = "CON-111"; }

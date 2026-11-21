@@ -13,11 +13,12 @@ lumbar pad; pass if the seat moves only while the control is held, in the reques
 
 :::{acctest} Comfort functions and night design in the vehicle
 :id: ATC-102
-:verifies: CRS-203, CRS-204, CRS-205, CRS-206, CRS-303, UC-102
+:verifies: CRS-203, CRS-204, CRS-205, CRS-206, CRS-303, CRS-305, UC-102
 
 At each seat position, step every comfort function through its levels, then switch the vehicle
 lighting on and vary the dimming; pass if each position has its keys, the function and indicator
-lights follow each press, and the symbols follow the dimming level within 8 cd/m² to 40 cd/m².
+lights follow each press, and the white symbols follow the dimming level within 8 cd/m² to
+40 cd/m².
 :::
 
 :::{acctest} Workshop diagnosis, update and replacement

@@ -25,6 +25,11 @@ package SeatSwitchPhysical {
         attribute durabilityCycles : Integer;
         attribute symbolLuminance : LuminanceValue;
         attribute linVersion : String;
+        attribute emcSeverityClass : Integer;
+        attribute mass : MassValue;
+        attribute symbolColour : String;
+        attribute levelIndicatorColour : String;
+        attribute quiescentCurrent : ElectricCurrentValue;
         // set by our own production and workshop requirements, not by a customer
         attribute endOfLineTestTime : DurationValue;
         attribute partMarking : String;
@@ -199,6 +204,11 @@ package SeatSwitchPhysical {
         attribute :>> durabilityCycles = 200000;
         attribute :>> symbolLuminance = 20 [cd/m^2];
         attribute :>> linVersion = "2.2A";
+        attribute :>> emcSeverityClass = 3;
+        attribute :>> mass = 48 [g];
+        attribute :>> symbolColour = "white";
+        attribute :>> levelIndicatorColour = "amber";
+        attribute :>> quiescentCurrent = 0.00005 [A];  // 50 µA, bus asleep
         attribute :>> endOfLineTestTime = 9 [s];
         attribute :>> partMarking = "laser Data Matrix";
         attribute :>> reflashTime = 95 [s];

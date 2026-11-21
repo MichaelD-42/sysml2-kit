@@ -68,7 +68,12 @@ def compliance(needs):
         )
         if class_ == "information":
             continue
-        answered = features or statements or (constraints and class_ in CONSTRAINED)
+        # a textual SR answers what the model cannot express as a constraint
+        satisfiers = constraints or any(
+            n["type"] == "sysreq" and crs in n.get("satisfies", [])
+            for n in needs.values()
+        )
+        answered = features or statements or (satisfiers and class_ in CONSTRAINED)
         findings += _answer_findings(crs, need, answered, statements)
         for f in features:
             if status[f] == "incomplete":

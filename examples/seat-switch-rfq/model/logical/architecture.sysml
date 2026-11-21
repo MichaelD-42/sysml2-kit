@@ -12,9 +12,8 @@ package SeatSwitchRfqLogical {
     private import SI::*;
 
     part <'LC-100'> seatSwitches :> seatSwitch {
-        doc /* The vehicle's seat switches: the platform seat switch within this RFQ's limits, fitted at four seat positions. */
-        // not rated by the platform; this program states it
-        attribute mass : MassValue;
+        doc /* The vehicle's seat switches: the platform seat switch within this RFQ's limits, fitted at four seat positions.
+         * Its limits apply to every position switch below. */
 
         constraint <'CON-101'> actuationForceLimits {
             @Satisfies { need = "CRS-301"; }
@@ -64,7 +63,7 @@ package SeatSwitchRfqLogical {
         }
         constraint <'CON-110'> dataMatrixMarking {
             @Satisfies { need = "CRS-703"; }
-            doc /* Every switch shall carry a laser-marked Data Matrix code. */
+            doc /* The traceability code of every switch shall be a laser-marked Data Matrix; its content is SR-120. */
             partMarking == "laser Data Matrix"
         }
         constraint <'CON-111'> workshopUpdateTime {
@@ -76,6 +75,21 @@ package SeatSwitchRfqLogical {
             @Satisfies { need = "CRS-506"; }
             doc /* A switch shall weigh at most 60 g. */
             mass <= 60 [g]
+        }
+        constraint <'CON-121'> emcSeverity {
+            @Satisfies { need = "CRS-505"; }
+            doc /* The switch shall meet OEM-EMC-200 at severity class 3 or higher. */
+            emcSeverityClass >= 3
+        }
+        constraint <'CON-122'> lightColours {
+            @Satisfies { need = "CRS-305"; }
+            doc /* Key symbols shall be lit white and level indicators amber. */
+            symbolColour == "white" and levelIndicatorColour == "amber"
+        }
+        constraint <'CON-123'> quiescentCurrentLimit {
+            @Satisfies { need = "CRS-509"; }
+            doc /* With the LIN bus asleep, the switch shall draw at most 100 µA. */
+            quiescentCurrent <= 0.0001 [A]
         }
 
         part <'LC-101'> driverSwitch :> seatSwitch {
@@ -110,11 +124,11 @@ package SeatSwitchRfqLogical {
     satisfy workshopUpdate by seatSwitch.linCommunication;
     satisfy endOfLineTest by seatSwitch.switchController;
     satisfy endOfLineCoding by seatSwitch.switchController;
+    satisfy traceabilityContent by seatSwitch.switchController;
     satisfy debugInterfaceClosed by seatSwitch.switchController;
     satisfy installationSpace by seatSwitch.enclosure;
     satisfy seatInPlaceReplacement by seatSwitch.enclosure;
     // what this program adds on top of the platform
-    satisfy emcLimits by seatSwitches;
     satisfy materialDeclaration by seatSwitches;
     satisfy sparePartNumbers by seatSwitches;
     satisfy durabilityGap by seatSwitches;

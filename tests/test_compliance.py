@@ -220,6 +220,16 @@ class ComplianceTest(unittest.TestCase):
         needs["CRS-1"]["class"] = "functional"
         self.assertEqual(compliance(needs)[1], ["CRS-1: not answered"])
 
+    def test_textual_requirement_answers_a_constrained_requirement(self):
+        needs = {
+            "CRS-1": need("crs", "Materials", **{"class": "constraint"}),
+            "SR-1": need("sysreq", satisfies=["CRS-1"]),
+            "ATC-1": need("acctest", verifies=["CRS-1"]),
+        }
+        self.assertEqual(compliance(needs)[1], [])
+        needs["CRS-1"]["class"] = "functional"
+        self.assertEqual(compliance(needs)[1], ["CRS-1: not answered"])
+
     def test_partial_constraint_needs_a_gap_requirement(self):
         needs = self.constrained(partial_satisfies=["CRS-1"])
         rows, findings = compliance(needs)

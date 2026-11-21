@@ -7,12 +7,12 @@ acceptance tests implement them; the texts are the customer's.
 :id: CTR-001
 :purpose: verification
 :method: test
-:applies_to: CRS-501, CRS-502
+:applies_to: CRS-501, CRS-502, CRS-509
 
 The switch shall pass the OEM-ENV-100 programme for interior components, mounting location "seat",
 on 6 samples: thermal shock, temperature and humidity cycling, low and high temperature operation,
-supply voltage variation, vibration and mechanical shock, with function checks before, during and
-after each test.
+supply voltage variation, quiescent current, vibration and mechanical shock, with function checks
+before, during and after each test.
 :::
 
 :::{ctr} Durability per key

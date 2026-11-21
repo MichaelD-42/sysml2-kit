@@ -44,6 +44,14 @@ communication), OEM-SEC-400 (cybersecurity of control units), OEM-MAT-500 (mater
 substances).
 :::
 
+:::{crs} Functional safety classification
+:id: CRS-105
+:class: information
+
+The seat adjustment switch is classified QM: none of its functions is assigned an ASIL. Unintended
+seat movement is prevented by the seat control unit.
+:::
+
 ## 2 Operating functions
 
 :::{crs} Seat adjustment directions
@@ -133,6 +141,13 @@ The luminance of a lit key symbol shall be between 8 cd/m² and 40 cd/m² at ful
 
 Every key and every control direction shall withstand 300 000 actuations over the temperature range
 without loss of function and with the actuation force still within CRS-301.
+:::
+
+:::{crs} Light colours
+:id: CRS-305
+:class: constraint
+
+Key symbols shall be lit white and level indicators amber, within the OEM interior colour limits.
 :::
 
 ## 4 Communication and diagnostics
@@ -227,6 +242,13 @@ The switch including its control shall fit the installation space defined in the
 
 All materials shall comply with OEM-MAT-500. The supplier shall declare every material in the OEM
 material data system before the first sample delivery.
+:::
+
+:::{crs} Quiescent current
+:id: CRS-509
+:class: constraint
+
+With the LIN bus asleep, the switch shall draw at most 100 µA.
 :::
 
 ## 6 Cybersecurity
