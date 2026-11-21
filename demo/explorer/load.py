@@ -95,22 +95,28 @@ def read_project(project: Path) -> Graph:
     return build(export, needs["versions"][needs["current_version"]]["needs"])
 
 
+def load(project: Path, driver, embedder) -> tuple[int, int]:
+    """Replace the graph with the project's model; returns (nodes, edges)."""
+    graph = read_project(project)
+    embed(graph, embedder)
+    write(graph, driver)
+    indexes(driver, embedder.dims)
+    return len(graph.nodes), len(graph.edges)
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if len(argv) != 1:
         sys.exit("usage: python -m explorer.load <project-dir>")
-    graph = read_project(Path(argv[0]))
     embedder = Embedder()
-    embed(graph, embedder)
     with GraphDatabase.driver(
         os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
         auth=None
         if os.environ.get("NEO4J_AUTH") == "none"
         else (os.environ.get("NEO4J_USER", "neo4j"), os.environ["NEO4J_PASSWORD"]),
     ) as driver:
-        write(graph, driver)
-        indexes(driver, embedder.dims)
-    print(f"loaded {len(graph.nodes)} nodes, {len(graph.edges)} edges")
+        nodes, edges = load(Path(argv[0]), driver, embedder)
+    print(f"loaded {nodes} nodes, {edges} edges")
 
 
 if __name__ == "__main__":

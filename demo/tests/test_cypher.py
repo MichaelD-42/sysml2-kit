@@ -1,7 +1,10 @@
 import unittest
+from pathlib import Path
 
 from explorer import cypher
-from tests.support import driver_or_skip
+from tests.support import driver_or_skip, load_project
+
+VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
 
 
 class CypherTest(unittest.TestCase):
@@ -41,9 +44,11 @@ class CypherTest(unittest.TestCase):
         self.assertEqual(rel, {"type": "OWNS", "src": a["key"], "dst": b["key"]})
 
     def test_examples_run(self):
+        load_project(self.driver, VEHICLE)
         for ex in cypher.EXAMPLES:
             with self.subTest(ex["title"]):
-                cypher.run_read(self.driver, ex["query"], ex.get("params"))
+                r = cypher.run_read(self.driver, ex["query"], ex.get("params"))
+                self.assertTrue(r["rows"])
 
 
 if __name__ == "__main__":

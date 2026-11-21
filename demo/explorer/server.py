@@ -92,11 +92,11 @@ def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
             if made.returncode:
                 tail = (made.stdout + made.stderr).splitlines()[-40:]
                 return error(422, "\n".join(tail))
-            graph = load.read_project(project)
-            load.embed(graph, embedder)
-            load.write(graph, driver)
-            load.indexes(driver, embedder.dims)
-            return {"nodes": len(graph.nodes), "edges": len(graph.edges)}
+            try:
+                nodes, edges = load.load(project, driver, embedder)
+            except Exception as e:  # noqa: BLE001 - any load failure is reported, not raised
+                return error(500, str(e))
+            return {"nodes": nodes, "edges": edges}
         finally:
             app.state.reload_lock.release()
 

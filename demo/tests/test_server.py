@@ -1,6 +1,7 @@
 import shutil
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from fastapi.testclient import TestClient
 
@@ -89,6 +90,21 @@ class ServerTest(unittest.TestCase):
             r = client.post("/api/reload")
             self.assertEqual(r.status_code, 200, r.text)
             self.assertEqual(node_count(self.driver), before)
+            self.assertEqual(r.json()["nodes"], before)
+
+    def test_reload_load_failure_is_500(self):
+        before = node_count(self.driver)
+        client = TestClient(server.create_app(self.driver, support._embedder, VEHICLE))
+        with (
+            mock.patch.object(server.subprocess, "run") as run,
+            mock.patch.object(
+                server.load, "load", side_effect=OSError("no needs.json")
+            ),
+        ):
+            run.return_value.returncode = 0
+            r = client.post("/api/reload")
+        self.assertEqual((r.status_code, r.json()), (500, {"error": "no needs.json"}))
+        self.assertEqual(node_count(self.driver), before)
 
     def test_concurrent_reload_rejected(self):
         app = server.create_app(self.driver, support._embedder, VEHICLE)

@@ -34,8 +34,4 @@ _embedder = None
 def load_project(driver, project: Path):
     global _embedder
     _embedder = _embedder or Embedder()  # loading the model is slow: once per run
-    graph = load.read_project(project)
-    load.embed(graph, _embedder)
-    load.write(graph, driver)
-    load.indexes(driver, _embedder.dims)
-    return graph
+    return load.load(project, driver, _embedder)
