@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+from explorer.graph import LAYERS
 from sysml2kit.compliance import compliance
 
 KINDS = (
@@ -15,6 +16,7 @@ KINDS = (
     "usecases",
     "trace",
     "compliance",
+    "vmodel",
 )
 NEED_LINKS = "SATISFIES|ALLOCATED_TO|VERIFIES|REALIZES|MATCHES|PARTIAL_MATCHES|ANSWERS|TESTS|REQUIRES"
 ROW = ("crs", "title", "features", "reuse", "partial", "statements", "domains")
@@ -315,6 +317,8 @@ def compliance_rows(needs_path: Path) -> dict:
 def view(driver, kind: str, focus: str | None, needs_path: Path | None = None) -> dict:
     if kind not in KINDS:
         raise ValueError(f"unknown view kind {kind!r}")
+    if kind == "vmodel":
+        return vmodel(driver, focus)
     if kind == "compliance":
         if needs_path is None:
             raise ValueError("the compliance view needs needs_path")
@@ -345,6 +349,197 @@ def view(driver, kind: str, focus: str | None, needs_path: Path | None = None) -
         "nodes": nodes,
         "edges": records[0]["edges"] if nodes else [],
         "reason": reason,
+    }
+
+
+# label order is not kept by Neo4j, so a need's type is picked from this list
+NEED_TYPES = list(LAYERS)
+
+# need link -> label read from the requirement's side, outgoing and incoming
+OUT_REL = {
+    "SATISFIES": "satisfies",
+    "VERIFIES": "verifies",
+    "ANSWERS": "answers",
+    "REQUIRES": "requires",
+    "REALIZES": "realizes",
+    "MATCHES": "matches",
+    "TESTS": "tests",
+}
+IN_REL = {
+    "SATISFIES": "satisfied by",
+    "REALIZES": "realized by",
+    "MATCHES": "matched by",
+    "PARTIAL_MATCHES": "matched by (partial)",
+    "ANSWERS": "answered by",
+    "VERIFIES": "verified by",
+    "TESTS": "result",
+    "REQUIRES": "required by",
+}
+REQUIREMENTS = """
+MATCH (n:Need) WHERE (NOT n:Element AND NOT n:testresult) OR n:sysreq
+RETURN n.key AS key, coalesce(n.title, n.name, n.key) AS name, head([l IN labels(n) WHERE l IN $types]) AS kind,
+  CASE WHEN n:sysreq THEN 'System requirements' ELSE coalesce(n.section, 'Other needs') END AS grp,
+  n.docname AS doc, coalesce(n.platform, false) AS platform,
+  COLLECT { MATCH (n)-[r]->(m:Node) WHERE type(r) IN $out
+            RETURN {dir: 'out', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.key), kind: m.kind} } +
+  COLLECT { MATCH (m:Node)-[r]->(n) WHERE type(r) IN $in
+            RETURN {dir: 'in', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.key), kind: m.kind} } AS links
+ORDER BY platform, doc IS NULL, doc, key"""
+
+
+def requirements_tree(driver) -> list[dict]:
+    """Requirements grouped by document section, each with the elements linked to it."""
+    groups = {}
+    for r in _read(
+        driver,
+        REQUIREMENTS,
+        types=NEED_TYPES,
+        out=list(OUT_REL),
+        **{"in": list(IN_REL)},
+    ):
+        partial = {x["key"] for x in r["links"] if x["type"] == "PARTIAL_MATCHES"}
+        kids = [
+            {
+                "key": x["key"],
+                "name": x["name"],
+                "kind": x["kind"],
+                "children": [],
+                "rel": (OUT_REL if x["dir"] == "out" else IN_REL)[x["type"]],
+            }
+            for x in r["links"]
+            if not (x["dir"] == "in" and x["type"] == "MATCHES" and x["key"] in partial)
+        ]
+        groups.setdefault(r["grp"], []).append(
+            {"key": r["key"], "name": r["name"], "kind": r["kind"], "children": kids}
+        )
+    return [
+        {"key": None, "name": g, "kind": "group", "children": items}
+        for g, items in groups.items()
+    ]
+
+
+RFLP = """
+MATCH (a:Node)-[r:PERFORMS|OWNS|ALLOCATED_TO]->(b:Node)
+WHERE (type(r) = 'PERFORMS' AND a:usecase AND b:feature)
+   OR (type(r) = 'OWNS' AND (a:feature OR a:function) AND b:function)
+   OR (type(r) = 'ALLOCATED_TO' AND a:function AND b:component)
+   OR (type(r) = 'ALLOCATED_TO' AND a:component AND b:physical)
+RETURN a.key AS src, b.key AS dst"""
+RFLP_NODES = """
+MATCH (n:usecase|feature|function|component|physical)
+RETURN n.key AS key, coalesce(n.name, n.title, n.key) AS name, head([l IN labels(n) WHERE l IN $types]) AS kind,
+  n.domain AS domain, coalesce(n.platform, false) AS platform"""
+
+
+def rflp_tree(driver) -> list[dict]:
+    """Use case > feature > function (nested) > logical > physical; a shared element repeats."""
+    info = {r["key"]: r.data() for r in _read(driver, RFLP_NODES, types=NEED_TYPES)}
+    kids = {}
+    for r in _read(driver, RFLP):
+        kids.setdefault(r["src"], []).append(r["dst"])
+
+    def node(key, seen):
+        n = dict(info[key])
+        n["children"] = [
+            node(k, seen | {key}) for k in sorted(kids.get(key, [])) if k not in seen
+        ]
+        return n
+
+    roots = sorted(
+        (k for k, v in info.items() if v["kind"] == "usecase"),
+        key=lambda k: (info[k]["platform"], k),
+    )
+    return [node(k, frozenset()) for k in roots]
+
+
+# V-model: need type -> (level, side)
+V_PLACE = {
+    "crs": (1, "left"),
+    "acctest": (1, "right"),
+    "usecase": (2, "left"),
+    "sysreq": (2, "left"),
+    "systest": (2, "right"),
+    "feature": (3, "left"),
+    "function": (3, "left"),
+    "component": (4, "left"),
+    "physical": (5, "bottom"),
+}
+V_NODES = """
+MATCH (n:Need) WHERE NOT coalesce(n.platform, false) AND ($keys IS NULL OR n.key IN $keys)
+RETURN n.key AS key, head([l IN labels(n) WHERE l IN $types]) AS type,
+  COLLECT { MATCH (t:Node)-[:TESTS]->(n) RETURN {key: t.key, result: t.result} } AS results"""
+V_REACH = (
+    """
+MATCH (f:crs {key: $focus})
+WITH f, [f] + COLLECT {
+  MATCH p = (f)-[:"""
+    + NEED_LINKS
+    + """*1..6]-(n) WHERE none(x IN nodes(p)[1..] WHERE x:crs) RETURN DISTINCT n
+} AS ns
+UNWIND ns AS n
+OPTIONAL MATCH (n:feature)-[:OWNS*]->(fn:function)
+OPTIONAL MATCH (fn)-[:ALLOCATED_TO]->(lc:component)
+OPTIONAL MATCH (lc)-[:ALLOCATED_TO]->(pc:physical)
+WITH collect(n.key) + collect(fn.key) + collect(lc.key) + collect(pc.key) AS keys
+RETURN [k IN keys WHERE k IS NOT NULL] AS keys"""
+)
+V_EDGES = "SATISFIES|REALIZES|MATCHES|PERFORMS|OWNS|ALLOCATED_TO|VERIFIES|TESTS"
+
+
+def vmodel(driver, focus):
+    """Left leg (requirements to parts) against right leg (tests and results), level by level."""
+    keys = None
+    if focus is not None:
+        found = _read(driver, FOCUS, focus=focus)
+        if not found:
+            raise KeyError(focus)
+        focus = found[0][0]
+        reach = _read(driver, V_REACH, focus=focus)
+        if not reach:
+            return {
+                "kind": "vmodel",
+                "focus": focus,
+                "nodes": [],
+                "edges": [],
+                "empty": [],
+                "reason": f"{focus} is not a customer requirement",
+            }
+        keys = reach[0]["keys"]
+    rows, results = [], []
+    for r in _read(driver, V_NODES, keys=keys, types=NEED_TYPES):
+        if r["type"] not in V_PLACE:
+            continue
+        level, side = V_PLACE[r["type"]]
+        rows.append({"key": r["key"], "parent": None, "level": level, "side": side})
+        results += [
+            {
+                "key": t["key"],
+                "parent": None,
+                "level": level,
+                "side": "right",
+                "result": t["result"],
+            }
+            for t in r["results"]
+        ]
+    nodes = _nodes(driver, rows + results)
+    present = {n["key"] for n in nodes}
+    edges = [
+        {"src": r["a"], "dst": r["b"], "type": r["t"], "label": None}
+        for r in _read(
+            driver,
+            f"MATCH (a:Node)-[r:{V_EDGES}]->(b:Node) WHERE a.key IN $k AND b.key IN $k "
+            "RETURN a.key AS a, b.key AS b, type(r) AS t",
+            k=list(present),
+        )
+    ]
+    right = {n["level"] for n in nodes if n["side"] == "right"}
+    return {
+        "kind": "vmodel",
+        "focus": focus,
+        "nodes": nodes,
+        "edges": edges,
+        "empty": [lv for lv in (1, 2, 3, 4) if lv not in right],
+        "reason": None if nodes else "no requirements to place",
     }
 
 

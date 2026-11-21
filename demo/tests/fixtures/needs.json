@@ -1,78 +1,82 @@
 {
- "current_version": "1",
- "versions": {
-  "1": {
-   "needs": {
-    "CRS-001": {
-     "id": "CRS-001",
-     "type": "crs",
-     "title": "Daily commute",
-     "content": "The vehicle shall do a 50 km commute.",
-     "satisfies_back": [
-      "SR-001"
-     ]
-    },
-    "SR-001": {
-     "id": "SR-001",
-     "type": "sysreq",
-     "title": "range",
-     "content": "The drive shall give 50 km range.",
-     "qualified_name": "Sys::range",
-     "sysml_kind": "RequirementUsage",
-     "source": "req.sysml:4",
-     "satisfies": [
-      "CRS-001"
-     ],
-     "satisfies_back": [
-      "LC-001"
-     ]
-    },
-    "LC-001": {
-     "id": "LC-001",
-     "type": "component",
-     "title": "lc",
-     "content": "The drive unit.",
-     "qualified_name": "Sys::lc",
-     "sysml_kind": "PartUsage",
-     "source": "arch.sysml:2",
-     "satisfies": [
-      "SR-001"
-     ],
-     "allocated_to_back": [
-      "PC-001"
-     ]
-    },
-    "PC-001": {
-     "id": "PC-001",
-     "type": "physical",
-     "title": "motor",
-     "content": "Permanent-magnet synchronous motor.",
-     "qualified_name": "Sys::motor",
-     "sysml_kind": "PartUsage",
-     "source": "phys.sysml:3",
-     "domain": "EE",
-     "platform": true,
-     "reuse": "variant",
-     "allocated_to": [
-      "LC-001"
-     ],
-     "specializes": [
-      "PC-000"
-     ]
-    },
-    "PC-000": {
-     "id": "PC-000",
-     "type": "physical",
-     "title": "base",
-     "content": "The base motor.",
-     "qualified_name": "Sys::base",
-     "sysml_kind": "PartUsage",
-     "source": "phys.sysml:1",
-     "specializes_back": [
-      "PC-001"
-     ]
+  "current_version": "1",
+  "versions": {
+    "1": {
+      "needs": {
+        "CRS-001": {
+          "id": "CRS-001",
+          "type": "crs",
+          "title": "Daily commute",
+          "content": "The vehicle shall do a 50 km commute.",
+          "satisfies_back": [
+            "SR-001"
+          ],
+          "docname": "customer/requirements",
+          "sections": [
+            "Customer requirements"
+          ]
+        },
+        "SR-001": {
+          "id": "SR-001",
+          "type": "sysreq",
+          "title": "range",
+          "content": "The drive shall give 50 km range.",
+          "qualified_name": "Sys::range",
+          "sysml_kind": "RequirementUsage",
+          "source": "req.sysml:4",
+          "satisfies": [
+            "CRS-001"
+          ],
+          "satisfies_back": [
+            "LC-001"
+          ]
+        },
+        "LC-001": {
+          "id": "LC-001",
+          "type": "component",
+          "title": "lc",
+          "content": "The drive unit.",
+          "qualified_name": "Sys::lc",
+          "sysml_kind": "PartUsage",
+          "source": "arch.sysml:2",
+          "satisfies": [
+            "SR-001"
+          ],
+          "allocated_to_back": [
+            "PC-001"
+          ]
+        },
+        "PC-001": {
+          "id": "PC-001",
+          "type": "physical",
+          "title": "motor",
+          "content": "Permanent-magnet synchronous motor.",
+          "qualified_name": "Sys::motor",
+          "sysml_kind": "PartUsage",
+          "source": "phys.sysml:3",
+          "domain": "EE",
+          "platform": true,
+          "reuse": "variant",
+          "allocated_to": [
+            "LC-001"
+          ],
+          "specializes": [
+            "PC-000"
+          ]
+        },
+        "PC-000": {
+          "id": "PC-000",
+          "type": "physical",
+          "title": "base",
+          "content": "The base motor.",
+          "qualified_name": "Sys::base",
+          "sysml_kind": "PartUsage",
+          "source": "phys.sysml:1",
+          "specializes_back": [
+            "PC-001"
+          ]
+        }
+      }
     }
-   }
   }
- }
 }

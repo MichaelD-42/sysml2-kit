@@ -44,6 +44,13 @@ class ServerTest(unittest.TestCase):
 
     def test_tree_search_keys_compliance(self):
         self.assertTrue(self.client.get("/api/tree").json())
+        reqs = self.client.get("/api/tree?kind=requirements").json()
+        self.assertIn("Customer requirements", [g["name"] for g in reqs])
+        self.assertEqual(
+            self.client.get("/api/tree?kind=rflp").json()[0]["kind"], "usecase"
+        )
+        self.assertEqual(self.client.get("/api/tree?kind=nope").status_code, 400)
+        self.assertTrue(self.client.get("/api/view/vmodel").json()["nodes"])
         hits = self.client.get("/api/search?q=drive motor&k=3").json()
         self.assertTrue(hits)
         self.assertIn("PC-001", self.client.get("/api/keys").json())

@@ -11,7 +11,16 @@ LAYERS = {
     **dict.fromkeys(("physical", "physinterface"), "P"),
     **dict.fromkeys(("systest", "acctest", "testresult"), "V"),
 }
-NEED_FIELDS = ("title", "content", "domain", "platform", "variant", "reuse")
+NEED_FIELDS = (
+    "title",
+    "content",
+    "domain",
+    "platform",
+    "variant",
+    "reuse",
+    "docname",
+    "result",
+)
 # usages that are edges or annotations, not things: nodes only when a need names them
 NOT_NODES = {
     "ReferenceUsage",
@@ -183,6 +192,7 @@ def build(export, needs):
         props = {"key": n["id"], "layer": LAYERS.get(n["type"])}
         props |= {f: n[f] for f in NEED_FIELDS if n.get(f) not in (None, "")}
         props["source"] = n.get("source")
+        props["section"] = (n.get("sections") or [None])[0]
         nodes[n["id"]] = Node(n["id"], ["Node", "Need", n["type"]], props)
 
     edges = []

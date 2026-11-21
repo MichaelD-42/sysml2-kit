@@ -67,8 +67,15 @@ def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
         return error(400, str(e))
 
     @app.get("/api/tree")
-    def tree():
-        return views.tree(driver)
+    def tree(kind: str = "packages"):
+        trees = {
+            "packages": views.tree,
+            "requirements": views.requirements_tree,
+            "rflp": views.rflp_tree,
+        }
+        if kind not in trees:
+            raise ValueError(f"unknown tree kind {kind!r}")
+        return trees[kind](driver)
 
     @app.get("/api/keys")
     def keys():

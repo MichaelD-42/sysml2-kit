@@ -146,6 +146,65 @@ class ViewsTest(unittest.TestCase):
         self.assertIn("VehiclePhysical", [r["name"] for r in roots])
         self.assertEqual({r["kind"] for r in roots}, {"Package"})
 
+    def test_requirements_tree_groups_by_section_and_lists_links(self):
+        groups = {g["name"]: g for g in views.requirements_tree(self.driver)}
+        self.assertIn("Customer requirements", groups)
+        self.assertIn("System requirements", groups)
+        crs = next(
+            c
+            for c in groups["Customer requirements"]["children"]
+            if c["key"] == "CRS-003"
+        )
+        links = {(c["rel"], c["key"]) for c in crs["children"]}
+        self.assertIn(("satisfied by", "SR-005"), links)
+        self.assertIn(("matched by (partial)", "FEAT-002"), links)
+        self.assertIn(("verified by", "ATC-003"), links)
+        self.assertNotIn(("matched by", "FEAT-002"), links)
+        self.assertIsNone(groups["Customer requirements"]["key"])
+
+    def test_rflp_tree_follows_the_chain(self):
+        def paths(nodes, prefix=()):
+            for n in nodes:
+                here = prefix + (n["key"],)
+                yield here
+                yield from paths(n["children"], here)
+
+        all_paths = set(paths(views.rflp_tree(self.driver)))
+        self.assertIn(
+            ("UC-001", "FEAT-002", "F-002", "F-007", "LC-007", "PC-001"), all_paths
+        )
+        self.assertTrue(
+            any(
+                p[:5] == ("UC-001", "FEAT-002", "F-002", "F-006", "LC-006")
+                and len(p) == 6
+                for p in all_paths
+            )
+        )
+        roots = [n["key"] for n in views.rflp_tree(self.driver)]
+        self.assertLess(roots.index("UC-001"), roots.index("EDU-UC-001"))
+
+    def test_vmodel_levels_and_sides(self):
+        v = views.view(self.driver, "vmodel", None)
+        at = {n["key"]: (n["level"], n["side"]) for n in v["nodes"]}
+        self.assertEqual(at["CRS-003"], (1, "left"))
+        self.assertEqual(at["ATC-003"], (1, "right"))
+        self.assertEqual(at["SR-005"], (2, "left"))
+        self.assertEqual(at["STC-005"], (2, "right"))
+        self.assertEqual(at["FEAT-002"], (3, "left"))
+        self.assertEqual(at["LC-007"], (4, "left"))
+        self.assertEqual(at["PC-001"], (5, "bottom"))
+        self.assertNotIn("EDU-FEAT-001", at)
+        self.assertIn(
+            ("STC-005", "SR-005", "VERIFIES"),
+            {(e["src"], e["dst"], e["type"]) for e in v["edges"]},
+        )
+        self.assertEqual(v["empty"], [3, 4])
+
+    def test_vmodel_of_one_requirement(self):
+        keys = {n["key"] for n in views.view(self.driver, "vmodel", "CRS-003")["nodes"]}
+        self.assertIn("SR-005", keys)
+        self.assertNotIn("CRS-001", keys)
+
     def test_unknown_kind(self):
         with self.assertRaises(ValueError):
             views.view(self.driver, "nope", None)

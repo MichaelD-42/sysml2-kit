@@ -74,6 +74,11 @@ class BuildTest(unittest.TestCase):
     def test_customer_requirement_is_need_only(self):
         self.assertEqual(self.graph.nodes["CRS-001"].labels, ["Node", "Need", "crs"])
 
+    def test_need_keeps_its_document_section(self):
+        props = self.graph.nodes["CRS-001"].props
+        self.assertEqual(props["docname"], "customer/requirements")
+        self.assertEqual(props["section"], "Customer requirements")
+
     def test_succession_flow_connects_performs(self):
         convert, produce = self.by_name("convert").key, self.by_name("produce").key
         self.assertEqual(self.edges("SUCCESSION"), {(convert, produce)})
