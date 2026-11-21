@@ -27,6 +27,7 @@ NEED_TYPES = {
     "InterfaceUsage": "interface",
     "VerificationCaseDefinition": "systest",
     "VerificationCaseUsage": "systest",
+    "ConstraintUsage": "constraint",
 }
 # (metaclass, `#keyword` metadata) -> need type, where the keyword changes the type NEED_TYPES gives
 KEYWORD_TYPES = {
@@ -59,6 +60,7 @@ PREFIXES = {
     "physical": "PC",
     "physinterface": "PI",
     "systest": "STC",
+    "constraint": "CON",
 }
 KIND_NAMES = {
     "usecase": "a use case",
@@ -70,6 +72,7 @@ KIND_NAMES = {
     "physical": "a physical component",
     "physinterface": "a physical interface",
     "systest": "a system test",
+    "constraint": "a constraint",
 }
 LINK_TYPES = (
     "satisfies",
@@ -80,6 +83,8 @@ LINK_TYPES = (
     "specializes",
     "matches",
     "partial_matches",
+    "implements",
+    "partial_satisfies",
 )
 # relationships whose `specific` end specializes the `general` end
 SPECIALIZATIONS = ("Subsetting", "Redefinition", "Subclassification", "FeatureTyping")
@@ -89,7 +94,10 @@ TRACE_METADATA = {
     "Trace::Realizes": "realizes",
     "Trace::Verifies": "verifies",
     "Trace::Matches": "matches",
+    "Trace::Implements": "implements",
 }
+# link types whose metadata may carry `partial = true`, -> the link type that records it
+PARTIAL_LINKS = {"matches": "partial_matches", "satisfies": "partial_satisfies"}
 # strings first, so `"http://x"` is not a comment; multi-line note `//* */` before `//`, or `//` would take only its first line
 COMMENT = re.compile(r'"(?:\\.|[^"\\])*"|//\*.*?\*/|/\*.*?\*/|//[^\n]*', re.DOTALL)
 # reStructuredText inline markup; doc text is plain text, so these are escaped
@@ -294,18 +302,15 @@ def convert(elements, locations, platform_files=()):
             targets = strings_under(e["@id"])
             if not targets:
                 errors.append(f"{src}: @{types[0]} names no need")
-            if link_type == "matches":
-                if needs[src]["type"] != "feature":
-                    errors.append(
-                        f"{src}: only a feature matches a customer requirement"
-                    )
-                    continue
-                if any(
-                    by_id.get(c, {}).get("@type") == "LiteralBoolean"
-                    and by_id[c]["value"] is True
-                    for c in all_under(e["@id"])
-                ):
-                    needs[src]["partial_matches"] += targets
+            if link_type == "matches" and needs[src]["type"] != "feature":
+                errors.append(f"{src}: only a feature matches a customer requirement")
+                continue
+            if link_type in PARTIAL_LINKS and any(
+                by_id.get(c, {}).get("@type") == "LiteralBoolean"
+                and by_id[c]["value"] is True
+                for c in all_under(e["@id"])
+            ):
+                needs[src][PARTIAL_LINKS[link_type]] += targets
             needs[src][link_type] += targets
         elif t in SPECIALIZATIONS and not e.get("isImplied"):
             # an end without a short name is not a need, so there is nothing to link

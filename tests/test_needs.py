@@ -351,8 +351,8 @@ def rel(id_, type_, specific, general, **fields):
     )
 
 
-def matches(id_, target, need="CRS-1", partial=None):
-    """`@Matches { need = ...; partial = ...; }` on `target`."""
+def matches(id_, target, need="CRS-1", partial=None, meta="Matches"):
+    """`@<meta> { need = ...; partial = ...; }` on `target`."""
     children = {f"{id_}s": {"@id": f"{id_}s", "@type": "LiteralString", "value": need}}
     if partial is not None:
         children[f"{id_}b"] = {
@@ -364,13 +364,13 @@ def matches(id_, target, need="CRS-1", partial=None):
         id_: el(
             id_,
             "MetadataUsage",
-            type=ids("defMatches"),
+            type=ids(f"def{meta}"),
             annotatedElement=ids(target),
             ownedElement=ids(*children),
         ),
-        "defMatches": {
-            **el("defMatches", "MetadataDefinition", name="Matches"),
-            "qualifiedName": "Trace::Matches",
+        f"def{meta}": {
+            **el(f"def{meta}", "MetadataDefinition", name=meta),
+            "qualifiedName": f"Trace::{meta}",
         },
         **children,
     }
@@ -469,6 +469,41 @@ class SpecializesMatchesTest(unittest.TestCase):
             BridgeError, "only a feature matches a customer requirement"
         ):
             needs_of(model(**matches("m", "uc")))
+
+
+class ConstraintTest(unittest.TestCase):
+    def test_constraint_is_a_need_and_partial_satisfies_keeps_satisfies(self):
+        con = el("con", "ConstraintUsage", "CON-001", "limit", owner="pkg")
+        n = needs_of(
+            model(
+                con=con,
+                **matches("s", "con", need="CRS-001", partial=True, meta="Satisfies"),
+            )
+        )["CON-001"]
+        self.assertEqual(n["type"], "constraint")
+        self.assertEqual((n["satisfies"], n["partial_satisfies"]), (["CRS-001"],) * 2)
+
+    def test_satisfies_without_partial(self):
+        con = el("con", "ConstraintUsage", "CON-001", "limit", owner="pkg")
+        n = needs_of(model(con=con, **matches("s", "con", meta="Satisfies")))["CON-001"]
+        self.assertEqual((n["satisfies"], n["partial_satisfies"]), (["CRS-1"], []))
+
+    def test_implements_on_a_verification(self):
+        n = needs_of(
+            model(
+                stc=el("stc", "VerificationCaseUsage", "STC-1", "t", owner="pkg"),
+                **matches("i", "stc", need="CTR-001", meta="Implements"),
+            )
+        )["STC-1"]
+        self.assertEqual(n["implements"], ["CTR-001"])
+
+    def test_constraint_prefix_must_match(self):
+        with self.assertRaisesRegex(
+            BridgeError, "SR-9: a constraint's id starts with CON-"
+        ):
+            needs_of(
+                model(con=el("con", "ConstraintUsage", "SR-9", "limit", owner="pkg"))
+            )
 
 
 if __name__ == "__main__":

@@ -9,8 +9,9 @@ package Trace {
     private import ScalarValues::Boolean;
 
     metadata def Realizes  { attribute need : String[1..*]; }
-    metadata def Satisfies { attribute need : String[1..*]; }
+    metadata def Satisfies { attribute need : String[1..*]; attribute partial : Boolean[0..1]; }
     metadata def Verifies  { attribute need : String[1..*]; }
+    metadata def Implements { attribute need : String[1..*]; }
 
     // keywords: `#Feature action <'FEAT-001'> x;`, `#Electrical part <'PC-001'> y;`
     metadata def Feature;

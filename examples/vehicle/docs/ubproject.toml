@@ -108,6 +108,20 @@ color = "#D2E4FE"
 id_regex = "^([A-Z][A-Z0-9]*-)?SWR-[0-9]{3,}$"
 
 [[needs.types]]
+directive = "ctr"
+title = "Customer test requirement"
+prefix = "CTR-"
+color = "#F7C6C0"
+id_regex = "^([A-Z][A-Z0-9]*-)?CTR-[0-9]{3,}$"
+
+[[needs.types]]
+directive = "constraint"
+title = "Constraint"
+prefix = "CON-"
+color = "#CFC3E8"
+id_regex = "^([A-Z][A-Z0-9]*-)?CON-[0-9]{3,}$"
+
+[[needs.types]]
 directive = "testresult"
 title = "Test result"
 prefix = "testresult_"
@@ -144,6 +158,18 @@ outgoing = "matches"
 [needs.links.partial_matches]
 incoming = "partially matched by"
 outgoing = "partially matches"
+
+[needs.links.implements]
+incoming = "implemented by"
+outgoing = "implements"
+
+[needs.links.applies_to]
+incoming = "applied by"
+outgoing = "applies to"
+
+[needs.links.partial_satisfies]
+incoming = "partially satisfied by"
+outgoing = "partially satisfies"
 
 [needs.links.answers]
 incoming = "answered by"
@@ -203,6 +229,23 @@ schema = { type = "string", enum = ["", "commercial", "not-offered"] }
 description = "Compliance statement: comply, partial or not-comply"
 nullable = true
 schema = { type = "string", enum = ["comply", "partial", "not-comply"] }
+
+# set on customer requirements (CRS) only
+[needs.fields.class]
+description = "Requirement class: functional, non-functional, constraint or information"
+default = ""
+schema = { type = "string", enum = ["", "functional", "non-functional", "constraint", "information"] }
+
+# set on customer test requirements (CTR) only
+[needs.fields.purpose]
+description = "Test purpose: verification or validation"
+default = ""
+schema = { type = "string", enum = ["", "verification", "validation"] }
+
+[needs.fields.method]
+description = "Test method: test, analysis, inspection or demonstration"
+default = ""
+schema = { type = "string", enum = ["", "test", "analysis", "inspection", "demonstration"] }
 
 # fields written by `test-reports build needs`
 [needs.fields.result]
