@@ -123,9 +123,19 @@ A new view kind `metamodel` ("Meta-model") that shows the kit's method as a diag
 - Data: server reads the project's `ubproject.toml` and `schemas.json` (standard library `tomllib`, `json`) plus one graph query; no new dependency. Laid out with ELK like the other views (layers as frames).
 - Tests: the vehicle-free seat-switch RFQ shows `crs → constraint` (satisfies) and `systest → ctr` (implements) with non-zero counts; a declared link with no instances is marked unused; rule ids attach to the right edges.
 
+## Part 5 — Review: can the meta-model show ASPICE compliance?
+
+A review, not an implementation. Question: can the meta-model view (Part 4) show how far a kit project meets the traceability and consistency expectations of Automotive SPICE 4.0, for the system and software engineering processes (SYS.1–SYS.5, SWE.1–SWE.6) and the hardware engineering processes (HWE.1–HWE.4)?
+
+- Map each kit need type and link type to the ASPICE process outcomes and work products it serves (stakeholder requirements, system requirements, system architecture, software and hardware requirements and design, verification measures and results), and each traceability expectation (bidirectional traceability and consistency between adjacent levels, verification results to verification measures) to the link and rule that would demonstrate it.
+- List the gaps: what ASPICE expects that the kit has no type, link or rule for (e.g. software/hardware requirement levels below the system, the release and baseline aspects, verification measure selection criteria), and what is out of reach of a model-and-needs tool (process, management and support processes).
+- Recommend: whether to add an ASPICE overlay to the meta-model view (process ids on types and links, coverage per expectation computed from the rules), what it would need, and what it must not claim (the view shows evidence of traceability, it is not an assessment).
+- Deliverable: `docs/aspice-review.md` (or a docs page in the kit), reviewed with the owner before any overlay is built.
+- Copyright: ASPICE is a VDA QMC publication; the review cites process ids and short names and paraphrases expectations, and never reproduces base-practice or outcome text.
+
 ## Order
 
-Part 1 → Part 2 → Part 3 → Part 4 (Part 3 needs Part 2's fields; demo tests move with Part 3; the meta-model view shows Part 2's types and is tested on Part 3's example).
+Part 1 → Part 2 → Part 3 → Part 4 → Part 5 (Part 3 needs Part 2's fields; demo tests move with Part 3; the meta-model view shows Part 2's types and is tested on Part 3's example; the ASPICE review reads the finished meta-model).
 
 ## Left to the builder
 
