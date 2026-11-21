@@ -6,26 +6,28 @@ The <code>.sysml</code> files are the model; sphinx-needs is where traceability 
 <p align="center">
 <a href="https://github.com/MichaelD-42/sysml2-kit/actions/workflows/ci.yml"><img src="https://github.com/MichaelD-42/sysml2-kit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a><br>
-<a href="examples/vehicle">Example project</a> ·
+<a href="examples/vehicle">RFQ example</a> ·
+<a href="examples/edrive-platform">Platform example</a> ·
 <a href="plugins/sysml-rflp/skills/rflp-method/references/structure.md">RFLP structure and rules</a> ·
 <a href="plugins/sysml-rflp/skills/sysml-author/references/patterns.sysml">SysML patterns</a>
 </p>
 
 ## Why sysml2-kit
 
-SysML v2 was adopted in 2025, so a language model asked to write it produces something that looks right and names things that do not exist. And a model on its own does not tell you whether every customer requirement ends up satisfied by a component and verified by a test. sysml2-kit closes both gaps. Agents write the model with a checker in the loop, a hook lints every `.sysml` file they edit, and the model is exported into sphinx-needs, where the RFLP rules (Requirements → Functional → Logical) fail the docs build when a link is missing.
+SysML v2 was adopted in 2025, so a language model asked to write it produces something that looks right and names things that do not exist. And a model on its own does not tell you whether every customer requirement ends up satisfied by a component and verified by a test. sysml2-kit closes both gaps. Agents write the model with a checker in the loop, a hook lints every `.sysml` file they edit, and the model is exported into sphinx-needs, where the RFLP rules (Requirements → Functional → Logical → Physical) fail the docs build when a link is missing.
 
-The method is fixed and documented: customer requirements (CRS) → use cases and system requirements (UC/SR) → functions (F) → logical components (LC) → system and acceptance tests (STC/ATC) → test results. Each layer has its own agent, and the workflow stops for your approval between layers. Terms and abbreviations are in the [glossary](glossary.md).
+The method is fixed and documented, and built for a supplier answering a customer RFQ: customer requirements (CRS, Markdown) → use cases and system requirements (UC/SR) → features and functions (FEAT/F) → logical components and interfaces (LC/LI) → physical components and interfaces in mechanical, electrical or software (PC/PI) → system and acceptance tests (STC/ATC) → test results. The supplier's platform (reusable features, components and variants) is a separate project that an RFQ project imports and reuses by subsetting. The docs show per customer requirement which feature meets it, how much comes from the platform (derived from the model, never claimed), and whether the match is partial; requirements no component can meet are answered by compliance statements (CST). Each layer has its own agent, an interview skill asks the user only what the inputs leave open, and the workflow stops for your approval between layers. Terms and abbreviations are in the [glossary](glossary.md).
 
-It is not a modeling GUI and it does not simulate. The physical layer (software, hardware, code) stays out of the SysML model; it lives in sphinx-needs next to the code. The toolchain is Python and Rust only, with no Java or Eclipse.
+It is not a modeling GUI and it does not simulate. Software components keep linking to code and tests in sphinx-needs. The toolchain is Python and Rust only, with no Java or Eclipse.
 
 ## What you get
 
-- **Plugin `sysml-rflp`** ([`plugins/sysml-rflp/`](plugins/sysml-rflp)): skills to scaffold (`sysml-init`), author (`sysml-author`), lint (`sysml-lint`) and document (`sysml-docs`) a model, and to run the RFLP workflow (`rflp`, `rflp-method`). There is an agent per layer plus a reviewer, a hook that runs `sysml check` and the bridge after every edit (language errors, duplicate ids, unlinked ends, vague requirement texts), a session-start check for missing tools, the `sysml` MCP server, and a project template.
-- **Python package `sysml2kit`** ([`src/`](src/sysml2kit)): turns `sysml export` JSON into sphinx-needs needs, warns on system requirement texts without exactly one `shall` or with a vague term, lists RFLP rule violations by layer (`sysml2kit gaps`), and renders use case diagrams and the RFLP trace graph as SVG, where a click on an element opens its need in the docs. Standard library only.
-- **Example [`examples/vehicle/`](examples/vehicle)**: a complete chain from CRS to test results, and the acceptance fixture for the toolkit.
+- **Plugin `sysml-rflp`** ([`plugins/sysml-rflp/`](plugins/sysml-rflp)): skills to scaffold (`sysml-init`), author (`sysml-author`), lint (`sysml-lint`) and document (`sysml-docs`) a model, to run the RFLP workflow (`rflp`, `rflp-method`), and to answer an RFQ with an interview per layer (`rfq`, which also captures a platform bottom-up). There is an agent per layer (requirements, functional, logical, physical, test) plus a reviewer, a hook that runs `sysml check` and the bridge after every edit (language errors, duplicate ids, unlinked ends, vague requirement texts), a session-start check for missing tools, the `sysml` MCP server, and a project template.
+- **Python package `sysml2kit`** ([`src/`](src/sysml2kit)): turns `sysml export` JSON into sphinx-needs needs, warns on system requirement texts without exactly one `shall` or with a vague term, lists RFLP rule violations by layer (`sysml2kit gaps`), derives reuse status and writes the compliance table (`sysml2kit compliance`), and renders use case diagrams and the RFLP trace graph as SVG, where a click on an element opens its need in the docs. Standard library only.
+- **Example [`examples/edrive-platform/`](examples/edrive-platform)**: a platform captured bottom-up, an e-drive product line with a 50 kW / 80 kW motor variation, from PRQ to test results.
+- **Example [`examples/vehicle/`](examples/vehicle)**: an RFQ project that imports the platform through `platform/` (a symlink here, a git submodule in a real project), with a complete chain from CRS to test results, a partial match, a compliance statement and the compliance table. It is the acceptance fixture for the toolkit.
 
-The docs build is the traceability report. Need tables, the trace graph and internal diagrams come out of the model, and `sphinx-build -W` fails on any RFLP rule the model breaks: a customer requirement nothing satisfies, a function allocated to no component, a requirement no test verifies.
+The docs build is the traceability report. Need tables, the trace graph and internal diagrams come out of the model, and `sphinx-build -W` fails on any RFLP rule the model breaks: a customer requirement nothing satisfies, a function allocated to no component, a logical component allocated to no physical one, a requirement no test verifies.
 
 ## For agents
 
@@ -53,25 +55,26 @@ You need Rust (cargo), Python 3.10+ and make. In Claude Code:
 /plugin install sysml-rflp@sysml2-kit
 ```
 
-Then ask Claude to set up a SysML project. `sysml-init` scaffolds the pipeline, and `make tools` installs the `sysml` CLI (built with cargo from the fork at the tag the Makefile pins) and the Python requirements (Sphinx, sphinx-needs, ub-test-reports, sysml2kit). Add customer requirements and ask for the RFLP workflow; `make all` builds the docs and checks the rules.
+Then ask Claude to set up a SysML project. `sysml-init` scaffolds the pipeline, and `make tools` installs the `sysml` CLI (built with cargo from the fork at the tag the Makefile pins) and the Python requirements (Sphinx, sphinx-needs, ub-test-reports, sysml2kit). If you have a platform repo, add it with `git submodule add <platform repo> platform`. Add customer requirements (`docs/customer/*.md`) and ask for the `rfq` workflow, or the `rflp` workflow without the interview; `make all` builds the docs and checks the rules.
 
 ## Pipeline
 
 ```text
-model/**/*.sysml ── sysml check ───────────────────────────── lint gate
+model/**/*.sysml + platform/model/**/*.sysml ── sysml check ── lint gate
        ├─ sysml export ─► model.json ─ sysml2kit needs ─► model-needs.json ─┐
        ├─ sysml2kit usecases / sysml diagram --internal ─► *.svg            ├─ needimport ─► sphinx-build -b needs
 test-results/*.xml ─ test-reports build needs ─► results-needs.json ────────┘        │
-docs/**/*.rst (CRS, ATC) ───────────────────────────────────────────────────────────┤
-                                     sysml2kit trace ◄─ needs.json ◄────────────────┘
-                                            └─► trace.svg ─► sphinx-build -W -b html (RFLP rules = schemas.json)
+docs/**/*.md|rst (CRS, PRQ, CST, ATC) ──────────────────────────────────────────────┤
+          sysml2kit trace ─► trace.svg ◄─ needs.json ◄──────────────────────────────┤
+          sysml2kit compliance ─► compliance.md ◄───────────────────────────────────┘
+                       └─► sphinx-build -W -b html (RFLP rules = schemas.json, reuse and compliance findings)
 ```
 
-Need types, link types, fields and the RFLP rules live in `docs/ubproject.toml` and `docs/schemas.json`, which Sphinx reads via `needs_from_toml` and ubCode reads directly. The structure and rules are documented in [`structure.md`](plugins/sysml-rflp/skills/rflp-method/references/structure.md).
+The platform model is loaded next to the RFQ's `model/`; its elements become needs with `platform: true`, which the RFQ build does not rule-check (the platform's own build does). Need types, link types, fields and the RFLP rules live in `docs/ubproject.toml` and `docs/schemas.json`, which Sphinx reads via `needs_from_toml` and ubCode reads directly. The structure and rules are documented in [`structure.md`](plugins/sysml-rflp/skills/rflp-method/references/structure.md).
 
 ### What `sysml export` gives the bridge
 
-A flat JSON array of elements with `@type`, `@id` and every metamodel property; references are `{"@id": ...}`. `sysml2kit needs` reads `declaredShortName` (not `shortName`, which implicit features inherit), `name`, `qualifiedName`, `owner`, `documentation`; `SatisfyRequirementUsage.satisfyingFeature/satisfiedRequirement`; `Verification*.verifiedRequirement`; `AllocationUsage.relatedFeature` (`[source, target]`); `PerformActionUsage` → `ReferenceSubsetting.referencedFeature`; `MetadataUsage` typed by `Trace::Realizes/Satisfies/Verifies` and the string literals under it. The export has no source positions; the bridge finds `<'ID'>` in the model text, skipping comments and string literals.
+A flat JSON array of elements with `@type`, `@id` and every metamodel property; references are `{"@id": ...}`. `sysml2kit needs` reads `declaredShortName` (not `shortName`, which implicit features inherit), `name`, `qualifiedName`, `owner`, `documentation`; `SatisfyRequirementUsage.satisfyingFeature/satisfiedRequirement`; `Verification*.verifiedRequirement`; `AllocationUsage.relatedFeature` (`[source, target]`); `PerformActionUsage` → `ReferenceSubsetting.referencedFeature`; `MetadataUsage` typed by `Trace::Realizes/Satisfies/Verifies/Matches` and the string literals under it, and keyword metadata `Trace::Feature/Mechanical/Electrical/Software`, which with the metaclass decide the need type (`#Feature action` → feature, `#Electrical part` → physical component); subsetting (`:>`) becomes a `specializes` link. The export has no source positions; the bridge finds `<'ID'>` in the model text, skipping comments and string literals.
 
 ## Tools and versions
 
@@ -82,7 +85,7 @@ A flat JSON array of elements with `@type`, `@id` and every metamodel property; 
 | ub-test-reports | 2.0.0 | JUnit → needs |
 | sysml2kit | this repo | export → needs, use case and trace diagrams |
 
-The fork fixes one bug in upstream sysmlv2-cli 0.1.4: a parenthesised sequence `("a", "b")` kept only its first element, so `@Satisfies { need = ("CRS-001", "CRS-002"); }` silently lost links. With the fix, the OMG corpus still checks clean. It also adds the `find` and `relations` MCP tools.
+The fork fixes two bugs in upstream sysmlv2-cli 0.1.4. A parenthesised sequence `("a", "b")` kept only its first element, so `@Satisfies { need = ("CRS-001", "CRS-002"); }` silently lost links. And a variant member with a short name (`variant part <'PC-002'> radar;`) failed to parse, so platform variants could not be needs. With the fixes, the OMG corpus still checks clean. The fork also adds the `find` and `relations` MCP tools.
 
 The pipeline was chosen by an evaluation on 2026-11-07, Python or Rust only, against the OMG SysML-v2-Release 2026-09.1 corpus (252 files):
 
@@ -101,7 +104,9 @@ There is no OMG Pilot Implementation gate (Java/Eclipse is out); the corpus run 
 - Its built-in standard library is 2026-05, not the 2026-09.1 release.
 - No derive/refine mapping: SysML v2 has no `refine` keyword.
 - ubCode support for `network_back` schema rules is untested here.
-- `make tools` and CI build the fork tag in `SYSML_TAG`. To take a newer fork commit, tag it, change `SYSML_TAG` in both Makefiles and release; CI reads the tag from the template Makefile.
+- The platform is pulled in as a git submodule (or symlink) only; sysand packages are not supported. Reuse status follows the chain feature → functions → LC → PC through `specializes` links, so reuse written any other way (copying a platform part) counts as new.
+- Document inputs other than the Markdown CRS (PDF, Word, drawings) are read by Claude as context; there is no ReqIF or Excel import.
+- `make tools` and CI build the fork tag in `SYSML_TAG`. To take a newer fork commit, tag it, change `SYSML_TAG` in the template and example Makefiles and release; CI reads the tag from the template Makefile.
 
 ## Development
 

@@ -14,6 +14,7 @@ description: Create and change SysML v2 models (.sysml files) - use cases, requi
 - Every short-named element has `doc /* ... */`; it becomes the need text.
 - Model traced elements as usages (`requirement <'SR-001'> range { ... }`, `action <'F-002'> propel;`, `part <'LC-002'> powertrain;`). `satisfy`, `allocate` and `perform` must point at usages, and both ends need short names.
 - Links to RST needs: `@Realizes { need = "CRS-001"; }` / `@Satisfies` / `@Verifies`, after `private import Trace::*;`.
+- Keywords from `Trace` set the kind: `#Feature action` (noun name), `#Mechanical`/`#Electrical`/`#Software` on `part` and `port` (exactly one); the id prefix must match (`FEAT-`, `PC-`, `PI-`). Reuse a platform part or variant by subsetting, `part <'PC-001'> x :> Platform::a::b;`, not `:>>`. `@Matches { need = "CRS-001"; partial = true; }` states a feature's coverage.
 - Keywords cannot be names (`loop`, `state`, `action`, `port`, `in`, `out`, `then`, `first`, `entry`, `do`, `exit`, ...).
 
 ## Rule

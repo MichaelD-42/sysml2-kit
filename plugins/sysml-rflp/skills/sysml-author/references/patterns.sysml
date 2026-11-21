@@ -13,7 +13,7 @@ package PumpPatterns {
         doc /* The driver drives under load; the engine stays within temperature limits. */
         subject pumpSystem;
         actor driver;
-        perform coolingFunctions.circulate;             // => F-102 realizes UC-101
+        perform engineCooling;                          // => FEAT-101 realizes UC-101
     }
 
     // --- R: system requirements are requirement usages; text-only is a full requirement ---
@@ -28,12 +28,16 @@ package PumpPatterns {
         require constraint { power <= 150.0 }          // optional formal part
     }
 
-    // --- F: a usage tree of solution-neutral functions (verb + noun) ---
-    action <'F-101'> coolingFunctions {
-        doc /* Top-level cooling function. */
-        action <'F-102'> circulate { doc /* Move coolant through the loop. */ }
-        action <'F-103'> rejectHeat { doc /* Transfer heat from coolant to ambient air. */ }
-        first circulate then rejectHeat;
+    // --- F: a feature (noun name) owns solution-neutral functions (verb + noun), nested for sub-functions ---
+    #Feature action <'FEAT-101'> engineCooling {
+        @Matches { need = "CRS-101"; }                  // covers this customer need; add `partial = true;` if only in part
+        doc /* Keeps the engine within its temperature limits. */
+        action <'F-101'> coolingFunctions {
+            doc /* Top-level cooling function. */
+            action <'F-102'> circulate { doc /* Move coolant through the loop. */ }
+            action <'F-103'> rejectHeat { doc /* Transfer heat from coolant to ambient air. */ }
+            first circulate then rejectHeat;
+        }
     }
 
     // --- L: a usage tree of technology-neutral components with ports (interfaces) ---
@@ -51,10 +55,32 @@ package PumpPatterns {
     }
 
     // --- L: allocation (leaf function -> exactly one leaf component) and satisfaction ---
-    allocate coolingFunctions.circulate to pumpSystem.pump;
-    allocate coolingFunctions.rejectHeat to pumpSystem.radiator;
+    allocate engineCooling.coolingFunctions.circulate to pumpSystem.pump;
+    allocate engineCooling.coolingFunctions.rejectHeat to pumpSystem.radiator;
     satisfy minFlow by pumpSystem.pump;               // both ends need short names
     satisfy maxPower by pumpSystem.pump;
+
+    // --- P: physical components, one domain keyword each (#Mechanical, #Electrical, #Software) ---
+    #Electrical part <'PC-101'> pumpUnit {
+        doc /* Brushless coolant pump, BOM PMP-100. */
+        #Electrical port <'PI-101'> hoseOutlet;
+    }
+    #Mechanical part <'PC-102'> heatExchanger { doc /* Aluminium cross-flow radiator, BOM RAD-200. */ }
+    allocate pumpSystem.pump to pumpUnit;               // LC => PC
+    allocate pumpSystem.radiator to heatExchanger;
+    allocate pumpSystem.pump.outlet to pumpUnit.hoseOutlet;   // LI => PI
+
+    // --- P: variation (platform side): variants are members; ids on variants need the kit's sysml fork ---
+    #Electrical variation part <'PC-103'> controller {
+        doc /* Pump controller family. */
+        variant #Electrical part <'PC-104'> controllerBasic { doc /* Fixed speed. */ }
+        variant #Electrical part <'PC-105'> controllerPwm { doc /* Speed control by PWM. */ }
+    }
+
+    // --- P: reuse in an RFQ project: subset (`:>`) a platform part or a variant; never `:>>` ---
+    #Electrical part <'PC-106'> selectedController :> controller::controllerPwm {
+        doc /* Platform PWM controller, selected for this program. */
+    }
 
     // --- V: system test cases verify system requirements ---
     verification <'STC-101'> flowBenchTest {

@@ -5,7 +5,7 @@ TEST_REPORTS ?= test-reports
 SPHINXBUILD  ?= sphinx-build
 # `make docs STRICT=` reports RFLP rule violations without failing (layer-by-layer work)
 STRICT       ?= -W --keep-going
-# sysmlv2-cli fork (sequence-expression fix, find/relations MCP tools), pinned to a tag so every install gets the same checker
+# sysmlv2-cli fork (sequence-expression fix, variant-id fix, find/relations MCP tools), pinned to a tag so every install gets the same checker
 SYSML_GIT     = https://github.com/MichaelD-42/sysml-v2-rs
 SYSML_TAG     = v0.1.4-kit.2
 
