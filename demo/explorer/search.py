@@ -27,43 +27,43 @@ def lucene(q: str) -> str:
     return LUCENE.sub(r"\\\1", " ".join(words))
 
 
-def search(driver, embedder, q: str, k: int = 10) -> list[dict]:
+def search(graph, embedder, q: str, k: int = 10) -> list[dict]:
     q = q.strip()
     if not q:
         return []
     vector = embedder.embed([q])[0]
     ranked = {}  # key -> fused score
     lists = [
-        driver.execute_query(
+        graph.query(
             "CALL db.index.vector.queryNodes('element_embedding', $k, $v) "
             "YIELD node RETURN node.key AS key",
             k=k,
             v=vector,
-        )[0]
+        )
     ]
     if text := lucene(q):
         lists.append(
-            driver.execute_query(
-                "CALL db.index.fulltext.queryNodes('element_text', $q, {limit: $k}) "
-                "YIELD node RETURN node.key AS key",
+            graph.query(
+                "CALL db.index.fulltext.queryNodes('element_text', $q) "
+                "YIELD node RETURN node.key AS key LIMIT $k",
                 q=text,
                 k=k,
-            )[0]
+            )
         )
     for rows in lists:
         for rank, row in enumerate(rows):
             ranked[row["key"]] = ranked.get(row["key"], 0) + 1 / (RRF_K + rank + 1)
-    exact = driver.execute_query("MATCH (n:Node {key: $q}) RETURN n.key AS key", q=q)[0]
+    exact = graph.query("MATCH (n:Node {key: $q}) RETURN n.key AS key", q=q)
     if exact:
         ranked[exact[0]["key"]] = float("inf")
     keys = sorted(ranked, key=ranked.get, reverse=True)[:k]
-    rows = driver.execute_query(
+    rows = graph.query(
         "UNWIND $keys AS key MATCH (n:Node {key: key}) "
         "OPTIONAL MATCH (o:Node)-[:OWNS]->(n) "
         "RETURN n.key AS key, n.name AS name, n.kind AS kind, n.shortName AS shortName, "
         "o.key AS owner, substring(coalesce(n.searchText, ''), 0, 200) AS snippet",
         keys=keys,
-    )[0]
+    )
     by_key = {r["key"]: r for r in rows}
     return [
         {**by_key[key], "score": ranked[key] if ranked[key] != float("inf") else 1.0}
@@ -71,16 +71,16 @@ def search(driver, embedder, q: str, k: int = 10) -> list[dict]:
     ]
 
 
-def neighbourhood(driver, key: str) -> dict:
+def neighbourhood(graph, key: str) -> dict:
     """The node and its 1-hop edges."""
-    records = driver.execute_query(
+    records = graph.query(
         "MATCH (n:Node {key: $key}) "
         "OPTIONAL MATCH (n)-[r]-(m:Node) "
         "RETURN n, collect(CASE WHEN r IS NULL THEN NULL ELSE {type: type(r), "
         "direction: CASE WHEN startNode(r) = n THEN 'out' ELSE 'in' END, "
         "other: m.key, name: m.name} END) AS edges",
         key=key,
-    )[0]
+    )
     if not records:
         return {}
     node = {k: v for k, v in records[0]["n"].items() if k != "embedding"}

@@ -50,15 +50,17 @@ RETURN nodes, COLLECT {{
 # the part that uses it, a part another child redefines is left out, and variants stay in their view
 PARTS = """
 WITH f, COLLECT {
-  MATCH p = (f) ((:Node)-[:OWNS|SPECIALIZES|TYPED_BY]->(:PartUsage|PartDefinition))* (x)-[:OWNS]->(c:PartUsage)
-  WHERE none(n IN nodes(p)[..-1] WHERE n.isVariation)
+  MATCH p = (f)-[:OWNS|SPECIALIZES|TYPED_BY*0..]->(x)-[:OWNS]->(c:PartUsage)
+  WHERE all(n IN nodes(p)[1..-1] WHERE n:PartUsage OR n:PartDefinition)
+    AND none(n IN nodes(p)[..-1] WHERE n.isVariation)
   WITH c, nodes(p) AS ns, [i IN range(0, length(p) - 2) WHERE type(relationships(p)[i]) = 'OWNS'] AS owns
   WITH c, collect(CASE owns WHEN [] THEN f ELSE ns[last(owns) + 1] END)[0] AS parent
   RETURN {n: c, parent: parent}
 } AS found
-WITH f, [p IN found WHERE NOT EXISTS {
-  MATCH (o)-[:SPECIALIZES]->(c) WHERE c = p.n AND o IN [q IN found | q.n]
-}] AS parts"""
+WITH f, found, COLLECT {
+  UNWIND found AS q WITH q.n AS o MATCH (o)-[:SPECIALIZES]->(c) RETURN c
+} AS redefined
+WITH f, [p IN found WHERE NOT p.n IN redefined] AS parts"""
 
 # ports a part shows: its own and those of what it specializes or is typed by
 PORTS = """COLLECT {{
@@ -280,19 +282,17 @@ RETURN n.key AS key, coalesce(n.name, n.key) AS name, n.kind AS kind, p.key AS p
 ORDER BY name"""
 
 
-def _read(driver, query, **params):
-    return driver.execute_query(query, params, routing_="r").records
+def _read(graph, query, **params):
+    return graph.query(query, **params)
 
 
-def _nodes(driver, rows):
+def _nodes(graph, rows):
     """Each view row's node once, with its properties and compartments."""
     first = {}
     for r in rows:
         first.setdefault(r["key"], r)
     rows = list(first.values())
-    props = {
-        r["key"]: r.data() for r in _read(driver, NODES, keys=[r["key"] for r in rows])
-    }
+    props = {r["key"]: r for r in _read(graph, NODES, keys=[r["key"] for r in rows])}
     out = []
     for row in rows:
         node = dict(props[row["key"]])
@@ -316,17 +316,17 @@ def compliance_rows(needs_path: Path) -> dict:
     return {"rows": [dict(zip(ROW, r)) for r in rows], "findings": findings}
 
 
-def view(driver, kind: str, focus: str | None, needs_path: Path | None = None) -> dict:
+def view(graph, kind: str, focus: str | None, needs_path: Path | None = None) -> dict:
     if kind not in KINDS:
         raise ValueError(f"unknown view kind {kind!r}")
     if kind == "vmodel":
-        return vmodel(driver, focus)
+        return vmodel(graph, focus)
     if kind == "compliance":
         if needs_path is None:
             raise ValueError("the compliance view needs needs_path")
         table = compliance_rows(needs_path)
         rows, findings = table["rows"], table["findings"]
-        nodes = _nodes(driver, [{"key": r["crs"], "parent": None} for r in rows])
+        nodes = _nodes(graph, [{"key": r["crs"], "parent": None} for r in rows])
         return {
             "kind": kind,
             "focus": None,
@@ -336,12 +336,12 @@ def view(driver, kind: str, focus: str | None, needs_path: Path | None = None) -
             "findings": findings,
             "reason": None if nodes else "no customer requirements",
         }
-    found = _read(driver, FOCUS if focus else DEFAULTS[kind], focus=focus)
+    found = _read(graph, FOCUS if focus else DEFAULTS[kind], focus=focus)
     if not found:
         raise KeyError(focus or f"no default focus for {kind}")
-    key = found[0][0]
-    records = _read(driver, QUERIES[kind], focus=key)
-    nodes = _nodes(driver, records[0]["nodes"]) if records else []
+    key = next(iter(found[0].values()))
+    records = _read(graph, QUERIES[kind], focus=key)
+    nodes = _nodes(graph, records[0]["nodes"]) if records else []
     reason = None
     if not nodes:
         reason = f"{focus or key} {REASONS.get(kind, f'has no {kind} view')}"
@@ -354,7 +354,7 @@ def view(driver, kind: str, focus: str | None, needs_path: Path | None = None) -
     }
 
 
-# label order is not kept by Neo4j, so a need's type is picked from this list
+# label order is not kept by the graph, so a need's type is picked from this list
 NEED_TYPES = list(LAYERS)
 
 # need link -> label read from the requirement's side, outgoing and incoming
@@ -389,11 +389,11 @@ RETURN n.key AS key, coalesce(n.title, n.name, n.key) AS name, head([l IN labels
 ORDER BY platform, CASE kind WHEN 'crs' THEN 0 WHEN 'sysreq' THEN 1 WHEN 'cst' THEN 2 ELSE 3 END, doc, key"""
 
 
-def requirements_tree(driver) -> list[dict]:
+def requirements_tree(graph) -> list[dict]:
     """Requirements grouped by document section, each with the elements linked to it."""
     groups = {}
     for r in _read(
-        driver,
+        graph,
         REQUIREMENTS,
         types=NEED_TYPES,
         out=list(OUT_REL),
@@ -440,11 +440,11 @@ RETURN n.key AS key, coalesce(n.name, n.title, n.key) AS name, head([l IN labels
   n.domain AS domain, coalesce(n.platform, false) AS platform"""
 
 
-def rflp_tree(driver) -> list[dict]:
+def rflp_tree(graph) -> list[dict]:
     """Use case > feature > function (nested) > logical > physical; a shared element repeats."""
-    info = {r["key"]: r.data() for r in _read(driver, RFLP_NODES, types=NEED_TYPES)}
+    info = {r["key"]: r for r in _read(graph, RFLP_NODES, types=NEED_TYPES)}
     kids = {}
-    for r in _read(driver, RFLP):
+    for r in _read(graph, RFLP):
         kids.setdefault(r["src"], []).append(r["dst"])
 
     def node(key, seen):
@@ -498,20 +498,20 @@ RETURN [k IN keys WHERE k IS NOT NULL] AS keys"""
 V_EDGES = "SATISFIES|REALIZES|MATCHES|PARTIAL_MATCHES|PERFORMS|OWNS|ALLOCATED_TO|VERIFIES|TESTS"
 
 
-def vmodel(driver, focus):
+def vmodel(graph, focus):
     """Left leg (requirements to parts) against right leg (tests and results), level by level."""
     keys = None
     if focus is not None:
-        found = _read(driver, FOCUS, focus=focus)
+        found = _read(graph, FOCUS, focus=focus)
         if not found:
             raise KeyError(focus)
-        focus = found[0][0]
+        focus = next(iter(found[0].values()))
         # a customer requirement narrows the V to its chain; any other focus is shown in the whole V
-        reach = _read(driver, V_REACH, focus=focus)
+        reach = _read(graph, V_REACH, focus=focus)
         if reach and reach[0]["keys"]:
             keys = reach[0]["keys"]
     rows, results = [], []
-    for r in _read(driver, V_NODES, keys=keys, types=NEED_TYPES):
+    for r in _read(graph, V_NODES, keys=keys, types=NEED_TYPES):
         if r["type"] not in V_PLACE:
             continue
         level, side = V_PLACE[r["type"]]
@@ -526,12 +526,12 @@ def vmodel(driver, focus):
             }
             for t in r["results"]
         ]
-    nodes = _nodes(driver, rows + results)
+    nodes = _nodes(graph, rows + results)
     present = {n["key"] for n in nodes}
     edges = [
         {"src": r["a"], "dst": r["b"], "type": r["t"], "label": None}
         for r in _read(
-            driver,
+            graph,
             f"MATCH (a:Node)-[r:{V_EDGES}]->(b:Node) WHERE a.key IN $k AND b.key IN $k "
             "RETURN a.key AS a, b.key AS b, type(r) AS t",
             k=list(present),
@@ -548,8 +548,8 @@ def vmodel(driver, focus):
     }
 
 
-def tree(driver) -> list[dict]:
-    rows = _read(driver, TREE, kinds=TREE_KINDS)
+def tree(graph) -> list[dict]:
+    rows = _read(graph, TREE, kinds=TREE_KINDS)
     items = {
         r["key"]: {
             "key": r["key"],

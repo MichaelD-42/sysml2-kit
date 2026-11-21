@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from explorer import server
 from tests import support
-from tests.support import driver_or_skip, load_project
+from tests.support import vehicle
 
 EXAMPLES = Path(__file__).resolve().parents[2] / "examples"
 VEHICLE = EXAMPLES / "vehicle"
@@ -17,15 +17,15 @@ def client(app):
     return TestClient(app, base_url="http://127.0.0.1")
 
 
-def node_count(driver):
-    return driver.execute_query("MATCH (n) RETURN count(n) AS c")[0][0]["c"]
+def node_count(graph):
+    return graph.query("MATCH (n) RETURN count(n) AS c")[0]["c"]
 
 
 class ServerTest(unittest.TestCase):
     def setUp(self):
-        self.driver = driver_or_skip(self)
-        load_project(self.driver, VEHICLE)
-        self.client = client(server.create_app(self.driver, support._embedder, VEHICLE))
+        self.graph = vehicle()
+        self.addCleanup(self.graph.close)
+        self.client = client(server.create_app(self.graph, support._embedder, VEHICLE))
 
     def test_view_errors(self):
         self.assertEqual(
@@ -84,8 +84,9 @@ class ServerTest(unittest.TestCase):
                 self.assertEqual(r.status_code, 415)
 
     def test_cypher(self):
+        # read-only Cypher on Relate comes with Task 2; until then every query is a 400
         r = self.client.post("/api/cypher", json={"query": "RETURN 1 AS one"})
-        self.assertEqual(r.json()["rows"], [[1]])
+        self.assertEqual(r.status_code, 400)
         r = self.client.post("/api/cypher", json={"query": "CREATE (n:X) RETURN n"})
         self.assertEqual(r.status_code, 400)
         self.assertIn("error", r.json())
@@ -105,28 +106,28 @@ class ServerTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             project = self.copy_projects(tmp)
             next(project.glob("model/**/*.sysml")).write_text("package { broken ;;")
-            before = node_count(self.driver)
-            c = client(server.create_app(self.driver, support._embedder, project))
+            before = node_count(self.graph)
+            c = client(server.create_app(self.graph, support._embedder, project))
             r = c.post("/api/reload", json={})
             self.assertEqual(r.status_code, 422)
             self.assertTrue(r.json()["error"])
-            self.assertEqual(node_count(self.driver), before)
+            self.assertEqual(node_count(self.graph), before)
 
     def test_reload_success(self):
         import tempfile
 
         with tempfile.TemporaryDirectory() as tmp:
             project = self.copy_projects(tmp)
-            before = node_count(self.driver)
-            c = client(server.create_app(self.driver, support._embedder, project))
+            before = node_count(self.graph)
+            c = client(server.create_app(self.graph, support._embedder, project))
             r = c.post("/api/reload", json={})
             self.assertEqual(r.status_code, 200, r.text)
-            self.assertEqual(node_count(self.driver), before)
+            self.assertEqual(node_count(self.graph), before)
             self.assertEqual(r.json()["nodes"], before)
 
     def test_reload_load_failure_is_500(self):
-        before = node_count(self.driver)
-        c = client(server.create_app(self.driver, support._embedder, VEHICLE))
+        before = node_count(self.graph)
+        c = client(server.create_app(self.graph, support._embedder, VEHICLE))
         with (
             mock.patch.object(server.subprocess, "run") as run,
             mock.patch.object(
@@ -136,10 +137,10 @@ class ServerTest(unittest.TestCase):
             run.return_value.returncode = 0
             r = c.post("/api/reload", json={})
         self.assertEqual((r.status_code, r.json()), (500, {"error": "no needs.json"}))
-        self.assertEqual(node_count(self.driver), before)
+        self.assertEqual(node_count(self.graph), before)
 
     def test_concurrent_reload_rejected(self):
-        app = server.create_app(self.driver, support._embedder, VEHICLE)
+        app = server.create_app(self.graph, support._embedder, VEHICLE)
         c = client(app)
         app.state.reload_lock.acquire()
         try:

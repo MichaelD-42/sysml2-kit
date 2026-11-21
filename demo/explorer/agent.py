@@ -42,25 +42,23 @@ def dumps(value) -> str:
     return json.dumps(value, default=str)
 
 
-def semantic_search(driver, embedder, q, k=8) -> str:
+def semantic_search(graph, embedder, q, k=8) -> str:
     try:
-        return dumps(search.search(driver, embedder, q, k))
+        return dumps(search.search(graph, embedder, q, k))
     except Exception as e:  # noqa: BLE001 - tool errors go back to the agent as text
         return dumps({"error": str(e)})
 
 
-def cypher(driver, query) -> str:
+def cypher(graph, query) -> str:
     try:
-        return dumps(cypher_mod.run_read(driver, query, limit=100))
+        return dumps(cypher_mod.run_read(graph, query, limit=100))
     except Exception as e:  # noqa: BLE001
         return dumps({"error": str(e)})
 
 
-def element(driver, key) -> str:
+def element(graph, key) -> str:
     try:
-        return dumps(
-            search.neighbourhood(driver, key) or {"error": f"no element {key}"}
-        )
+        return dumps(search.neighbourhood(graph, key) or {"error": f"no element {key}"})
     except Exception as e:  # noqa: BLE001
         return dumps({"error": str(e)})
 
@@ -88,7 +86,7 @@ async def can_use_tool(name, input, context):
     )
 
 
-def options(project: Path, driver, embedder) -> ClaudeAgentOptions:
+def options(project: Path, graph, embedder) -> ClaudeAgentOptions:
     def text(s):
         return {"content": [{"type": "text", "text": s}]}
 
@@ -99,7 +97,7 @@ def options(project: Path, driver, embedder) -> ClaudeAgentOptions:
     )
     async def semantic_search_tool(args):
         return text(
-            await asyncio.to_thread(semantic_search, driver, embedder, args["q"])
+            await asyncio.to_thread(semantic_search, graph, embedder, args["q"])
         )
 
     @tool(
@@ -108,7 +106,7 @@ def options(project: Path, driver, embedder) -> ClaudeAgentOptions:
         {"query": str},
     )
     async def cypher_tool(args):
-        return text(await asyncio.to_thread(cypher, driver, args["query"]))
+        return text(await asyncio.to_thread(cypher, graph, args["query"]))
 
     @tool(
         "element",
@@ -116,7 +114,7 @@ def options(project: Path, driver, embedder) -> ClaudeAgentOptions:
         {"key": str},
     )
     async def element_tool(args):
-        return text(await asyncio.to_thread(element, driver, args["key"]))
+        return text(await asyncio.to_thread(element, graph, args["key"]))
 
     kit = create_sdk_mcp_server(
         "kit", tools=[semantic_search_tool, cypher_tool, element_tool]

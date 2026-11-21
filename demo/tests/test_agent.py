@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 
 from explorer import agent, server
 from tests import support
-from tests.support import driver_or_skip, load_project
+from tests.support import vehicle
 
 VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
 BUILT_IN = {"Bash", "Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSearch"}
@@ -17,35 +17,25 @@ BUILT_IN = {"Bash", "Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSea
 class ToolsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        case = unittest.TestCase()
-        try:
-            cls.driver = driver_or_skip(case)
-        except unittest.SkipTest as skip:
-            raise unittest.SkipTest(str(skip))
-        load_project(cls.driver, VEHICLE)
+        cls.graph = vehicle()
 
     @classmethod
     def tearDownClass(cls):
-        cls.driver.close()
+        cls.graph.close()
 
     def test_element(self):
         self.assertEqual(
-            json.loads(agent.element(self.driver, "PC-001"))["node"]["key"], "PC-001"
+            json.loads(agent.element(self.graph, "PC-001"))["node"]["key"], "PC-001"
         )
-        self.assertIn("error", json.loads(agent.element(self.driver, "NOPE-1")))
+        self.assertIn("error", json.loads(agent.element(self.graph, "NOPE-1")))
 
-    def test_cypher_is_read_only(self):
-        self.assertIn(
-            "error", json.loads(agent.cypher(self.driver, "CREATE (n) RETURN n"))
-        )
-        self.assertEqual(
-            json.loads(agent.cypher(self.driver, "RETURN 1 AS one"))["rows"], [[1]]
-        )
+    def test_cypher_is_a_stub(self):
+        # read-only Cypher on Relate comes with Task 2; until then every query is an error
+        for q in ("CREATE (n) RETURN n", "RETURN 1 AS one"):
+            self.assertIn("error", json.loads(agent.cypher(self.graph, q)))
 
     def test_semantic_search(self):
-        hits = json.loads(
-            agent.semantic_search(self.driver, support._embedder, "motor")
-        )
+        hits = json.loads(agent.semantic_search(self.graph, support._embedder, "motor"))
         self.assertIsInstance(hits, list)
         self.assertTrue(hits)
 
@@ -126,13 +116,14 @@ class NoResultClient(FailingClient):
         yield
 
 
-class Driver:
+class FakeGraph:
     def __init__(self, error=None):
         self.error = error
 
-    def verify_connectivity(self):
+    def query(self, cypher, **params):
         if self.error:
             raise self.error
+        return [{"1": 1}]
 
 
 async def collect(stream):
@@ -148,8 +139,8 @@ class AskTest(unittest.TestCase):
         events = asyncio.run(collect(agent.ask(None, "q", client=NoResultClient)))
         self.assertEqual([e["type"] for e in events], ["error"])
 
-    def post(self, driver, fake):
-        app = server.create_app(driver, None, VEHICLE, agent_factory=fake)
+    def post(self, graph, fake):
+        app = server.create_app(graph, None, VEHICLE, agent_factory=fake)
         r = TestClient(app, base_url="http://127.0.0.1").post(
             "/api/ask", json={"question": "hi"}
         )
@@ -160,20 +151,20 @@ class AskTest(unittest.TestCase):
             if line.startswith("data:")
         ]
 
-    def test_endpoint_without_neo4j_is_one_error(self):
+    def test_endpoint_without_graph_is_one_error(self):
         async def fake(question):
             raise AssertionError("agent must not start")
             yield
 
-        data = self.post(Driver(OSError("connection refused")), fake)
-        self.assertEqual(data, [{"type": "error", "message": "connection refused"}])
+        data = self.post(FakeGraph(OSError("database closed")), fake)
+        self.assertEqual(data, [{"type": "error", "message": "database closed"}])
 
     def test_endpoint_streams_events(self):
         async def fake(question):
             yield {"type": "text", "text": question}
             yield {"type": "done"}
 
-        data = self.post(Driver(), fake)
+        data = self.post(FakeGraph(), fake)
         self.assertEqual(data, [{"type": "text", "text": "hi"}, {"type": "done"}])
 
 

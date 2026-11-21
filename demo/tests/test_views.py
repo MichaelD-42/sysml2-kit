@@ -2,9 +2,9 @@ import re
 import unittest
 from pathlib import Path
 
-from explorer import load, views
+from explorer import db, load, views
 from explorer.graph import Edge, Graph, Node
-from tests.support import driver_or_skip, load_project
+from tests.support import vehicle
 
 VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
 NEEDS = VEHICLE / "build" / "needs" / "needs.json"
@@ -20,7 +20,8 @@ class DefaultFocusTest(unittest.TestCase):
     """A project without VehicleLogical::vehicle: the first top-level project part."""
 
     def test_falls_back_to_a_top_level_project_part(self):
-        driver = driver_or_skip(self)
+        graph = db.Graph()
+        self.addCleanup(graph.close)
         nodes = [
             part("pkg", "Shop", kind="Package"),
             part("A-1", "Shop::platformBench", platform=True),
@@ -29,29 +30,26 @@ class DefaultFocusTest(unittest.TestCase):
             part("C-1", "Shop::lathe"),
         ]
         owns = [("pkg", "A-1"), ("pkg", "B-1"), ("pkg", "C-1"), ("B-1", "A-2")]
-        graph = Graph({n.key: n for n in nodes}, [Edge(a, "OWNS", b) for a, b in owns])
-        load.write(graph, driver)
+        load.write(
+            Graph({n.key: n for n in nodes}, [Edge(a, "OWNS", b) for a, b in owns]),
+            graph,
+        )
         for kind in ("context", "boundary", "interfaces", "composition"):
             with self.subTest(kind=kind):
-                self.assertEqual(views.view(driver, kind, None)["focus"], "B-1")
+                self.assertEqual(views.view(graph, kind, None)["focus"], "B-1")
 
 
 class ViewsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        case = unittest.TestCase()
-        try:
-            cls.driver = driver_or_skip(case)
-        except unittest.SkipTest as skip:
-            raise unittest.SkipTest(str(skip))
-        load_project(cls.driver, VEHICLE)
+        cls.graph = vehicle()
 
     @classmethod
     def tearDownClass(cls):
-        cls.driver.close()
+        cls.graph.close()
 
     def view(self, kind, focus=None):
-        v = views.view(self.driver, kind, focus, NEEDS)
+        v = views.view(self.graph, kind, focus, NEEDS)
         self.assertEqual(bool(v["reason"]), not v["nodes"])
         return v
 
@@ -143,12 +141,12 @@ class ViewsTest(unittest.TestCase):
                 self.assertTrue(self.view(kind)["nodes"])
 
     def test_tree(self):
-        roots = views.tree(self.driver)
+        roots = views.tree(self.graph)
         self.assertIn("VehiclePhysical", [r["name"] for r in roots])
         self.assertEqual({r["kind"] for r in roots}, {"Package"})
 
     def test_requirements_tree_groups_by_section_and_lists_links(self):
-        groups = {g["name"]: g for g in views.requirements_tree(self.driver)}
+        groups = {g["name"]: g for g in views.requirements_tree(self.graph)}
         self.assertIn("Customer requirements", groups)
         self.assertIn("System requirements", groups)
         crs = next(
@@ -170,7 +168,7 @@ class ViewsTest(unittest.TestCase):
                 yield here
                 yield from paths(n["children"], here)
 
-        all_paths = set(paths(views.rflp_tree(self.driver)))
+        all_paths = set(paths(views.rflp_tree(self.graph)))
         self.assertIn(
             ("UC-001", "FEAT-002", "F-002", "F-007", "LC-007", "PC-001"), all_paths
         )
@@ -181,11 +179,11 @@ class ViewsTest(unittest.TestCase):
                 for p in all_paths
             )
         )
-        roots = [n["key"] for n in views.rflp_tree(self.driver)]
+        roots = [n["key"] for n in views.rflp_tree(self.graph)]
         self.assertLess(roots.index("UC-001"), roots.index("EDU-UC-001"))
 
     def test_vmodel_levels_and_sides(self):
-        v = views.view(self.driver, "vmodel", None)
+        v = views.view(self.graph, "vmodel", None)
         at = {n["key"]: (n["level"], n["side"]) for n in v["nodes"]}
         self.assertEqual(at["CRS-003"], (1, "left"))
         self.assertEqual(at["ATC-003"], (1, "right"))
@@ -202,19 +200,19 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(v["empty"], [3, 4])
 
     def test_vmodel_of_another_focus_is_the_whole_v(self):
-        v = views.view(self.driver, "vmodel", "LC-001")
+        v = views.view(self.graph, "vmodel", "LC-001")
         self.assertEqual(v["focus"], "LC-001")
         self.assertIn("CRS-001", {n["key"] for n in v["nodes"]})
 
     def test_requirements_tree_puts_customer_requirements_first(self):
-        names = [g["name"] for g in views.requirements_tree(self.driver)]
+        names = [g["name"] for g in views.requirements_tree(self.graph)]
         self.assertEqual(names[0], "Customer requirements")
         self.assertLess(
             names.index("System requirements"), names.index("Acceptance tests")
         )
 
     def test_vmodel_of_one_requirement(self):
-        keys = {n["key"] for n in views.view(self.driver, "vmodel", "CRS-003")["nodes"]}
+        keys = {n["key"] for n in views.view(self.graph, "vmodel", "CRS-003")["nodes"]}
         self.assertIn("SR-005", keys)
         self.assertNotIn("CRS-001", keys)
         # the shared use case UC-001 must not pull in battery and seating
@@ -223,11 +221,11 @@ class ViewsTest(unittest.TestCase):
 
     def test_unknown_kind(self):
         with self.assertRaises(ValueError):
-            views.view(self.driver, "nope", None)
+            views.view(self.graph, "nope", None)
 
     def test_unknown_focus(self):
         with self.assertRaises(KeyError):
-            views.view(self.driver, "trace", "NOPE-1")
+            views.view(self.graph, "trace", "NOPE-1")
 
 
 if __name__ == "__main__":

@@ -1,9 +1,8 @@
-"""HTTP API over the loaded graph: `python -m explorer.server <project-dir>`."""
+"""HTTP API over the loaded graph: `python -m explorer.server <project-dir>` loads and serves."""
 
 import asyncio
 import contextlib
 import json
-import os
 import subprocess
 import sys
 import threading
@@ -13,10 +12,9 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from neo4j import GraphDatabase
 from pydantic import BaseModel
 
-from explorer import agent, cypher, load, search, views
+from explorer import agent, cypher, db, load, search, views
 from explorer.search import Embedder
 
 STATIC = Path(__file__).resolve().parent.parent / "static"
@@ -42,14 +40,14 @@ def json_only(request: Request):
         raise HTTPException(415, "Content-Type must be application/json")
 
 
-def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
+def create_app(graph, embedder, project: Path, agent_factory=None) -> FastAPI:
     app = FastAPI()
     # DNS rebinding: a page on another name that resolves to 127.0.0.1 is refused
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
     app.state.reload_lock = threading.Lock()
     needs_path = project / "build" / "needs" / "needs.json"
     if agent_factory is None:
-        agent_options = agent.options(project, driver, embedder)
+        agent_options = agent.options(project, graph, embedder)
 
         def agent_factory(question):
             return agent.ask(agent_options, question)
@@ -75,29 +73,29 @@ def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
         }
         if kind not in trees:
             raise ValueError(f"unknown tree kind {kind!r}")
-        return trees[kind](driver)
+        return trees[kind](graph)
 
     @app.get("/api/keys")
     def keys():
-        records, _, _ = driver.execute_query(
-            "MATCH (n:Node) RETURN n.key AS key ORDER BY key", routing_="r"
-        )
-        return [r["key"] for r in records]
+        return [
+            r["key"]
+            for r in graph.query("MATCH (n:Node) RETURN n.key AS key ORDER BY key")
+        ]
 
     @app.get("/api/element/{key}")
     def element(key: str):
-        found = search.neighbourhood(driver, key)
+        found = search.neighbourhood(graph, key)
         if not found:
             raise KeyError(key)
         return found
 
     @app.get("/api/view/{kind}")
     def view(kind: str, focus: str | None = None):
-        return views.view(driver, kind, focus, needs_path)
+        return views.view(graph, kind, focus, needs_path)
 
     @app.get("/api/search")
     def find(q: str, k: int = Query(10, ge=1, le=50)):
-        return search.search(driver, embedder, q, k)
+        return search.search(graph, embedder, q, k)
 
     @app.get("/api/cypher/examples")
     def examples():
@@ -105,13 +103,13 @@ def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
 
     @app.post("/api/cypher", dependencies=[Depends(json_only)])
     def run(body: CypherBody):
-        return cypher.run_read(driver, body.query, body.params)
+        return cypher.run_read(graph, body.query, body.params)
 
     @app.post("/api/ask", dependencies=[Depends(json_only)])
     async def ask(body: AskBody):
         async def events():
             try:
-                await asyncio.to_thread(driver.verify_connectivity)
+                await asyncio.to_thread(graph.query, "RETURN 1")
             except Exception as e:  # noqa: BLE001 - no graph, no grounded answer
                 yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
                 return
@@ -137,7 +135,7 @@ def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
                 tail = (made.stdout + made.stderr).splitlines()[-40:]
                 return error(422, "\n".join(tail))
             try:
-                nodes, edges = load.load(project, driver, embedder)
+                nodes, edges = load.load(project, graph, embedder)
             except Exception as e:  # noqa: BLE001 - any load failure is reported, not raised
                 return error(500, str(e))
             return {"nodes": nodes, "edges": edges}
@@ -155,13 +153,10 @@ def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if len(argv) != 1:
         sys.exit("usage: python -m explorer.server <project-dir>")
-    driver = GraphDatabase.driver(
-        os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
-        auth=None
-        if os.environ.get("NEO4J_AUTH") == "none"
-        else (os.environ.get("NEO4J_USER", "neo4j"), os.environ["NEO4J_PASSWORD"]),
-    )
-    app = create_app(driver, Embedder(), Path(argv[0]).resolve())
+    project, graph, embedder = Path(argv[0]).resolve(), db.Graph(), Embedder()
+    nodes, edges = load.load(project, graph, embedder)
+    print(f"loaded {nodes} nodes, {edges} edges")
+    app = create_app(graph, embedder, project)
     uvicorn.run(app, host="127.0.0.1", port=8000)
 
 

@@ -1,14 +1,15 @@
-"""Write a Graph into Neo4j, replacing its :Node graph: `python -m explorer.load <project-dir>`."""
+"""Write a Graph into the Relate graph, replacing its :Node graph.
+
+`python -m explorer.load <project-dir>` loads into a throwaway in-memory graph: a load check.
+"""
 
 import json
-import os
 import re
 import sys
 from itertools import groupby
 from pathlib import Path
 
-from neo4j import GraphDatabase
-
+from explorer import db
 from explorer.graph import Graph, build
 from explorer.search import Embedder
 
@@ -44,23 +45,23 @@ def embed(graph: Graph, embedder) -> None:
             n.props["embedding"] = v
 
 
-def indexes(driver, dims: int) -> None:
-    driver.execute_query(
+def indexes(graph: db.Graph, dims: int) -> None:
+    graph.query(
         "CREATE VECTOR INDEX element_embedding IF NOT EXISTS FOR (n:Node) ON (n.embedding) "
         "OPTIONS {indexConfig: {`vector.dimensions`: $dims, "
         "`vector.similarity_function`: 'cosine'}}",
         dims=dims,
     )
-    driver.execute_query(
+    graph.query(
         "CREATE FULLTEXT INDEX element_text IF NOT EXISTS FOR (n:Node) "
         "ON EACH [n.name, n.shortName, n.title, n.searchText]"
     )
-    driver.execute_query("CALL db.awaitIndexes(300)")
+    graph.query("CALL db.awaitIndexes(300)")
 
 
-def write(graph: Graph, driver) -> None:
-    def tx_work(tx):
-        tx.run("MATCH (n:Node) DETACH DELETE n")
+def write(graph: Graph, target: db.Graph) -> None:
+    def statements(run):
+        run("MATCH (n:Node) DETACH DELETE n")
         nodes = sorted(graph.nodes.values(), key=lambda n: n.labels)
         for labels, group in groupby(nodes, key=lambda n: n.labels):
             label = ":".join(f"`{x}`" for x in labels)
@@ -69,24 +70,24 @@ def write(graph: Graph, driver) -> None:
                 for n in group
             ]
             for batch in batches(rows):
-                tx.run(
-                    f"UNWIND $rows AS r CREATE (n:{label}) SET n = r.props", rows=batch
+                run(
+                    f"UNWIND $rows AS r CREATE (n:{label}) SET n = r.props",
+                    {"rows": batch},
                 )
         edges = sorted(graph.edges, key=lambda e: e.type)
         for type, group in groupby(edges, key=lambda e: e.type):
             rows = [{"src": e.src, "dst": e.dst, "props": e.props} for e in group]
             for batch in batches(rows):
-                tx.run(
+                run(
                     "UNWIND $rows AS r MATCH (a:Node {key: r.src}), (b:Node {key: r.dst}) "
                     f"CREATE (a)-[x:`{type}`]->(b) SET x = r.props",
-                    rows=batch,
+                    {"rows": batch},
                 )
 
-    with driver.session() as session:
-        session.run(
-            "CREATE CONSTRAINT node_key IF NOT EXISTS FOR (n:Node) REQUIRE n.key IS UNIQUE"
-        ).consume()
-        session.execute_write(tx_work)
+    target.query(
+        "CREATE CONSTRAINT node_key IF NOT EXISTS FOR (n:Node) REQUIRE n.key IS UNIQUE"
+    )
+    target.write(statements)
 
 
 def read_project(project: Path) -> Graph:
@@ -95,12 +96,12 @@ def read_project(project: Path) -> Graph:
     return build(export, needs["versions"][needs["current_version"]]["needs"])
 
 
-def load(project: Path, driver, embedder) -> tuple[int, int]:
+def load(project: Path, target: db.Graph, embedder) -> tuple[int, int]:
     """Replace the graph with the project's model; returns (nodes, edges)."""
     graph = read_project(project)
     embed(graph, embedder)
-    write(graph, driver)
-    indexes(driver, embedder.dims)
+    write(graph, target)
+    indexes(target, embedder.dims)
     return len(graph.nodes), len(graph.edges)
 
 
@@ -109,13 +110,11 @@ def main(argv=None):
     if len(argv) != 1:
         sys.exit("usage: python -m explorer.load <project-dir>")
     embedder = Embedder()
-    with GraphDatabase.driver(
-        os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
-        auth=None
-        if os.environ.get("NEO4J_AUTH") == "none"
-        else (os.environ.get("NEO4J_USER", "neo4j"), os.environ["NEO4J_PASSWORD"]),
-    ) as driver:
-        nodes, edges = load(Path(argv[0]), driver, embedder)
+    target = db.Graph()
+    try:
+        nodes, edges = load(Path(argv[0]), target, embedder)
+    finally:
+        target.close()
     print(f"loaded {nodes} nodes, {edges} edges")
 
 

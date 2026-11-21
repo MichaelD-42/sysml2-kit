@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 
 from explorer.search import Embedder, neighbourhood, search
-from tests.support import driver_or_skip, load_project
+from tests.support import vehicle
 
 VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
 
@@ -10,27 +10,22 @@ VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
 class SearchTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        case = unittest.TestCase()
-        try:
-            cls.driver = driver_or_skip(case)
-        except unittest.SkipTest as skip:
-            raise unittest.SkipTest(str(skip))
-        load_project(cls.driver, VEHICLE)
+        cls.graph = vehicle()
         cls.embedder = Embedder()
 
     @classmethod
     def tearDownClass(cls):
-        cls.driver.close()
+        cls.graph.close()
 
     def keys(self, q, k=10):
-        return [h["key"] for h in search(self.driver, self.embedder, q, k)]
+        return [h["key"] for h in search(self.graph, self.embedder, q, k)]
 
     def test_exact_key_comes_first(self):
         for key in ("PC-001", "EDU-PC-003"):
             self.assertEqual(self.keys(key)[0], key)
 
     def test_natural_query_finds_the_limit(self):
-        hits = search(self.driver, self.embedder, "what limits motor torque", 5)
+        hits = search(self.graph, self.embedder, "what limits motor torque", 5)
         self.assertIn("peakTorqueLimit", [h["name"] for h in hits])
         self.assertEqual(
             set(hits[0]),
@@ -41,7 +36,7 @@ class SearchTest(unittest.TestCase):
         self.assertIsInstance(self.keys("torque AND ("), list)
 
     def test_neighbourhood(self):
-        n = neighbourhood(self.driver, "PC-001")
+        n = neighbourhood(self.graph, "PC-001")
         self.assertEqual(n["node"]["key"], "PC-001")
         self.assertTrue(n["edges"])
         self.assertNotIn("embedding", n["node"])

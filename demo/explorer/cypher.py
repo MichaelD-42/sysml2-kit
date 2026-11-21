@@ -1,8 +1,5 @@
 """Read-only Cypher for the explorer's query panel."""
 
-import neo4j
-from neo4j.graph import Node, Path, Relationship
-
 
 class CypherError(Exception):
     pass
@@ -51,38 +48,8 @@ EXAMPLES = [
 ]
 
 
-def plain(v):
-    if isinstance(v, Node):
-        return {"key": v.get("key"), "name": v.get("name"), "kind": v.get("kind")}
-    if isinstance(v, Relationship):
-        return {
-            "type": v.type,
-            "src": v.start_node.get("key"),
-            "dst": v.end_node.get("key"),
-        }
-    if isinstance(v, Path):
-        return [plain(x) for x in (*v.nodes, *v.relationships)]
-    if isinstance(v, list):
-        return [plain(x) for x in v]
-    if isinstance(v, dict):
-        return {k: plain(x) for k, x in v.items()}
-    return v if v is None or isinstance(v, (str, int, float, bool)) else str(v)
-
-
-def run_read(driver, query, params=None, limit=500, timeout_s=10) -> dict:
-    # a transaction function's timeout is set by unit_of_work, not by a Query passed to tx.run
-    @neo4j.unit_of_work(timeout=timeout_s)
-    def work(tx):
-        result = tx.run(query, params or {})
-        return result.keys(), [r.values() for _, r in zip(range(limit + 1), result)]
-
+def run_read(graph, query, params=None, limit=500, timeout_s=10) -> dict:
     try:
-        with driver.session() as session:
-            columns, rows = session.execute_read(work)
+        return graph.read_only(query, params, limit, timeout_s)
     except Exception as e:
-        raise CypherError(getattr(e, "message", None) or str(e)) from e
-    return {
-        "columns": list(columns),
-        "rows": [[plain(v) for v in r] for r in rows[:limit]],
-        "truncated": len(rows) > limit,
-    }
+        raise CypherError(str(e)) from e

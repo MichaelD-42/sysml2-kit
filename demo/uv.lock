@@ -492,7 +492,7 @@ dependencies = [
     { name = "fastapi", version = "0.162.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "fastapi", version = "0.165.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "fastembed" },
-    { name = "neo4j" },
+    { name = "relate-db" },
     { name = "sysml2kit" },
     { name = "uvicorn" },
 ]
@@ -502,7 +502,7 @@ requires-dist = [
     { name = "claude-agent-sdk" },
     { name = "fastapi" },
     { name = "fastembed" },
-    { name = "neo4j", specifier = ">=5.11,<6" },
+    { name = "relate-db", specifier = "==1.2.0" },
     { name = "sysml2kit", editable = "../" },
     { name = "uvicorn" },
 ]
@@ -1068,18 +1068,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e0/47/dd32fa426cc72114383ac549964eecb20ecfd886d1e5ccf5340b55b02f57/mpmath-1.3.0.tar.gz", hash = "sha256:7a28eb2a9774d00c7bc92411c19a89209d5da7c4c9a9e227be8330a23a25b91f", size = 508106, upload-time = "2023-03-07T16:47:11.061Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/43/e3/7d92a15f894aa0c9c4b49b8ee9ac9850d6e63b03c9c32c0367a13ae62209/mpmath-1.3.0-py3-none-any.whl", hash = "sha256:a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c", size = 536198, upload-time = "2023-03-07T16:47:09.197Z" },
-]
-
-[[package]]
-name = "neo4j"
-version = "5.28.8"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytz" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/e2/62b2ced8591abf5aabb4bce6160dacb75e53992875ee6aec03fb5ea2dc0d/neo4j-5.28.8.tar.gz", hash = "sha256:b2531e5fb618bd1b0f5f3d62b5f9be480a66969396f82c41caaf2f3539f7e72c", size = 234107, upload-time = "2026-10-15T11:02:32.284Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/34/5b/c3a3fc2604cd578c27f8d36de7973093ebc7c148f749be9db067dd63a00a/neo4j-5.28.8-py3-none-any.whl", hash = "sha256:f8ecdad94be88f0f7a766a284a9a7023db9e7bd92d1b0a4fe6d6e191feb97f91", size = 314703, upload-time = "2026-10-15T11:02:29.605Z" },
 ]
 
 [[package]]
@@ -1928,15 +1916,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pytz"
-version = "2026.6"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f5/b0/168030b0bfcc334cf09fa3313afdb888d892c8a0027324683d1de0ec277e/pytz-2026.6.tar.gz", hash = "sha256:3b0fc2727707663d6e517936f444fd8a8b240f1fc32f4bf7ee03274245945284", size = 318520, upload-time = "2026-10-29T09:05:47.011Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b6/25/564f3fc5b70c1398d706c51f2b1470d0ea0b1b2f96fee67877b6f5bdf3b6/pytz-2026.6-py2.py3-none-any.whl", hash = "sha256:7fed3fee8fd6bd4a2b7b75a8d56021d0624127bf69bd5691f115db929ac570b3", size = 506321, upload-time = "2026-10-29T09:05:45.14Z" },
-]
-
-[[package]]
 name = "pywin32"
 version = "312"
 source = { registry = "https://pypi.org/simple" }
@@ -2056,6 +2035,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/22/f5/df4e9027acead3ecc63e50fe1e36aca1523e1719559c499951bb4b53188f/referencing-0.37.0.tar.gz", hash = "sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8", size = 78036, upload-time = "2025-10-13T15:30:48.871Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2c/58/ca301544e1fa93ed4f80d724bf5b194f6e4b945841c5bfd555878eea9fcb/referencing-0.37.0-py3-none-any.whl", hash = "sha256:381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231", size = 26766, upload-time = "2025-10-13T15:30:47.625Z" },
+]
+
+[[package]]
+name = "relate-db"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/15/e8/17cca7a148e001803f46dd97f123c8922d1c6a6aecf1df1882c4ddca7551/relate_db-1.2.0.tar.gz", hash = "sha256:143646c88a822034f50e262495a794ed548e388348c9c7ba794d157be6ee3b0d", size = 5118275, upload-time = "2026-11-20T09:34:24.782Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0f/6b/8caff3ee08a8e7a349125f3f58fc3eec892ea9f13916e48c299015178b4f/relate_db-1.2.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:25e593c3308d1d04cf0d66764c45d47ae2e085b3fc38168d966034654d850d33", size = 10247231, upload-time = "2026-11-20T09:34:14.338Z" },
+    { url = "https://files.pythonhosted.org/packages/43/e0/db5e9bf99cdf1b7cb5c25cdde71a1014da016dda8fe96fa0769852ac4095/relate_db-1.2.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:400ea6f9d71c03151ccafe274121c282b19a69a5e6b1835bf1f6a206502b6e29", size = 9523209, upload-time = "2026-11-20T09:34:16.719Z" },
+    { url = "https://files.pythonhosted.org/packages/63/68/d47629e44f03fab3c2a56e7f989724a811cf68e96dc904d3d700b3781fe8/relate_db-1.2.0-cp39-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:37f008756158f7973b7e42c6a79e8c35cf8173de7335f57d71283a458c24e7bd", size = 10014260, upload-time = "2026-11-20T09:34:18.833Z" },
+    { url = "https://files.pythonhosted.org/packages/43/9e/129c1dc7e823c5372e56dcd1f362e0f1856c51a6b44e1d0d359c9b11aa27/relate_db-1.2.0-cp39-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:f58bab28cdbd25715f5a9a52b79d92a26abb141e837933f713a68bb13c2c5829", size = 10582040, upload-time = "2026-11-20T09:34:20.7Z" },
+    { url = "https://files.pythonhosted.org/packages/29/14/189c88904f5a599eea0a1e4783dee2b3aa7cf7e9c79eaefd6b5b17418fbf/relate_db-1.2.0-cp39-abi3-win_amd64.whl", hash = "sha256:762306044991221951335b6216a9f0cc5eb1105f6a6bedbbe4fe8d8064d352cf", size = 10283678, upload-time = "2026-11-20T09:34:22.695Z" },
 ]
 
 [[package]]

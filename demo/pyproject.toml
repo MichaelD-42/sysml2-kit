@@ -1,12 +1,12 @@
 [project]
 name = "explorer"
 version = "0.1.0"
-description = "Model explorer demo: a kit project's SysML v2 model and needs as a Neo4j graph"
+description = "Model explorer demo: a kit project's SysML v2 model and needs as a Relate graph"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi",
     "uvicorn",
-    "neo4j>=5.11,<6",
+    "relate-db==1.2.0",
     "fastembed",
     "claude-agent-sdk",
     "sysml2kit",
