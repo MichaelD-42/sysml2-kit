@@ -75,7 +75,6 @@ class ServerTest(unittest.TestCase):
         for path, body in (
             ("/api/reload", "{}"),
             ("/api/ask", '{"question": "hi"}'),
-            ("/api/cypher", '{"query": "RETURN 1"}'),
         ):
             with self.subTest(path=path):
                 r = self.client.post(
@@ -83,14 +82,12 @@ class ServerTest(unittest.TestCase):
                 )
                 self.assertEqual(r.status_code, 415)
 
-    def test_cypher(self):
-        # read-only Cypher on Relate comes with Task 2; until then every query is a 400
+    def test_no_cypher_endpoint(self):
+        self.assertEqual(self.client.get("/api/cypher").status_code, 404)
+        self.assertEqual(self.client.get("/api/cypher/examples").status_code, 404)
+        # the static mount takes every path that is not a route and allows only GET and HEAD
         r = self.client.post("/api/cypher", json={"query": "RETURN 1 AS one"})
-        self.assertEqual(r.status_code, 400)
-        r = self.client.post("/api/cypher", json={"query": "CREATE (n:X) RETURN n"})
-        self.assertEqual(r.status_code, 400)
-        self.assertIn("error", r.json())
-        self.assertTrue(self.client.get("/api/cypher/examples").json())
+        self.assertEqual(r.status_code, 405)
 
     def copy_projects(self, tmp):
         ignore = shutil.ignore_patterns("build", "_build", "_generated")

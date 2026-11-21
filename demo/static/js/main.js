@@ -251,5 +251,4 @@ focus.subscribe(onFocus);
 await loadModel();
 panels.mountSearch($("#search"), names);
 panels.mountAsk($("#ask"), knownKeys, names);
-panels.mountCypher($("#cypher"), knownKeys).catch((e) => console.error(`Cypher examples: ${e.message}`));
 await show("context", null);

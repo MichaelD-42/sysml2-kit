@@ -14,15 +14,10 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from explorer import agent, cypher, db, load, search, views
+from explorer import agent, db, load, search, views
 from explorer.search import Embedder
 
 STATIC = Path(__file__).resolve().parent.parent / "static"
-
-
-class CypherBody(BaseModel):
-    query: str
-    params: dict | None = None
 
 
 class AskBody(BaseModel):
@@ -60,10 +55,6 @@ def create_app(graph, embedder, project: Path, agent_factory=None) -> FastAPI:
     def not_found(request, e):
         return error(404, str(e.args[0]) if e.args else "not found")
 
-    @app.exception_handler(cypher.CypherError)
-    def bad_cypher(request, e):
-        return error(400, str(e))
-
     @app.get("/api/tree")
     def tree(kind: str = "packages"):
         trees = {
@@ -96,14 +87,6 @@ def create_app(graph, embedder, project: Path, agent_factory=None) -> FastAPI:
     @app.get("/api/search")
     def find(q: str, k: int = Query(10, ge=1, le=50)):
         return search.search(graph, embedder, q, k)
-
-    @app.get("/api/cypher/examples")
-    def examples():
-        return cypher.EXAMPLES
-
-    @app.post("/api/cypher", dependencies=[Depends(json_only)])
-    def run(body: CypherBody):
-        return cypher.run_read(graph, body.query, body.params)
 
     @app.post("/api/ask", dependencies=[Depends(json_only)])
     async def ask(body: AskBody):

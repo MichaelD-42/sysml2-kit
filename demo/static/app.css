@@ -220,7 +220,6 @@ svg text { fill: var(--ink); font-family: system-ui, sans-serif; }
 .tools .tool { color: var(--ink); font-weight: 600; }
 code { font-size: 12px; background: var(--canvas); padding: 0 3px; border-radius: 2px; }
 code.unresolved { color: var(--error); text-decoration: underline wavy; }
-.result { overflow: auto; margin-top: 8px; }
 
 table { border-collapse: collapse; font-size: 13px; width: 100%; }
 th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }

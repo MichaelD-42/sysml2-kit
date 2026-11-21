@@ -34,6 +34,45 @@ MATCH p=(:Node {key:$key})-[:SPECIALIZES|TYPED_BY*0..]->(s)-[:OWNS]->(a:Attribut
 
 The `cypher` tool takes no parameters: write the key in place of `$key`, as `{key:'PC-001'}`.
 
+## Example queries
+
+The composition of a part, three levels down:
+
+```cypher
+MATCH (p:Node {qualifiedName: 'VehiclePhysical::vehicleAssembly'})-[:OWNS*1..3]->(c:PartUsage)
+RETURN p, c
+```
+
+Constraints on a part and its ancestors, through the logical component it is allocated to, the platform part it specialises and the definition it is typed by, each with the way it applies (`owns`, or the requirement that requires it):
+
+```cypher
+MATCH (anc:Node)-[:OWNS*0..]->(:Node {key: 'PC-001'})
+MATCH (anc)-[:ALLOCATED_TO|SPECIALIZES|TYPED_BY*0..3]-(s:Node)
+MATCH (s)-[:OWNS]->(c:ConstraintUsage)
+RETURN DISTINCT s.name AS source, 'owns' AS via, c.name AS constraint, c.expression AS expression
+UNION
+MATCH (anc:Node)-[:OWNS*0..]->(:Node {key: 'PC-001'})
+MATCH (anc)-[:ALLOCATED_TO|SPECIALIZES|TYPED_BY*0..3]-(s:Node)
+MATCH (s)-[:SATISFIES]->(r:Node)-[:REQUIRES]->(c:ConstraintUsage)
+RETURN DISTINCT s.name AS source, r.key AS via, c.name AS constraint, c.expression AS expression
+```
+
+Customer requirements whose matching features are not all platform features:
+
+```cypher
+MATCH (f:Node)-[:MATCHES|PARTIAL_MATCHES]->(c:crs)
+WITH c, collect(f.platform) AS flags WHERE NOT all(x IN flags WHERE x)
+RETURN c.key AS crs, c.title AS title, flags
+```
+
+Interfaces by domain:
+
+```cypher
+MATCH (p:PartUsage)-[:OWNS]->(port:PortUsage)-[:TYPED_BY]->(d:PortDefinition)
+RETURN coalesce(p.domain, '(none)') AS domain, d.name AS interface, count(*) AS ports
+ORDER BY domain, interface
+```
+
 ## RFLP layers and id prefixes
 
 Every need has a `layer` property:

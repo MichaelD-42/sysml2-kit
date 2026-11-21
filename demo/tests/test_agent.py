@@ -1,5 +1,6 @@
 import asyncio
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,9 +9,8 @@ from fastapi.testclient import TestClient
 
 from explorer import agent, server
 from tests import support
-from tests.support import vehicle
+from tests.support import VEHICLE, vehicle
 
-VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
 BUILT_IN = {"Bash", "Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSearch"}
 
 
@@ -29,10 +29,22 @@ class ToolsTest(unittest.TestCase):
         )
         self.assertIn("error", json.loads(agent.element(self.graph, "NOPE-1")))
 
-    def test_cypher_is_a_stub(self):
-        # read-only Cypher on Relate comes with Task 2; until then every query is an error
-        for q in ("CREATE (n) RETURN n", "RETURN 1 AS one"):
-            self.assertIn("error", json.loads(agent.cypher(self.graph, q)))
+    def test_cypher(self):
+        self.assertIn(
+            "error", json.loads(agent.cypher(self.graph, "CREATE (n) RETURN n"))
+        )
+        self.assertIn("error", json.loads(agent.cypher(self.graph, "NOT CYPHER")))
+        result = json.loads(agent.cypher(self.graph, "RETURN 1 AS one"))
+        self.assertEqual(result["rows"], [[1]])
+
+    def test_prompt_queries_run(self):
+        # the prompt's Cypher guidance must stay valid against the graph it describes
+        blocks = re.findall(r"```cypher\n(.*?)```", agent.PROMPT.read_text(), re.DOTALL)
+        self.assertGreaterEqual(len(blocks), 6)
+        for query in blocks:
+            with self.subTest(query):
+                query = query.replace("$key", "'PC-001'")
+                self.assertTrue(self.graph.read_only(query, None, 100, 10)["rows"])
 
     def test_semantic_search(self):
         hits = json.loads(agent.semantic_search(self.graph, support._embedder, "motor"))

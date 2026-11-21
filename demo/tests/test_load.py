@@ -1,9 +1,7 @@
 import unittest
-from pathlib import Path
 
 from explorer import db, load
-
-VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
+from tests.support import VEHICLE
 
 
 def count(graph, query="MATCH (n) RETURN count(n) AS c"):

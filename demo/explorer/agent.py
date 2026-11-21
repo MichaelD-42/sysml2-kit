@@ -21,7 +21,6 @@ from claude_agent_sdk import (
     tool,
 )
 
-from explorer import cypher as cypher_mod
 from explorer import search
 
 PROMPT = Path(__file__).with_name("prompt.md")
@@ -51,7 +50,7 @@ def semantic_search(graph, embedder, q, k=8) -> str:
 
 def cypher(graph, query) -> str:
     try:
-        return dumps(cypher_mod.run_read(graph, query, limit=100))
+        return dumps(graph.read_only(query, None, 100, 10))
     except Exception as e:  # noqa: BLE001
         return dumps({"error": str(e)})
 

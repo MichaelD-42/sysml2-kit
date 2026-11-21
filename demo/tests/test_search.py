@@ -1,10 +1,7 @@
 import unittest
-from pathlib import Path
 
 from explorer.search import Embedder, neighbourhood, search
 from tests.support import vehicle
-
-VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
 
 
 class SearchTest(unittest.TestCase):

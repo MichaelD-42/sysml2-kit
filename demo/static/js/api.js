@@ -20,8 +20,6 @@ export const element = (key) => get(`/api/element/${encodeURIComponent(key)}`);
 export const view = (kind, focus) =>
   get(`/api/view/${kind}` + (focus ? `?focus=${encodeURIComponent(focus)}` : ""));
 export const search = (q, k = 10) => get(`/api/search?q=${encodeURIComponent(q)}&k=${k}`);
-export const examples = () => get("/api/cypher/examples");
-export const cypher = (query, params) => post("/api/cypher", { query, params });
 export const reload = () => post("/api/reload", {});
 
 /** Whole server-sent events in `buffer` (as parsed JSON data) and the unfinished rest. */

@@ -1,4 +1,4 @@
-// Side panels: hierarchy tree, search, Cypher, ask, and the compliance table.
+// Side panels: hierarchy tree, search, ask, and the compliance table.
 // Every key is rendered as <a data-key>; main.js turns a click on one into setFocus.
 import * as api from "./api.js";
 import { esc } from "./render.js";
@@ -136,46 +136,6 @@ export function mountSearch(el, names) {
       }
     }, 200);
   });
-}
-
-function cell(v, knownKeys) {
-  if (v === null || v === undefined) return '<span class="none">–</span>';
-  if (Array.isArray(v)) return v.map((x) => cell(x, knownKeys)).join(", ");
-  if (typeof v === "object") return v.key ? keyLink(v.key, v.name ?? v.key) : esc(JSON.stringify(v));
-  return knownKeys.has(String(v)) ? keyLink(String(v)) : esc(v);
-}
-
-export async function mountCypher(el, knownKeys) {
-  el.innerHTML = `<label for="cy-example">Example</label><select id="cy-example"></select>
-    <label for="cy-query">Read-only Cypher</label><textarea id="cy-query" rows="7" spellcheck="false"></textarea>
-    <div class="row"><button type="button" class="primary">Run</button><span class="status" aria-live="polite"></span></div>
-    <div class="result"></div>`;
-  const [select, query, run, status, result] = ["select", "textarea", "button", ".status", ".result"].map((s) => el.querySelector(s));
-  const examples = await api.examples();
-  select.innerHTML = examples.map((x, i) => `<option value="${i}">${esc(x.title)}</option>`).join("");
-  const pick = () => (query.value = examples[select.value]?.query ?? "");
-  select.onchange = pick;
-  pick();
-  const go = async () => {
-    run.disabled = true;
-    status.textContent = "running";
-    try {
-      const { columns, rows } = await api.cypher(query.value);
-      status.textContent = `${rows.length} rows`;
-      result.innerHTML = `<table><thead><tr>${columns.map((c) => `<th scope="col">${esc(c)}</th>`).join("")}</tr></thead>
-        <tbody>${rows.map((r) => `<tr>${r.map((v) => `<td>${cell(v, knownKeys)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
-    } catch (e) {
-      status.textContent = "";
-      result.innerHTML = `<p class="error">${esc(e.message)}</p>`;
-    } finally {
-      run.disabled = false;
-    }
-  };
-  run.onclick = go;
-  // block bodies: an on-handler that returns false cancels the key, so nothing could be typed
-  query.onkeydown = (e) => {
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) go();
-  };
 }
 
 export function mountAsk(el, knownKeys, names) {

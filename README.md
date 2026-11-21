@@ -62,7 +62,7 @@ Then ask Claude to set up a SysML project. `sysml-init` scaffolds the pipeline, 
 
 ## Model explorer demo
 
-[`demo/`](demo) is a local web app over a kit project: nine views generated from the model, search, a read-only Cypher panel and a chat in which Claude answers from a Neo4j graph of the model. `make -C demo demo` starts it on the vehicle example; [`demo/README.md`](demo/README.md) has the steps, the HTTP API and the graph schema, and the notes for integrating it into your own tools.
+[`demo/`](demo) is a local web app over a kit project: nine views generated from the model, search and a chat in which Claude answers from an in-memory graph of the model. `make -C demo demo` starts it on the vehicle example; [`demo/README.md`](demo/README.md) has the steps, the HTTP API and the graph schema, and the notes for integrating it into your own tools.
 
 ## Upgrading from 0.1.x
 
