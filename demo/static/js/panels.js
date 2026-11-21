@@ -63,9 +63,13 @@ export function renderTree(el, roots) {
   const item = (n, depth) => {
     const kids = n.children ?? [];
     const open = depth < 1;
-    return `<li data-tree="${esc(n.key)}">
+    const label = n.key
+      ? `${n.rel ? `<span class="rel">${esc(n.rel)}</span> ` : ""}${keyLink(n.key, n.name)}${n.key !== n.name ? ` <span class="id">${esc(n.key)}</span>` : ""}`
+      : `<span class="group">${esc(n.name)}</span>`;
+    const marks = `${n.domain ? ` <span class="domain d-${esc(n.domain)}">${esc(n.domain)}</span>` : ""}${n.platform ? ' <span class="kind">platform</span>' : ""}`;
+    return `<li data-tree="${esc(n.key ?? "")}">
       ${kids.length ? `<button type="button" class="twisty" aria-expanded="${open}" aria-label="expand ${esc(n.name)}"></button>` : '<span class="twisty-gap"></span>'}
-      ${keyLink(n.key, n.name)} <span class="kind">${esc(n.kind)}</span>
+      ${label}${n.key && !n.rel ? ` <span class="kind">${esc(n.kind)}</span>` : ""}${marks}
       ${kids.length ? `<ul${open ? "" : " hidden"}>${kids.map((c) => item(c, depth + 1)).join("")}</ul>` : ""}
     </li>`;
   };
@@ -79,17 +83,24 @@ export function renderTree(el, roots) {
   };
 }
 
-/** Mark `key` in the tree, opening its ancestors. */
-export function revealInTree(el, key) {
-  el.querySelectorAll("li.current").forEach((li) => li.classList.remove("current"));
-  const li = [...el.querySelectorAll("li[data-tree]")].find((x) => x.dataset.tree === key);
-  if (!li) return;
-  li.classList.add("current");
+const openUp = (li) => {
   for (let up = li.parentElement.closest("li"); up; up = up.parentElement.closest("li")) {
     up.querySelector(":scope > .twisty")?.setAttribute("aria-expanded", "true");
     up.querySelector(":scope > ul").hidden = false;
   }
-  li.scrollIntoView({ block: "nearest" });
+};
+
+/** Mark every row of `key` (opening its ancestors) and, more lightly, the first row of each linked key. */
+export function revealInTree(el, key, linked = new Set()) {
+  el.querySelectorAll("li.current, li.linked").forEach((li) => li.classList.remove("current", "linked"));
+  const rows = [...el.querySelectorAll("li[data-tree]")];
+  const hits = rows.filter((x) => x.dataset.tree === key);
+  hits.forEach((li) => (li.classList.add("current"), openUp(li)));
+  for (const k of linked) {
+    const li = rows.find((x) => x.dataset.tree === k && !x.parentElement.closest(`li[data-tree="${CSS.escape(key)}"]`));
+    if (li) li.classList.add("linked"), openUp(li);
+  }
+  hits[0]?.scrollIntoView({ block: "nearest" });
 }
 
 export function mountSearch(el, names) {

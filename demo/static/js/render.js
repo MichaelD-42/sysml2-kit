@@ -90,6 +90,16 @@ function edge(e, domain) {
   return `<g class="e e-${esc(e.type)}${domainClass(domain)}"><path d="${d}" ${edgeMarkers(e.type)}/>${label}</g>`;
 }
 
+// a V-model level: its title, and a dashed slot where the right leg has no tests at this level
+function band(b, view) {
+  const slot = b.empty
+    ? `<rect x="${view.width - 24 - b.indent - 220}" y="${b.y + 30}" width="220" height="40" class="slot"/>
+       ${text(view.width - 24 - b.indent - 110, b.y + 55, "no tests at this level", "t-tag", "middle")}`
+    : "";
+  return `<g class="band"><line x1="0" x2="${view.width}" y1="${b.y}" y2="${b.y}" class="band-rule"/>
+    ${text(24 + b.indent, b.y + 18, b.title, "t-band")}${slot}</g>`;
+}
+
 /** SVG markup for a positioned view; the focus element is highlighted. */
 export function svg(view, focus) {
   const domains = new Map(view.nodes.map((n) => [n.key, n.domain]));
@@ -97,6 +107,7 @@ export function svg(view, focus) {
   const nodes = [...view.nodes].sort((a, b) => a.depth - b.depth);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${view.width} ${view.height}" width="${view.width}" height="${view.height}" role="img" aria-label="diagram">
     ${MARKERS}
+    ${(view.bands ?? []).map((b) => band(b, view)).join("")}
     ${nodes.map((n) => node(n, focus)).join("")}
     ${view.edges.map((e) => edge(e, domains.get(e.src) ?? domains.get(e.dst))).join("")}
     ${view.ports.map((p) => port(p, domains.get(p.key), focus)).join("")}

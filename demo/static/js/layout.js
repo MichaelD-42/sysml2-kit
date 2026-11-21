@@ -181,3 +181,76 @@ export function fromElk(laid) {
   }
   return out;
 }
+
+const V_LEVELS = ["Customer requirements · acceptance", "System · system tests", "Features and functions", "Logical components", "Physical components"];
+
+/** Where a straight line from rect a's centre towards rect b's centre leaves a. */
+function border(a, b) {
+  const cx = a.x + a.width / 2, cy = a.y + a.height / 2;
+  const dx = b.x + b.width / 2 - cx, dy = b.y + b.height / 2 - cy;
+  const t = Math.min(dx ? a.width / 2 / Math.abs(dx) : Infinity, dy ? a.height / 2 / Math.abs(dy) : Infinity);
+  return { x: cx + dx * t, y: cy + dy * t };
+}
+
+/** V-model geometry: level bands top-down, the left leg stepping inwards, tests on the right, parts at the bottom. */
+export function layoutV(view) {
+  const GAP = 14, STEP = 70, PAD = 24, LEG = 560, BAND = 30;
+  const metas = (view.nodes ?? []).map((n) => {
+    const meta = describe(n, new Set(), false);
+    // a test result shows its outcome, not its generated id
+    if (n.result !== undefined) Object.assign(meta, { header: `«result» ${n.result ?? "no outcome"}`, outcome: n.result });
+    const [width, height] = size(meta);
+    return { ...meta, shape: "block", width, height, depth: 0 };
+  });
+  const rows = (items, maxWidth) => {
+    // wrap items into rows no wider than maxWidth; returns [{items, width, height}]
+    const out = [];
+    for (const it of items) {
+      const row = out.at(-1);
+      if (row && row.width + GAP + it.width <= maxWidth) {
+        row.items.push(it), (row.width += GAP + it.width), (row.height = Math.max(row.height, it.height));
+      } else out.push({ items: [it], width: it.width, height: it.height });
+    }
+    return out;
+  };
+  const width = PAD * 2 + LEG * 2 + STEP * 2;
+  const bands = [];
+  let y = PAD;
+  for (let level = 1; level <= 5; level++) {
+    const top = y;
+    y += BAND;
+    const indent = (level - 1) * STEP;
+    let bottom = y;
+    if (level === 5) {
+      for (const row of rows(metas.filter((m) => m.level === 5), width - PAD * 2)) {
+        let x = (width - row.width) / 2;
+        for (const it of row.items) Object.assign(it, { x, y }), (x += it.width + GAP);
+        y += row.height + GAP;
+      }
+      bottom = y;
+    } else {
+      for (const [side, x0] of [["left", PAD + indent], ["right", null]]) {
+        let yy = y;
+        for (const row of rows(metas.filter((m) => m.level === level && m.side === side), LEG - indent)) {
+          let x = side === "left" ? x0 : width - PAD - indent - row.width;
+          for (const it of row.items) Object.assign(it, { x, y: yy }), (x += it.width + GAP);
+          yy += row.height + GAP;
+        }
+        bottom = Math.max(bottom, yy);
+      }
+    }
+    const empty = level < 5 && (view.empty ?? []).includes(level);
+    bands.push({ level, title: V_LEVELS[level - 1], y: top, height: Math.max(bottom, y + 40) - top, indent, empty });
+    y = Math.max(bottom, y + 40) + GAP;
+  }
+  const at = new Map(metas.map((m) => [m.key, m]));
+  // only links between neighbouring levels and across the V; longer jumps are in the trace view
+  const near = (a, b) => Math.abs(a.level - b.level) <= 1 || a.side !== b.side;
+  const edges = (view.edges ?? [])
+    .filter((e) => at.has(e.src) && at.has(e.dst) && near(at.get(e.src), at.get(e.dst)))
+    .map((e, i) => {
+      const a = at.get(e.src), b = at.get(e.dst);
+      return { ...e, key: `e${i}`, points: [border(a, b), border(b, a)], label: null };
+    });
+  return { width, height: y + PAD, nodes: metas, ports: [], edges, bands, leg: LEG };
+}

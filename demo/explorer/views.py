@@ -384,7 +384,7 @@ RETURN n.key AS key, coalesce(n.title, n.name, n.key) AS name, head([l IN labels
             RETURN {dir: 'out', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.key), kind: m.kind} } +
   COLLECT { MATCH (m:Node)-[r]->(n) WHERE type(r) IN $in
             RETURN {dir: 'in', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.key), kind: m.kind} } AS links
-ORDER BY platform, doc IS NULL, doc, key"""
+ORDER BY platform, CASE kind WHEN 'crs' THEN 0 WHEN 'sysreq' THEN 1 WHEN 'cst' THEN 2 ELSE 3 END, doc, key"""
 
 
 def requirements_tree(driver) -> list[dict]:
@@ -494,17 +494,10 @@ def vmodel(driver, focus):
         if not found:
             raise KeyError(focus)
         focus = found[0][0]
+        # a customer requirement narrows the V to its chain; any other focus is shown in the whole V
         reach = _read(driver, V_REACH, focus=focus)
-        if not reach:
-            return {
-                "kind": "vmodel",
-                "focus": focus,
-                "nodes": [],
-                "edges": [],
-                "empty": [],
-                "reason": f"{focus} is not a customer requirement",
-            }
-        keys = reach[0]["keys"]
+        if reach and reach[0]["keys"]:
+            keys = reach[0]["keys"]
     rows, results = [], []
     for r in _read(driver, V_NODES, keys=keys, types=NEED_TYPES):
         if r["type"] not in V_PLACE:

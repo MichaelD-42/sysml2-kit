@@ -14,7 +14,7 @@ export const post = (path, body) =>
     body: JSON.stringify(body),
   }).then(json);
 
-export const tree = () => get("/api/tree");
+export const tree = (kind = "packages") => get(`/api/tree?kind=${kind}`);
 export const keys = () => get("/api/keys");
 export const element = (key) => get(`/api/element/${encodeURIComponent(key)}`);
 export const view = (kind, focus) =>

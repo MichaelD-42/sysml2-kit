@@ -240,3 +240,17 @@ caption { text-align: left; color: var(--muted); padding: 8px; }
 .tree .twisty::before { content: "▸"; color: var(--muted); }
 .tree .twisty[aria-expanded="true"]::before { content: "▾"; }
 .tree li.current > a { color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--accent); }
+
+/* requirement and model trees, stacked; each scrolls on its own */
+.tree-col { display: flex; flex-direction: column; min-height: 0; }
+.tree-part { flex: 1 1 50%; min-height: 0; overflow: auto; }
+.tree-part + .tree-part { border-top: 1px solid var(--rule); }
+.tree .group { font-weight: 700; color: var(--ink); }
+.tree .rel { font-size: 11px; color: var(--muted); }
+.tree .id { font-size: 11px; color: var(--muted); }
+.tree li.linked > a { border-bottom: 2px dotted var(--accent); }
+
+/* V-model */
+.band-rule { stroke: var(--rule); stroke-width: 1; }
+.t-band { font-size: 12px; font-weight: 700; fill: var(--muted); }
+.slot { fill: none; stroke: var(--line); stroke-dasharray: 5 4; }

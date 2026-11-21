@@ -200,6 +200,18 @@ class ViewsTest(unittest.TestCase):
         )
         self.assertEqual(v["empty"], [3, 4])
 
+    def test_vmodel_of_another_focus_is_the_whole_v(self):
+        v = views.view(self.driver, "vmodel", "LC-001")
+        self.assertEqual(v["focus"], "LC-001")
+        self.assertIn("CRS-001", {n["key"] for n in v["nodes"]})
+
+    def test_requirements_tree_puts_customer_requirements_first(self):
+        names = [g["name"] for g in views.requirements_tree(self.driver)]
+        self.assertEqual(names[0], "Customer requirements")
+        self.assertLess(
+            names.index("System requirements"), names.index("Acceptance tests")
+        )
+
     def test_vmodel_of_one_requirement(self):
         keys = {n["key"] for n in views.view(self.driver, "vmodel", "CRS-003")["nodes"]}
         self.assertIn("SR-005", keys)

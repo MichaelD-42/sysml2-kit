@@ -1,7 +1,7 @@
 // Wires the page: one focus element, nine views laid out by ELK, and the side panels.
 import * as api from "./api.js";
 import { focus, setFocus, breadcrumb, history } from "./state.js";
-import { toElk, fromElk, keyword } from "./layout.js";
+import { toElk, fromElk, layoutV, keyword } from "./layout.js";
 import { svg, esc, drillKind } from "./render.js";
 import * as panels from "./panels.js";
 
@@ -15,6 +15,7 @@ const KINDS = {
   usecases: "Use cases",
   trace: "Traceability",
   compliance: "Compliance",
+  vmodel: "V-model",
 };
 const $ = (s) => document.querySelector(s);
 const elk = new globalThis.ELK();
@@ -25,8 +26,10 @@ const current = { kind: "context", keys: new Set(), view: null };
 let token = 0;
 let scale = 1;
 
+const related = new Map(); // key -> keys linked to it through a requirement (both directions)
+
 async function loadModel() {
-  const [roots, keys] = await Promise.all([api.tree(), api.keys()]);
+  const [roots, reqs, rflp, keys] = await Promise.all([api.tree(), api.tree("requirements"), api.tree("rflp"), api.keys()]);
   names.clear(), parents.clear(), knownKeys.clear();
   keys.forEach((k) => knownKeys.add(k));
   const walk = (n, parent) => {
@@ -35,7 +38,18 @@ async function loadModel() {
     n.children.forEach((c) => walk(c, n.key));
   };
   roots.forEach((r) => walk(r, null));
-  panels.renderTree($("#tree"), roots);
+  related.clear();
+  const link = (a, b) => (related.has(a) || related.set(a, new Set()), related.get(a).add(b));
+  for (const g of reqs) for (const r of g.children) for (const l of r.children) link(r.key, l.key), link(l.key, r.key);
+  const named = (n) => (n.key && !names.has(n.key) && names.set(n.key, n.name), (n.children ?? []).forEach(named));
+  [...reqs, ...rflp].forEach(named);
+  panels.renderTree($("#req-tree"), reqs);
+  panels.renderTree($("#rflp-tree"), rflp);
+}
+
+// the focus in both trees, plus what it is linked to through a requirement
+function revealTrees(key) {
+  for (const id of ["#req-tree", "#rflp-tree"]) panels.revealInTree($(id), key, related.get(key) ?? new Set());
 }
 
 // unnamed elements (a requirement's constraint) are labelled by their expression
@@ -108,7 +122,7 @@ async function show(kind, key) {
     } else if (view.reason) {
       canvas.innerHTML = `<div class="empty"><p>${esc(view.reason)}.</p></div>`;
     } else {
-      const laid = fromElk(await elk.layout(toElk(view)));
+      const laid = kind === "vmodel" ? layoutV(view) : fromElk(await elk.layout(toElk(view)));
       if (mine !== token) return;
       current.laid = laid;
       canvas.innerHTML = svg(laid, focus.get());
@@ -160,7 +174,7 @@ async function inspect(key) {
 
 function onFocus(key) {
   $("#back").disabled = !history.length;
-  panels.revealInTree($("#tree"), key);
+  revealTrees(key);
   inspect(key);
   if (current.kind === "compliance" || current.keys.has(key)) highlight(key);
   else show(current.kind, key);
@@ -202,7 +216,7 @@ function wire() {
       const { nodes, edges } = await api.reload();
       status.textContent = `loaded ${nodes} nodes, ${edges} edges`;
       await loadModel();
-      if (focus.get()) panels.revealInTree($("#tree"), focus.get());
+      if (focus.get()) revealTrees(focus.get());
       await show(current.kind, focus.get());
     } catch (err) {
       status.textContent = "";
