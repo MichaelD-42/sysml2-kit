@@ -1,5 +1,6 @@
 """HTTP API over the loaded graph: `python -m explorer.server <project-dir>`."""
 
+import json
 import os
 import subprocess
 import sys
@@ -7,12 +8,12 @@ import threading
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from neo4j import GraphDatabase
 from pydantic import BaseModel
 
-from explorer import cypher, load, search, views
+from explorer import agent, cypher, load, search, views
 from explorer.search import Embedder
 
 STATIC = Path(__file__).resolve().parent.parent / "static"
@@ -23,6 +24,10 @@ class CypherBody(BaseModel):
     params: dict | None = None
 
 
+class AskBody(BaseModel):
+    question: str
+
+
 def error(status, message):
     return JSONResponse({"error": message}, status_code=status)
 
@@ -31,6 +36,11 @@ def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
     app = FastAPI()
     app.state.reload_lock = threading.Lock()
     needs_path = project / "build" / "needs" / "needs.json"
+    if agent_factory is None:
+        agent_options = agent.options(project, driver, embedder)
+
+        def agent_factory(question):
+            return agent.ask(agent_options, question)
 
     @app.exception_handler(ValueError)
     def bad_value(request, e):
@@ -77,6 +87,14 @@ def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
     @app.post("/api/cypher")
     def run(body: CypherBody):
         return cypher.run_read(driver, body.query, body.params)
+
+    @app.post("/api/ask")
+    async def ask(body: AskBody):
+        async def events():
+            async for event in agent_factory(body.question):
+                yield f"data: {json.dumps(event)}\n\n"
+
+        return StreamingResponse(events(), media_type="text/event-stream")
 
     @app.post("/api/reload")
     def reload():
