@@ -35,11 +35,14 @@ The `sysml` MCP server answers from the language's own standard library, not fro
 
 ```text
 find       { "kind": "ActionUsage", "without": "allocated_to" }
-→ VehicleFunctions::operateVehicle   F-001   functions.sysml:4
+→ VehicleFeatures::travelRange         FEAT-001   features.sysml:7
+  VehicleFeatures::propulsion          FEAT-002   features.sysml:13
+  VehicleFeatures::propulsion::propel  F-002      features.sysml:17
+  ... (5 found)
 
 relations  { "element": "SR-001" }
 → VehicleRequirements::range
-    incoming  satisfies  VehicleLogical::vehicle::energyStore (LC-003)   architecture.sysml:29
+    incoming  satisfies  VehicleLogical::vehicle::energyStore (LC-003)   architecture.sysml:32
     incoming  verifies   VehicleSystemTests::rangeTest (STC-001)         system_tests.sysml:6
     outgoing  annotated_by  Trace::Satisfies                             system_requirements.sysml:7
 ```
@@ -56,6 +59,17 @@ You need Rust (cargo), Python 3.10+ and make. In Claude Code:
 ```
 
 Then ask Claude to set up a SysML project. `sysml-init` scaffolds the pipeline, and `make tools` installs the `sysml` CLI (built with cargo from the fork at the tag the Makefile pins) and the Python requirements (Sphinx, sphinx-needs, ub-test-reports, sysml2kit). If you have a platform repo, add it with `git submodule add <platform repo> platform`. Add customer requirements (`docs/customer/*.md`) and ask for the `rfq` workflow, or the `rflp` workflow without the interview; `make all` builds the docs and checks the rules.
+
+## Upgrading from 0.1.x
+
+An existing project needs these changes before it builds with 0.2:
+
+- `docs/ubproject.toml` and `docs/schemas.json`: copy from the template (new need types feature, physical component and interface, CST and PRQ; new fields such as `scope`, `compliance`, `platform`, `variant`; new links such as `matches`, `answers`, `specializes`; the new rules).
+- `model/trace.sysml`: add the `Feature`, `Mechanical`, `Electrical`, `Software` and `Matches` metadata and the `ScalarValues::Boolean` import, or copy it from the template.
+- `requirements.txt`: add `myst-parser` and pin `sysml2kit` to the new tag; `docs/conf.py`: add `myst_parser` to `extensions`, plus the template's `exclude_patterns` and `myst_enable_extensions`.
+- `docs/index.rst`: add `compliance` to the toctree, and copy `docs/compliance.md` from the template.
+- `Makefile`: copy from the template and keep your `DIAGRAMS` line.
+- The model itself: the new F and P gates fail until each function tree sits under a feature (`#Feature action <'FEAT-nnn'>`) and every leaf logical component is allocated to a physical component (`#Mechanical|#Electrical|#Software part <'PC-nnn'>`).
 
 ## Pipeline
 

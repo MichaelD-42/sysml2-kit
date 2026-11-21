@@ -20,7 +20,7 @@ Terms used in this repository, the plugin and the generated docs. Which layer ow
 
 ## Artifacts and ids
 
-**CRS** (customer requirement, `CRS-nnn`): the customer's own words, written in Markdown (MyST). Not part of the SysML model. `:scope: commercial` exempts it from `crs-satisfied` and `crs-verified` and requires a CST.
+**CRS** (customer requirement, `CRS-nnn`): the customer's own words, written in Markdown (MyST). Not part of the SysML model. `:scope: commercial` (terms, delivery, warranty) or `:scope: not-offered` (a technical requirement the supplier does not meet at all) exempts it from `crs-satisfied` and `crs-verified` and requires a CST, `not-comply` for `not-offered`. Adding `:scope:` is the only edit the supplier makes to a CRS.
 
 **PRQ** (platform requirement, `PRQ-nnn`): what the platform offers every program, written in Markdown in the platform project, where it plays the role CRS plays in an RFQ project.
 
@@ -88,7 +88,7 @@ Terms used in this repository, the plugin and the generated docs. Which layer ow
 
 **Keyword metadata**: `#Feature`, `#Mechanical`, `#Electrical`, `#Software`, also from `model/trace.sysml`; they set what kind of need an `action`, `part` or `port` becomes.
 
-**Variation / variant**: SysML v2 way to declare alternatives: a `variation part` with `variant part` members. An RFQ part selects one by subsetting it.
+**Variation / variant**: SysML v2 way to declare alternatives: a `variation part` with `variant part` members. An RFQ part selects one by subsetting it; a chain that reaches the variation without a selection makes the feature `incomplete`.
 
 **Interchange JSON**: the output of `sysml export`, a flat array of elements with `@id`, `@type` and every metamodel property.
 

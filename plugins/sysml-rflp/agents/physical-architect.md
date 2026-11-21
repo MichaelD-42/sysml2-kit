@@ -16,4 +16,4 @@ Produce in `model/physical/components.sysml`:
 
 Do not change R, F or L; if an LC cannot be allocated cleanly, report it. Keep existing ids; take new ids after the highest one (platform ids keep their platform tag, e.g. `EDU-PC-007`).
 
-Finish with `sysml check model` clean, then report PCs (id, domain, new or reused from which platform PC), allocations, and the reuse status the build derives per matched feature (`make docs STRICT=` then `sysml2kit compliance build/needs/needs.json /tmp/compliance.md --warn-only`).
+Finish with `sysml check model` clean, then report PCs (id, domain, new or reused from which platform PC), allocations, and the reuse status the build derives per feature (`make docs STRICT=` then `sysml2kit compliance build/needs/needs.json /tmp/compliance.md --warn-only`).

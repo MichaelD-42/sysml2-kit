@@ -1,6 +1,6 @@
 ---
 name: test-designer
-description: RFLP step 4 (V). Writes system test cases in SysML v2 that verify system requirements, and acceptance test cases in Markdown that verify customer requirements and use cases. Use when the rflp workflow asks for the verification layer.
+description: RFLP step 5 (V). Writes system test cases in SysML v2 that verify system requirements, and acceptance test cases in Markdown that verify customer requirements and use cases. Use when the rflp workflow asks for the verification layer.
 tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 

@@ -51,18 +51,19 @@ Prefix package names with the system name; `UseCases`, `Requirements` and simila
 The platform is the supplier's own project with this same layout (its PRQ play the role of CRS), in `<project>/platform/` as a git submodule (`git submodule add <platform repo> platform`; the repo examples use a symlink). Its ids carry a tag before the type prefix (`EDU-FEAT-001`, `EDU-PC-004`). `make` loads its model next to `model/`; its elements become needs with `platform: true`, which RFQ builds never rule-check (the platform's own build does).
 
 - Reuse is subsetting: `part <'PC-001'> driveMotor :> EDrivePhysical::motor::motor80kW;` or `#Feature action <'FEAT-010'> acc :> PlatformFeatures::cruise;`. The bridge turns it into a `specializes` link; the coverage chain follows it into the platform.
-- Variants are native `variation` / `variant` members in the platform; the RFQ part subsets one variant to select it.
+- Variants are native `variation` / `variant` members in the platform; the RFQ part subsets one variant to select it. A chain that reaches a variation without such a selection reaches no PC there: the feature is `incomplete`.
 - `@Matches { need = "CRS-001"; }` in a feature states that it covers that CRS; `partial = true` says only in part, and then an SR that satisfies the CRS must be satisfied by a component in the feature's chain (it states the gap).
 - Reuse status per matched feature is derived from the chain feature → leaf functions → LC → PC, never written: `platform` (all PCs from the platform, no variant), `variant` (all from the platform, at least one a selected variant), `modified` (some platform, some new), `new` (no platform PC), `incomplete` (a leaf function reaches no PC). On a CRS: the worst of its features.
-- A CRS with `:scope: commercial` is exempt from `crs-satisfied` and `crs-verified` and must be answered by a CST. `sysml2kit compliance` reports a CRS that is neither matched nor answered, an incomplete chain, and a partial match with no SR stating the gap; the V gate includes these.
+- A CRS with `:scope: commercial` (terms, delivery, warranty) or `:scope: not-offered` (a technical CRS the supplier does not meet at all) is exempt from `crs-satisfied` and `crs-verified` and must be answered by a CST; for `not-offered` the CST is `not-comply`. A technical CRS met in part keeps empty scope: an SR states what is met, a feature matches it partially, a CST is optional. Adding `:scope:` is the one permitted edit to a customer's CRS. `sysml2kit compliance` reports a CRS that is neither matched nor answered, a `not-offered` CRS whose statement is not `not-comply`, an incomplete chain, a variation reached without a selected variant, and a partial match with no SR stating the gap; the V gate includes these.
 
 ## Rules (docs/schemas.json, enforced by `make all` and ubCode)
 
 | Rule id | Layer gate | Rule |
 |---|---|---|
-| `crs-satisfied` | R | every non-commercial CRS is satisfied by at least one SR |
+| `crs-satisfied` | R | every CRS with empty scope is satisfied by at least one SR |
 | `usecase-realizes` | R | every UC realizes at least one CRS |
 | `sysreq-satisfies` | R | every SR satisfies at least one CRS |
+| `cst-compliance` | R | every CST has a compliance value (comply, partial or not-comply) |
 | `usecase-realized` | F | every UC is realized by at least one feature |
 | `feature-realizes` | F | every feature realizes at least one UC |
 | `function-allocated` | L | every leaf function is allocated to exactly one component |
@@ -74,7 +75,7 @@ The platform is the supplier's own project with this same layout (its PRQ play t
 | `acctest-verifies` | V | every ATC verifies a CRS or UC |
 | `sysreq-verified` | V | every SR is verified by at least one STC |
 | `usecase-verified` | V | every UC is verified by at least one ATC |
-| `crs-verified` | V | every non-commercial CRS is verified by at least one ATC |
+| `crs-verified` | V | every CRS with empty scope is verified by at least one ATC |
 
 In an RFQ build the rules select only needs with `platform: false`. In the platform project `prq` needs take CRS's place in these rules.
 

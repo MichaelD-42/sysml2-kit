@@ -11,7 +11,7 @@ Precondition: an initialized project (`sysml-init`), `make lint` passing. Platfo
 
 ## Inputs
 
-- Customer requirements: `docs/customer/*.md`, `crs` directives (MyST). Never rewrite them.
+- Customer requirements: `docs/customer/*.md`, `crs` directives (MyST). Never rewrite them; the one permitted edit is adding `:scope: commercial` or `:scope: not-offered` with the user's yes.
 - Platform: `platform/docs/platform/*.md` (PRQ), `platform/model/` (features, LCs, PCs, variants). Read it with the `find` and `relations` MCP tools, not by opening every file.
 - Other RFQ documents (PDF, Word, drawings, specs): read as context. Cite what you took from them when you ask ("the spec on page 4 gives 400 V; is that the supply?"). Never turn a fact from them into a requirement without the user's yes.
 
@@ -31,7 +31,7 @@ For each of R, F, L, P (the `rflp` steps 1 to 4):
 
 At step 3 of P, once the chain reaches physical components, the main session (not an agent) states with the user what each customer requirement is met by, and writes the claims the user agrees to into the features: `@Matches { need = "CRS-001"; }` inside the feature that covers it, one per CRS; add `partial = true` when the feature meets it only in part (value not reached, condition excluded). A partial match needs an SR that states the gap, satisfied by a component in that feature's chain. Write only claims the user agrees with; the reuse status (platform, variant, modified, new, incomplete) is derived from the chain, never written.
 
-A CRS no feature can meet (commercial terms, delivery, certification, or a technical gap) is answered by a compliance statement: a `cst` directive in `docs/customer/statements.md` with `:answers:` and `:compliance:` (`comply`, `partial`, `not-comply`). The compliance value is the user's decision.
+A CRS no feature can meet (commercial terms, delivery, certification, or a technical requirement not offered at all, marked `:scope: not-offered` and answered `not-comply`) is answered by a compliance statement: a `cst` directive in `docs/customer/statements.md` with `:answers:` and `:compliance:` (`comply`, `partial`, `not-comply`). The compliance value is the user's decision.
 
 ## Finish
 
