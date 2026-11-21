@@ -21,8 +21,8 @@ package VehiclePhysical {
         doc /* The vehicle as assembled: the platform drive unit wired, cooled and mounted. */
         part driveUnit :> eDriveUnit {
             doc /* The platform drive unit fitted to this vehicle. */
-            // selects the platform's 80 kW motor variant for this vehicle
-            #Electrical part <'PC-001'> driveMotor :> EDrivePhysical::motor::motor80kW { doc /* Platform motor, 80 kW variant. */ }
+            // fills the drive unit's motor slot with the platform's 80 kW variant
+            #Electrical part <'PC-001'> driveMotor :>> motor :> EDrivePhysical::motor::motor80kW { doc /* Platform motor, 80 kW variant. */ }
         }
         ref part tractionBattery :> VehiclePhysical::tractionBattery;
         ref part ladderFrame :> VehiclePhysical::ladderFrame;

@@ -32,7 +32,9 @@ def index(elements):
 
 
 def element(elements, qualified_name):
-    return next(e for e in elements if e.get("qualifiedName") == qualified_name)
+    found = [e for e in elements if e.get("qualifiedName") == qualified_name]
+    assert found, f"no element {qualified_name} in the export"
+    return found[0]
 
 
 def owned(elements, e, key="ownedElement"):
@@ -82,10 +84,11 @@ def port_names(elements, qualified_name):
     }
 
 
-def part_names(elements, qualified_name):
+def part_names(elements, qualified_name, key="ownedElement"):
+    """Names of the parts the element owns (key="feature": owns or inherits)."""
     return {
         e["name"]
-        for e in owned(elements, element(elements, qualified_name))
+        for e in owned(elements, element(elements, qualified_name), key)
         if e["@type"] == "PartUsage"
     }
 
@@ -133,6 +136,15 @@ class EnrichedExampleTest(unittest.TestCase):
         self.assertGreaterEqual(
             connections_touching(export, "VehiclePhysical::vehicleAssembly::driveUnit"),
             5,
+        )
+
+    def test_drive_unit_holds_one_motor(self):
+        # driveMotor redefines the inherited `motor` slot, so the unselected variation is gone
+        self.assertEqual(
+            part_names(
+                export, "VehiclePhysical::vehicleAssembly::driveUnit", "feature"
+            ),
+            {"controllerFirmware", "driveMotor", "housing", "inverter"},
         )
 
     def test_context(self):
