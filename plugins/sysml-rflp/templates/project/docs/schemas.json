@@ -75,39 +75,6 @@
       }
     },
     {
-      "id": "crs-verified",
-      "message": "Customer requirement is not verified by any acceptance test",
-      "select": {
-        "properties": {
-          "type": {
-            "enum": [
-              "crs",
-              "prq"
-            ]
-          },
-          "scope": {
-            "const": ""
-          }
-        }
-      },
-      "validate": {
-        "network_back": {
-          "verifies": {
-            "contains": {
-              "local": {
-                "properties": {
-                  "type": {
-                    "const": "acctest"
-                  }
-                }
-              }
-            },
-            "minContains": 1
-          }
-        }
-      }
-    },
-    {
       "id": "ctr-implemented",
       "message": "Customer test requirement is not implemented by any system or acceptance test",
       "select": {
@@ -617,7 +584,7 @@
     },
     {
       "id": "systest-implements",
-      "message": "System test implements something other than a customer test requirement",
+      "message": "System test implements links but none to a customer test requirement",
       "select": {
         "properties": {
           "type": {
@@ -658,6 +625,9 @@
         "properties": {
           "type": {
             "const": "acctest"
+          },
+          "implements": {
+            "maxItems": 0
           }
         }
       },
@@ -673,6 +643,39 @@
                       "prq",
                       "usecase"
                     ]
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "acctest-implements",
+      "message": "Acceptance test implements links but none to a customer test requirement",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "acctest"
+          },
+          "implements": {
+            "minItems": 1
+          }
+        },
+        "required": [
+          "implements"
+        ]
+      },
+      "validate": {
+        "network": {
+          "implements": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "ctr"
                   }
                 }
               }

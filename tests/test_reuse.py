@@ -1,6 +1,6 @@
 import unittest
 
-from sysml2kit.reuse import reuse, reused_pcs, unselected_variations
+from sysml2kit.reuse import constraint_reuse, reuse, reused_pcs, unselected_variations
 
 
 def need(type_, platform=False, variant=False, **links):
@@ -155,6 +155,20 @@ class ReuseTest(unittest.TestCase):
             "B": need("feature", specializes=["A"], owned_by=["A"]),
         }
         self.assertEqual(reuse(needs), {"A": "incomplete", "B": "incomplete"})
+
+    def test_constraint_reuse_follows_its_owner_part(self):
+        needs = {
+            "CON-1": need("constraint", owned_by=["PC"]),
+            "PC": need("physical", specializes=["PV"]),
+            "PV": need("physical", platform=True),
+        }
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "platform")
+        needs["PV"]["variant"] = True
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "variant")
+        needs["PC"]["specializes"] = []
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "new")
+        needs["CON-1"]["owned_by"] = []
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "incomplete")
 
 
 if __name__ == "__main__":

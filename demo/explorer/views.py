@@ -19,7 +19,17 @@ KINDS = (
     "vmodel",
 )
 NEED_LINKS = "SATISFIES|ALLOCATED_TO|VERIFIES|REALIZES|MATCHES|PARTIAL_MATCHES|ANSWERS|TESTS|REQUIRES"
-ROW = ("crs", "title", "features", "reuse", "partial", "statements", "domains")
+ROW = (
+    "crs",
+    "title",
+    "class",
+    "features",
+    "reuse",
+    "partial",
+    "statements",
+    "domains",
+    "constraints",
+)
 TREE_KINDS = [
     "Package",
     "PartDefinition",

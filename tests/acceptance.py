@@ -162,7 +162,7 @@ MUTATIONS = [
         "a customer requirement without a class violates crs-class",
         "all",
         replace("docs/customer/requirements.md", ":class: functional\n", ""),
-        r"crs-class",
+        r"CRS-001\n\s+Schema path:\s+crs-class",
     ),
     (
         "a constraint satisfying no requirement violates constraint-satisfies",
@@ -172,7 +172,7 @@ MUTATIONS = [
             "whichever comes first.\n:::\n",
             "whichever comes first.\n:::\n\n:::{constraint} Unused limit\n:id: CON-099\n\nA limit.\n:::\n",
         ),
-        r"constraint-satisfies",
+        r"CON-099 > satisfies\n\s+Schema path:\s+constraint-satisfies",
     ),
     (
         "a compliance statement without a compliance value violates cst-compliance",
@@ -197,6 +197,16 @@ MUTATIONS = [
             "",
         ),
         r"CRS-003: partial match without a system requirement stating the gap",
+    ),
+    (
+        "a customer requirement without an acceptance test is not verified",
+        "all",
+        replace(
+            "docs/acceptance/tests.rst",
+            ":verifies: CRS-003, UC-001",
+            ":verifies: UC-001",
+        ),
+        r"CRS-003: not verified \(no acceptance test, no implemented CTR applying to it\)",
     ),
     (
         "a feature without its #Feature keyword fails the bridge",
@@ -256,7 +266,31 @@ def main():
         print(f"{'ok  ' if ok else 'FAIL'} baseline: {name}")
         failures += not ok
     failures += mutations(MUTATIONS, EXAMPLE)
+    failures += information()
     return 1 if failures + incremental(work) + hook(work) else 0
+
+
+def information():
+    """An information CRS is no coverage obligation: no SR, a partial match without a gap SR, still green."""
+
+    def edit(work):
+        replace(
+            "docs/customer/requirements.md",
+            ":class: non-functional\n",
+            ":class: information\n",
+        )(work)
+        replace(
+            "model/requirements/system_requirements.sysml",
+            '@Satisfies { need = "CRS-003"; }',
+            '@Satisfies { need = "CRS-001"; }',
+        )(work)
+
+    code, out, _ = build("all", edit)
+    return report(
+        "an information requirement without a system requirement builds clean",
+        code == 0,
+        out,
+    )
 
 
 def links_resolve(html_dir):
@@ -278,15 +312,18 @@ def links_resolve(html_dir):
 
 def compliance_rows(table):
     """The compliance table has a variant, a new, a partial and a statement-only row."""
-    rows = table.read_text().splitlines()[2:] if table.exists() else []
+    text = table.read_text() if table.exists() else ""
+    rows = text.split("\n\n")[0].splitlines()[
+        2:
+    ]  # the requirements table, not the CTR one
     cells = [[c.strip() for c in row.strip("|").split("|")] for row in rows]
     return {
         f"compliance table has a {kind} row": any(test(c) for c in cells)
         for kind, test in {
-            "variant": lambda c: c[3] == "variant",
-            "new": lambda c: c[3] == "new",
-            "partial": lambda c: c[4] == "yes",
-            "statement-only": lambda c: not c[2] and "CST-001" in c[5],
+            "variant": lambda c: c[4] == "variant",
+            "new": lambda c: c[4] == "new",
+            "partial": lambda c: c[5] == "yes",
+            "statement-only": lambda c: not c[3] and "CST-001" in c[6],
         }.items()
     }
 

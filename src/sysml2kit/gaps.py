@@ -22,9 +22,9 @@ RULE_LAYERS = {
     "constraint-verified": "V",
     "ctr-implemented": "V",
     "acctest-verifies": "V",
+    "acctest-implements": "V",
     "sysreq-verified": "V",
     "usecase-verified": "V",
-    "crs-verified": "V",
 }
 
 

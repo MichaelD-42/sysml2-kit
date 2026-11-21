@@ -138,3 +138,18 @@ def reuse(needs):
         else:
             out[fid] = "modified" if any(platform) else "new"
     return out
+
+
+def constraint_reuse(needs, con_id):
+    """Platform, variant or new by the part owning the constraint; incomplete without one."""
+    owners = [
+        o
+        for o in needs[con_id].get("owned_by", [])
+        if o in needs and needs[o]["type"] in ("physical", "component")
+    ]
+    if not owners:
+        return "incomplete"
+    chain = [needs[i] for o in owners for i in closure(needs, o, "specializes")]
+    if not any(n["platform"] for n in chain):
+        return "new"
+    return "variant" if any(n["variant"] for n in chain) else "platform"
