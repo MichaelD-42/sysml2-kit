@@ -27,10 +27,12 @@ RETURN DISTINCT o.key, o.name, c.key, c.expression, r.key
 
 A constraint also comes from a system requirement that the part satisfies (`(s)-[:SATISFIES]->(:sysreq)-[:REQUIRES]->(:ConstraintUsage)`). Then follow the requirement upward (`SATISFIES`, `REALIZES`, `MATCHES` to a `crs`) to the customer requirement behind it.
 
-Attribute values (`value`, `unit`) sit on the part itself or on what it specialises or is typed by: a selected variant, a platform part, a definition. A part that owns no attributes usually inherits them this way (`PC-101` owns none and specialises the platform variant `SSW-PC-002`). Follow every `SPECIALIZES` and `TYPED_BY` branch and prefer the nearest value (the shortest path). When a constraint mentions an attribute, look up that attribute's nearest value with the query below, then state the value and whether the constraint holds for it. Never say a value is missing or unspecified without running this query:
+Attribute values (`value`, `unit`) sit on the part itself or on what it specialises or is typed by: a selected variant, a platform part, a definition. A part that owns no attributes usually inherits them this way (`PC-101` owns none and specialises the platform variant `SSW-PC-002`). Follow every `SPECIALIZES` and `TYPED_BY` branch and prefer the nearest value (the shortest path). A whole-switch constraint (one the logical component or its owner holds) is about the logical component, not the physical part: for a position's physical part such as `PC-101`, take the values from the logical component allocated to it (`LC-101`, through `ALLOCATED_TO`) and that component's `SPECIALIZES`/`TYPED_BY` chain up to the `SwitchAssembly` definition, which holds the platform's rated values. The query below does both. When a constraint mentions an attribute, look up that attribute's nearest value with the query below, then state the value and whether the constraint holds for it. Do this for every constraint you list, the whole-switch ones included, not only the part's own. Never say a value is missing or unspecified without running this query:
 
 ```cypher
-MATCH p=(:Node {key:$key})-[:SPECIALIZES|TYPED_BY*0..]->(s)-[:OWNS]->(a:AttributeUsage) RETURN s.key, a.name, a.value, a.unit ORDER BY length(p)
+MATCH (:Node {key:$key})<-[:ALLOCATED_TO*0..1]-(x:Node)
+MATCH p=(x)-[:SPECIALIZES|TYPED_BY*0..]->(s)-[:OWNS]->(a:AttributeUsage)
+RETURN x.key AS from, s.key, a.name, a.value, a.unit ORDER BY from, length(p)
 ```
 
 The `cypher` tool takes no parameters: write the key in place of `$key`, as `{key:'PC-101'}`.
