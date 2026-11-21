@@ -16,7 +16,7 @@ The <code>.sysml</code> files are the model; sphinx-needs is where traceability 
 
 SysML v2 was adopted in 2025, so a language model asked to write it produces something that looks right and names things that do not exist. And a model on its own does not tell you whether every customer requirement ends up satisfied by a component and verified by a test. sysml2-kit closes both gaps. Agents write the model with a checker in the loop, a hook lints every `.sysml` file they edit, and the model is exported into sphinx-needs, where the RFLP rules (Requirements → Functional → Logical → Physical) fail the docs build when a link is missing.
 
-The method is fixed and documented, and built for a supplier answering a customer RFQ: customer requirements (CRS, Markdown) → use cases and system requirements (UC/SR) → features and functions (FEAT/F) → logical components and interfaces (LC/LI) → physical components and interfaces in mechanical, electrical or software (PC/PI) → system and acceptance tests (STC/ATC) → test results. The supplier's platform (reusable features, components and variants) is a separate project that an RFQ project imports and reuses by subsetting. The docs show per customer requirement which feature meets it, how much comes from the platform (derived from the model, never claimed), and whether the match is partial; requirements no component can meet are answered by compliance statements (CST). Each layer has its own agent, an interview skill asks the user only what the inputs leave open, and the workflow stops for your approval between layers. Terms and abbreviations are in the [glossary](glossary.md).
+The method is fixed and documented, and built for a supplier answering a customer RFQ: customer requirements (CRS, Markdown) → use cases and system requirements (UC/SR) → features and functions (FEAT/F) → logical components and interfaces (LC/LI) → physical components and interfaces in mechanical, electrical or software (PC/PI) → system and acceptance tests (STC/ATC) → test results. The supplier's platform (reusable features, components and variants) is a separate project that an RFQ project imports and reuses by subsetting. The docs show per customer requirement which feature meets it, how much comes from the platform (derived from the model, never claimed), and whether the match is partial; requirements no component can meet are answered by compliance statements (CST). Every customer requirement carries a class (functional, non-functional, constraint, information): plain values become constraints (CON) in the model, and the customer's own tests (CTR) are implemented by the supplier's system and acceptance tests. Each layer has its own agent, an interview skill asks the user only what the inputs leave open, and the workflow stops for your approval between layers. Terms and abbreviations are in the [glossary](glossary.md).
 
 It is not a modeling GUI and it does not simulate. Software components keep linking to code and tests in sphinx-needs. The toolchain is Python and Rust only, with no Java or Eclipse.
 
@@ -74,6 +74,16 @@ An existing project needs these changes before it builds with 0.2:
 - `docs/index.rst`: add `compliance` to the toctree, and copy `docs/compliance.md` from the template.
 - `Makefile`: copy from the template and keep your `DIAGRAMS` line.
 - The model itself: the new F and P gates fail until each function tree sits under a feature (`#Feature action <'FEAT-nnn'>`) and every leaf logical component is allocated to a physical component (`#Mechanical|#Electrical|#Software part <'PC-nnn'>`).
+
+## Upgrading from 0.2.x
+
+Requirement classes, constraints and customer test requirements change the rules. An existing project needs:
+
+- `docs/ubproject.toml` and `docs/schemas.json`: copy from the template. New need types `ctr` (`CTR-`) and `constraint` (`CON-`); new fields `class` (on CRS and PRQ), `purpose` and `method` (on CTR); new links `implements`, `applies_to`, `partial_satisfies`; new rules `crs-class`, `constraint-satisfies`, `constraint-verified`, `ctr-implemented`, `systest-implements`, `acctest-implements`. `crs-satisfied` is selected by class and accepts an SR or a constraint; `systest-verifies` and `acctest-verifies` apply to tests that implement nothing.
+- `crs-verified` is gone from `schemas.json`. CRS and PRQ verification is now the computed finding `<CRS>: not verified (no acceptance test, no implemented CTR applying to it)` of `sysml2kit compliance`, which runs at the V gate and fails the build; `sysml2kit gaps` no longer lists it.
+- `model/trace.sysml`: add the `Implements` metadata (`need : String[1..*]`), and `partial` on `Satisfies`, or copy it from the template.
+- Every CRS and PRQ needs a `:class:` (`functional`, `non-functional`, `constraint` or `information`). Plain values move from bare attributes or textual SRs into `CON-` constraints; `information` carries no obligation.
+- Customer tests become `ctr` directives with `:applies_to:`, implemented by STC (`@Implements`) or ATC (`:implements:`).
 
 ## Pipeline
 

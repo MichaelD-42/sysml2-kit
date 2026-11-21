@@ -20,7 +20,13 @@ Terms used in this repository, the plugin and the generated docs. Which layer ow
 
 ## Artifacts and ids
 
-**CRS** (customer requirement, `CRS-nnn`): the customer's own words, written in Markdown (MyST). Not part of the SysML model. `:scope: commercial` (terms, delivery, warranty) or `:scope: not-offered` (a technical requirement the supplier does not meet at all) exempts it from `crs-satisfied` and `crs-verified` and requires a CST, `not-comply` for `not-offered`. Adding `:scope:` is the only edit the supplier makes to a CRS.
+**CRS** (customer requirement, `CRS-nnn`): the customer's own words, written in Markdown (MyST). Not part of the SysML model. `:scope: commercial` (terms, delivery, warranty) or `:scope: not-offered` (a technical requirement the supplier does not meet at all) exempts it from `crs-satisfied` and from the not-verified compliance finding and requires a CST, `not-comply` for `not-offered`. Adding `:scope:` is the only edit the supplier makes to a CRS.
+
+**Requirement class**: `:class:` on every CRS and PRQ: `functional`, `non-functional`, `constraint` or `information`. Functional needs a matching feature and an SR or constraint; non-functional and constraint need a `CON-` constraint; information carries no obligation.
+
+**CON** (constraint, `CON-nnn`): a SysML `constraint` usage over a part attribute that satisfies a CRS with a plain value. Verified by a system test (`@Verifies`).
+
+**CTR** (customer test requirement, `CTR-nnn`): the customer's own test, written in Markdown and captured as written; `applies_to` the CRS it tests. The supplier's STC or ATC implements it (`@Implements` / `:implements:`). It counts toward verifying the CRSs it applies to, whatever its scope.
 
 **PRQ** (platform requirement, `PRQ-nnn`): what the platform offers every program, written in Markdown in the platform project, where it plays the role CRS plays in an RFQ project.
 

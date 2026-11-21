@@ -9,6 +9,8 @@ Ask only what the inputs (CRS, platform, RFQ documents) leave open. One topic at
 - System boundary and context: what is inside the delivery, what is the customer's or another supplier's? What does it sit in or connect to?
 - External interfaces: what crosses the boundary (power, data, mounting, people)? With which standard or part number?
 - Operating conditions: environment, duty cycle, lifetime, safety or regulatory class.
+- Requirement class: for each CRS, is it functional, non-functional, a constraint or information only? Plain values (mass, speed, voltage) become `CON-` constraints in the model.
+- Customer test requirements: which tests does the customer prescribe (CTR), which CRS does each apply to, and can the supplier run them as written or only in part?
 - Quantities without values: for each CRS that says "fast", "enough", "long" or names no number, ask for the value and the unit, or mark it open.
 - Commercial requirements: warranty, price, delivery, quantity, certification, process. Which of them does the supplier comply with, only in part, or not? Each needs a compliance statement (CST) with that answer.
 
@@ -23,7 +25,7 @@ Ask only what the inputs (CRS, platform, RFQ documents) leave open. One topic at
 
 - What roles does the solution need beyond the platform's own? Ask only for roles the functions cannot be allocated to yet.
 - Which interfaces connect the logical components, and what flows through each?
-- Are there design constraints that fix a choice (a given supplier, a mandated technology)? Record as an SR; do not pick technology here.
+- Are there design constraints that fix a choice (a given supplier, a mandated technology)? Record as an SR or a constraint; do not pick technology here.
 
 ## P: physical architecture
 

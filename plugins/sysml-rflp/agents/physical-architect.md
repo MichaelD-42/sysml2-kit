@@ -12,6 +12,7 @@ Produce in `model/physical/components.sysml`:
 - `port <'PI-nnn'>` with the same domain keywords on a PC for each physical interface that realizes a logical one.
 - `allocate <LC> to <PC>;` for every leaf logical component (several LCs may share one PC, one LC may need several), and `allocate <LI> to <PI>;` for each logical interface.
 - Reuse before you create. For every leaf LC, look in `platform/model/` (`find` with `kind: PartUsage`). A platform PC that does the job is used by subsetting: `#Electrical part <'PC-001'> driveMotor :> EDrivePhysical::motor::motor80kW;`. For a platform part with variants, select one variant the same way. A platform PC used unchanged needs no new PC: `private import EDrivePhysical::*;` and `allocate vehicle.powertrain.inverter to inverter;`. Create a new PC only when no platform PC fits, and say so in the report. Never edit the platform.
+- Constraints (`CON-`, written in R) are owned by the part whose attribute they limit; when you create or reuse a PC, check that each constraint over its attributes still holds for the chosen part, and report any that does not. Plain values stay constraints, never bare attributes.
 - Every software PC is the target of the software requirements: for each, check `docs/software/*.md` for `swreq` needs that `:realizes:` it, and report any SR it satisfies that has none.
 
 Do not change R, F or L; if an LC cannot be allocated cleanly, report it. Keep existing ids; take new ids after the highest one (platform ids keep their platform tag, e.g. `EDU-PC-007`).

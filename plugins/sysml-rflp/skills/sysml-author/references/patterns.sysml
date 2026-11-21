@@ -28,6 +28,27 @@ package PumpPatterns {
         require constraint { power <= 150.0 }          // optional formal part
     }
 
+    // --- R: a constraint states a value over a part attribute; it carries an id and satisfies a CRS ---
+    // Plain values go here, never as a bare attribute. A constraint is owned by the part it limits.
+    part <'LC-104'> pumpHousing {
+        attribute mass : Real;
+        constraint <'CON-101'> maxMass {
+            @Satisfies { need = "CRS-103"; }
+            doc /* The housing mass shall not exceed 2.5 kg. */
+            mass <= 2.5
+        }
+        constraint <'CON-102'> maxSpeed {
+            @Satisfies { need = "CRS-104"; partial = true; }   // met in part: an SR must state the gap
+            doc /* The pump shall run up to 4000 rpm. */
+            attribute speed : Real;
+            speed <= 4000.0
+        }
+    }
+    requirement <'SR-103'> speedGap {
+        @Satisfies { need = "CRS-104"; }
+        doc /* The pump shall run continuously up to 3500 rpm; 4000 rpm is limited to 10 minutes. */
+    }
+
     // --- F: a feature (noun name) owns solution-neutral functions (verb + noun), nested for sub-functions ---
     #Feature action <'FEAT-101'> engineCooling {
         @Matches { need = "CRS-101"; }                  // covers this customer need; add `partial = true;` if only in part
@@ -86,5 +107,16 @@ package PumpPatterns {
     verification <'STC-101'> flowBenchTest {
         doc /* Measure flow on the test bench at nominal speed. */
         objective { verify minFlow; verify maxPower; }
+    }
+
+    // --- V: a test verifies a constraint (@Verifies) or implements a customer test requirement (CTR) ---
+    verification <'STC-102'> housingMassTest {
+        @Verifies { need = "CON-101"; }                 // a constraint is not a requirement usage: @Verifies, not `verify`
+        doc /* Weigh the housing on a calibrated scale; pass at 2.5 kg or less. */
+    }
+    verification <'STC-103'> customerEnduranceTest {
+        @Implements { need = "CTR-101"; }               // a CTR is the customer's own test; implement it, do not rewrite it
+        @Verifies { need = "CON-102"; }                 // optional: also verifies a constraint
+        doc /* Run the endurance profile of CTR-101; pass when flow stays above 20 l/min. */
     }
 }

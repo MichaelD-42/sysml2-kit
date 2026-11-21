@@ -11,6 +11,6 @@ description: Scaffold a SysML v2 + sphinx-needs RFLP project (Makefile, model/tr
 4. Add `docs/customer/requirements.md` with the customer requirements (`:::{crs} Title` with `:id: CRS-001`, MyST), and add it to the toctree in `docs/index.rst`. Commercial ones get `:scope: commercial` and a compliance statement in `docs/customer/statements.md`.
 5. If the supplier has a platform repo: `git submodule add <platform repo> platform`. `make` picks up `platform/model/` itself. Skip when there is none.
 6. Tools: `make tools` installs the `sysml` CLI (cargo, from the fork tag `SYSML_TAG` in the Makefile) and the Python requirements. Needs Rust and Python 3.10+.
-7. Run `make all`. With customer requirements and no model yet, the RFLP rules fail on `crs-satisfied` and `crs-verified`; that is expected and is the starting point for the `rflp` or `rfq` skill.
+7. Run `make all`. With customer requirements and no model yet, the RFLP rules fail on `crs-satisfied` and the compliance `not verified` finding; that is expected and is the starting point for the `rflp` or `rfq` skill.
 
 CI: any runner with Rust and Python runs `make tools && make all`; cache `~/.cargo/bin/sysml` keyed on `SYSML_TAG`, so changing the tag rebuilds it.
