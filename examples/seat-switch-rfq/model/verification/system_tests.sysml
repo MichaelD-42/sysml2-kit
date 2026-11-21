@@ -99,7 +99,8 @@ package SeatSwitchRfqSystemTests {
         objective { verify authenticatedWrite; verify signedImagesOnly; verify debugInterfaceClosed; }
     }
     verification <'STC-118'> endOfLineSequenceTest {
-        doc /* Run the end-of-line sequence for each position's button set; pass if every key and LED is reported and only the coded set's keys are active. */
+        @Verifies { need = "CON-124"; }
+        doc /* Run the end-of-line sequence for each position's button set and node address; pass if every key and LED is reported, only the coded set's keys are active, and each switch answers only at its position's NAD. */
         objective { verify endOfLineTest; verify endOfLineCoding; }
     }
     verification <'STC-119'> materialDataReview {

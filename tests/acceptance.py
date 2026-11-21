@@ -63,6 +63,16 @@ PLATFORM_MUTATIONS = [
         ),
         r"SSW-PC-004: a logical component's id starts with LC-",
     ),
+    (
+        "platform: a SW component without a logical component violates swcomponent-used",
+        "all",
+        replace(
+            "model/physical/components.sysml",
+            "    allocate seatSwitch.illumination to switchFirmware.illuminationControl;\n",
+            "",
+        ),
+        r"Need path:\s+SSW-PC-031\b.*\n\s+Schema path:\s+swcomponent-used",
+    ),
 ]
 
 MUTATIONS = [

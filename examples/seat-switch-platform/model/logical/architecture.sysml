@@ -18,14 +18,14 @@ package SeatSwitchLogical {
             port <'SSW-LI-002'> directionStates;
         }
         part <'SSW-LC-004'> switchController {
-            doc /* Debounces and maps inputs, keeps the fault memory, guards access and the firmware. */
+            doc /* Debounces and maps inputs, keeps the fault memory, guards access and the firmware, from a protected supply. */
             port <'SSW-LI-003'> keyInput;
             port <'SSW-LI-004'> directionInput;
             port <'SSW-LI-005'> busData;
             port <'SSW-LI-006'> lightControl;
         }
         part <'SSW-LC-005'> linCommunication {
-            doc /* Exchanges frames with the seat control unit. */
+            doc /* Exchanges frames with the seat control unit, checks received frames, sleeps and wakes with the bus. */
             port <'SSW-LI-007'> controllerLink;
             port <'SSW-LI-008'> vehicleBus;
         }
@@ -56,7 +56,7 @@ package SeatSwitchLogical {
     allocate nightDesignIllumination.lightKeySymbols to seatSwitch.illumination;
     allocate vehicleCommunication.sendKeyStates to seatSwitch.linCommunication;
     allocate vehicleCommunication.receiveVehicleCommands to seatSwitch.linCommunication;
-    allocate vehicleCommunication.checkMessagePlausibility to seatSwitch.switchController;
+    allocate vehicleCommunication.checkMessagePlausibility to seatSwitch.linCommunication;
     allocate diagnostics.storeFaultCodes to seatSwitch.switchController;
     allocate diagnostics.answerDiagnosticRequests to seatSwitch.switchController;
     allocate diagnostics.grantSecurityAccess to seatSwitch.switchController;
@@ -77,4 +77,7 @@ package SeatSwitchLogical {
     satisfy variantCoding by seatSwitch.switchController;
     satisfy mirroredMounting by seatSwitch.enclosure;
     satisfy sideKeyedAssembly by seatSwitch.enclosure;
+    satisfy nodeAddressing by seatSwitch.linCommunication;
+    satisfy busSleepAndWake by seatSwitch.linCommunication;
+    satisfy framePlausibility by seatSwitch.linCommunication;
 }

@@ -72,7 +72,8 @@ package SeatSwitchSystemTests {
     }
     verification <'SSW-STC-017'> linConformanceTest {
         @Verifies { need = "SSW-CON-009"; }
-        doc /* Run the LIN 2.2A protocol conformance test suite; pass if every case passes. */
+        doc /* Run the LIN 2.2A protocol conformance test suite, with frames to the coded and to foreign node addresses, go-to-sleep and wake-up, and frames with wrong checksum, repeated alive counter and out-of-range signals; pass if every case passes. */
+        objective { verify nodeAddressing; verify busSleepAndWake; verify framePlausibility; }
     }
     verification <'SSW-STC-018'> endOfLineCycleTimeTest {
         @Verifies { need = "SSW-CON-010"; }

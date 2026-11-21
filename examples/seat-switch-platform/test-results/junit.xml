@@ -1,20 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <testsuites>
-  <testsuite name="firmware-unit-tests" tests="5" failures="0" errors="0" skipped="0" timestamp="2026-11-19T08:00:00">
-    <testcase classname="firmware" name="boot_rejects_bad_signature" time="0.02">
+  <testsuite name="firmware-unit-tests" tests="13" failures="0" errors="0" skipped="0" timestamp="2026-11-19T08:00:00">
+    <testcase classname="firmware.bootManager.signatureCheck" name="boot_rejects_bad_signature" time="0.02">
       <properties><property name="verifies" value="SSW-SWR-001"/></properties>
     </testcase>
-    <testcase classname="firmware" name="security_access_lockout" time="0.05">
+    <testcase classname="firmware.diagnosticsManager.securityAccess" name="security_access_lockout" time="0.02">
       <properties><property name="verifies" value="SSW-SWR-002"/></properties>
     </testcase>
-    <testcase classname="firmware" name="lin_frame_update" time="0.01">
+    <testcase classname="firmware.linStack" name="lin_stack_integration" time="0.02">
       <properties><property name="verifies" value="SSW-SWR-003"/></properties>
     </testcase>
-    <testcase classname="firmware" name="debounce_10ms" time="0.01">
+    <testcase classname="firmware.inputProcessing.debouncer" name="debounce_10ms" time="0.02">
       <properties><property name="verifies" value="SSW-SWR-004"/></properties>
     </testcase>
-    <testcase classname="firmware" name="stuck_key_dtc" time="0.03">
+    <testcase classname="firmware.diagnosticsManager.faultMemory" name="stuck_key_dtc" time="0.02">
       <properties><property name="verifies" value="SSW-SWR-005"/></properties>
+    </testcase>
+    <testcase classname="firmware.linStack.linProtocol" name="bad_parity_and_checksum_discarded" time="0.02">
+      <properties><property name="verifies" value="SSW-SWR-006"/></properties>
+    </testcase>
+    <testcase classname="firmware.linStack.signalInterface" name="repeated_alive_counter_discarded" time="0.02">
+      <properties><property name="verifies" value="SSW-SWR-007"/></properties>
+    </testcase>
+    <testcase classname="firmware.linStack.nodeConfiguration" name="foreign_nad_ignored" time="0.02">
+      <properties><property name="verifies" value="SSW-SWR-008"/></properties>
+    </testcase>
+    <testcase classname="firmware.linStack.networkManagement" name="sleep_after_idle_and_wake_on_pulse" time="0.02">
+      <properties><property name="verifies" value="SSW-SWR-009"/></properties>
+    </testcase>
+    <testcase classname="firmware.linStack.transportLayer" name="segment_4095_byte_message" time="0.02">
+      <properties><property name="verifies" value="SSW-SWR-010"/></properties>
+    </testcase>
+    <testcase classname="firmware.illuminationControl.ledControl" name="dimming_within_20ms" time="0.02">
+      <properties><property name="verifies" value="SSW-SWR-011"/></properties>
+    </testcase>
+    <testcase classname="firmware.updateManager.imageActivation" name="unsigned_image_not_activated" time="0.02">
+      <properties><property name="verifies" value="SSW-SWR-012"/></properties>
+    </testcase>
+    <testcase classname="firmware.diagnosticsManager.endOfLineServices" name="coding_needs_authenticated_session" time="0.02">
+      <properties><property name="verifies" value="SSW-SWR-013"/></properties>
     </testcase>
   </testsuite>
   <testsuite name="system-tests" tests="21" failures="0" errors="0" skipped="0" timestamp="2026-11-20T10:00:00">

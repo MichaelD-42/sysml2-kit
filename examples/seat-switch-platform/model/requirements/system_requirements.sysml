@@ -48,4 +48,17 @@ package SeatSwitchRequirements {
         @Satisfies { need = "SSW-PRQ-021"; }
         doc /* Each housing shall accept the knob carrier and keymat of its own side only. */
     }
+    requirement <'SSW-SR-012'> nodeAddressing {
+        @Satisfies { need = "SSW-PRQ-004"; }
+        @Satisfies { need = "SSW-PRQ-008"; }
+        doc /* The switch shall answer diagnostic and configuration requests addressed to the node address coded at end of line or to the broadcast address, and no others. */
+    }
+    requirement <'SSW-SR-013'> busSleepAndWake {
+        @Satisfies { need = "SSW-PRQ-004"; }
+        doc /* The switch shall enter its low-power mode at most 4 s after the bus falls idle or on a go-to-sleep command, and resume communication at most 100 ms after a bus wake-up. */
+    }
+    requirement <'SSW-SR-014'> framePlausibility {
+        @Satisfies { need = "SSW-PRQ-004"; }
+        doc /* The switch shall discard every received LIN frame with a wrong checksum, a repeated alive counter or a signal out of its range. */
+    }
 }

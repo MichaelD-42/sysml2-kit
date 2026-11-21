@@ -92,17 +92,30 @@ package SeatSwitchRfqLogical {
             quiescentCurrent <= 0.0001 [A]
         }
 
+        // the four switches share the seat LIN, so each gets its own node address, coded at end of line (CRS-702)
+        constraint <'CON-124'> distinctNodeAddresses {
+            @Satisfies { need = "CRS-702"; }
+            doc /* The four position switches shall be coded to four different LIN node addresses. */
+            driverSwitch.nad != coDriverSwitch.nad and driverSwitch.nad != rearLeftSwitch.nad
+                and driverSwitch.nad != rearRightSwitch.nad and coDriverSwitch.nad != rearLeftSwitch.nad
+                and coDriverSwitch.nad != rearRightSwitch.nad and rearLeftSwitch.nad != rearRightSwitch.nad
+        }
+
         part <'LC-101'> driverSwitch :> seatSwitch {
-            doc /* Driver seat (left-hand drive): left-hand housing; massage, heating and cooling keys. */
+            doc /* Driver seat (left-hand drive): left-hand housing; massage, heating and cooling keys; NAD 0x21. */
+            attribute :>> nad = 33;
         }
         part <'LC-102'> coDriverSwitch :> seatSwitch {
-            doc /* Co-driver seat: right-hand housing; heating and cooling keys. */
+            doc /* Co-driver seat: right-hand housing; heating and cooling keys; NAD 0x22. */
+            attribute :>> nad = 34;
         }
         part <'LC-103'> rearLeftSwitch :> seatSwitch {
-            doc /* Rear left seat: left-hand housing; heating key. */
+            doc /* Rear left seat: left-hand housing; heating key; NAD 0x23. */
+            attribute :>> nad = 35;
         }
         part <'LC-104'> rearRightSwitch :> seatSwitch {
-            doc /* Rear right seat: right-hand housing; heating key. */
+            doc /* Rear right seat: right-hand housing; heating key; NAD 0x24. */
+            attribute :>> nad = 36;
         }
     }
 
@@ -116,7 +129,7 @@ package SeatSwitchRfqLogical {
     satisfy comfortLevelSteps by seatSwitch.keypad;
     satisfy nightDesignDimming by seatSwitch.illumination;
     satisfy keyStateReporting by seatSwitch.linCommunication;
-    satisfy messagePlausibility by seatSwitch.switchController;
+    satisfy messagePlausibility by seatSwitch.linCommunication;
     satisfy diagnosticIdentification by seatSwitch.switchController;
     satisfy faultCodes by seatSwitch.switchController;
     satisfy authenticatedWrite by seatSwitch.switchController;

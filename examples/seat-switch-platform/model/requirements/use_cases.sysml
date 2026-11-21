@@ -8,6 +8,7 @@ package SeatSwitchUseCases {
     use case <'SSW-UC-001'> adjustSeat {
         @Realizes { need = "SSW-PRQ-001"; }
         @Realizes { need = "SSW-PRQ-004"; }
+        objective { doc /* The occupant wants to adjust the seat position */ }
         doc /* The occupant pushes the seat knob or the lumbar pad; the seat control unit moves the seat while it is held. */
         subject seatSwitch;
         actor occupant;
@@ -19,6 +20,7 @@ package SeatSwitchUseCases {
     use case <'SSW-UC-002'> operateComfortFunctions {
         @Realizes { need = "SSW-PRQ-002"; }
         @Realizes { need = "SSW-PRQ-003"; }
+        objective { doc /* The occupant wants to set seat heating, cooling and massage */ }
         doc /* The occupant presses a heating, cooling or massage key and sees its level; at night the keys are lit. */
         subject seatSwitch;
         actor occupant;
@@ -31,6 +33,7 @@ package SeatSwitchUseCases {
         @Realizes { need = "SSW-PRQ-005"; }
         @Realizes { need = "SSW-PRQ-006"; }
         @Realizes { need = "SSW-PRQ-007"; }
+        objective { doc /* The technician wants to diagnose and update the switch in the workshop */ }
         doc /* A technician reads the fault memory and updates the firmware over the vehicle bus with a diagnostic tester. */
         subject seatSwitch;
         actor technician;
@@ -41,6 +44,7 @@ package SeatSwitchUseCases {
 
     use case <'SSW-UC-004'> produceAndTestAtEndOfLine {
         @Realizes { need = "SSW-PRQ-008"; }
+        objective { doc /* The end-of-line tester wants to flash, code and test every switch */ }
         doc /* The end-of-line station flashes and codes the button set, then tests every key and LED. */
         subject seatSwitch;
         actor endOfLineTester;
