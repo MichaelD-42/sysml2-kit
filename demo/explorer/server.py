@@ -1,5 +1,7 @@
 """HTTP API over the loaded graph: `python -m explorer.server <project-dir>`."""
 
+import asyncio
+import contextlib
 import json
 import os
 import subprocess
@@ -91,8 +93,15 @@ def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
     @app.post("/api/ask")
     async def ask(body: AskBody):
         async def events():
-            async for event in agent_factory(body.question):
-                yield f"data: {json.dumps(event)}\n\n"
+            try:
+                await asyncio.to_thread(driver.verify_connectivity)
+            except Exception as e:  # noqa: BLE001 - no graph, no grounded answer
+                yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
+                return
+            # closes the agent (and its CLI process) in this task when the client goes away
+            async with contextlib.aclosing(agent_factory(body.question)) as stream:
+                async for event in stream:
+                    yield f"data: {json.dumps(event)}\n\n"
 
         return StreamingResponse(events(), media_type="text/event-stream")
 

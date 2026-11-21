@@ -1,5 +1,6 @@
 import asyncio
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -62,6 +63,8 @@ class OptionsTest(unittest.TestCase):
         self.assertEqual(deny_or_allow(self.options, "Bash"), "deny")
         self.assertEqual(deny_or_allow(self.options, "mcp__kit__cypher"), "allow")
         self.assertEqual(deny_or_allow(self.options, "mcp__sysml__find"), "allow")
+        for name in ("mcp__sysml__generate_rust", "mcp__sysml__import_rust"):
+            self.assertEqual(deny_or_allow(self.options, name), "deny")
         self.assertFalse(BUILT_IN & set(self.options.allowed_tools))
         self.assertTrue(
             all(
@@ -79,6 +82,24 @@ class OptionsTest(unittest.TestCase):
         self.assertTrue((project / "vehicle" / "model").is_dir())
         self.assertTrue((project / "edrive-platform" / "model").is_dir())
         self.assertIn("read-only", self.options.system_prompt)
+
+
+class ModelRootTest(unittest.TestCase):
+    def tree(self, platform_at):
+        tmp = Path(self.enterContext(tempfile.TemporaryDirectory())).resolve()
+        project, platform = tmp / "a" / "vehicle", tmp / platform_at
+        (project / "model").mkdir(parents=True)
+        (platform / "model").mkdir(parents=True)
+        (project / "platform").symlink_to(platform)
+        return project
+
+    def test_sibling_platform_uses_parent(self):
+        project = self.tree("a/edrive")
+        self.assertEqual(agent.model_root(project), project.parent)
+
+    def test_distant_platform_falls_back_to_model(self):
+        project = self.tree("b/c/edrive")
+        self.assertEqual(agent.model_root(project), project / "model")
 
 
 class FailingClient:
@@ -99,6 +120,21 @@ class FailingClient:
         yield
 
 
+class NoResultClient(FailingClient):
+    async def receive_response(self):
+        return
+        yield
+
+
+class Driver:
+    def __init__(self, error=None):
+        self.error = error
+
+    def verify_connectivity(self):
+        if self.error:
+            raise self.error
+
+
 async def collect(stream):
     return [e async for e in stream]
 
@@ -108,19 +144,34 @@ class AskTest(unittest.TestCase):
         events = asyncio.run(collect(agent.ask(None, "q", client=FailingClient)))
         self.assertEqual(events, [{"type": "error", "message": "boom"}])
 
+    def test_stream_without_result_is_an_error(self):
+        events = asyncio.run(collect(agent.ask(None, "q", client=NoResultClient)))
+        self.assertEqual([e["type"] for e in events], ["error"])
+
+    def post(self, driver, fake):
+        app = server.create_app(driver, None, VEHICLE, agent_factory=fake)
+        r = TestClient(app).post("/api/ask", json={"question": "hi"})
+        self.assertEqual(r.headers["content-type"].split(";")[0], "text/event-stream")
+        return [
+            json.loads(line[5:])
+            for line in r.text.splitlines()
+            if line.startswith("data:")
+        ]
+
+    def test_endpoint_without_neo4j_is_one_error(self):
+        async def fake(question):
+            raise AssertionError("agent must not start")
+            yield
+
+        data = self.post(Driver(OSError("connection refused")), fake)
+        self.assertEqual(data, [{"type": "error", "message": "connection refused"}])
+
     def test_endpoint_streams_events(self):
         async def fake(question):
             yield {"type": "text", "text": question}
             yield {"type": "done"}
 
-        app = server.create_app(None, None, VEHICLE, agent_factory=fake)
-        r = TestClient(app).post("/api/ask", json={"question": "hi"})
-        self.assertEqual(r.headers["content-type"].split(";")[0], "text/event-stream")
-        data = [
-            json.loads(line[5:])
-            for line in r.text.splitlines()
-            if line.startswith("data:")
-        ]
+        data = self.post(Driver(), fake)
         self.assertEqual(data, [{"type": "text", "text": "hi"}, {"type": "done"}])
 
 

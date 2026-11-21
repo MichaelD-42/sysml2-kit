@@ -25,7 +25,15 @@ from explorer import cypher as cypher_mod
 from explorer import search
 
 PROMPT = Path(__file__).with_name("prompt.md")
-SYSML_TOOLS = ("outline", "find", "relations", "check")
+ALLOWED = (
+    "mcp__kit__semantic_search",
+    "mcp__kit__cypher",
+    "mcp__kit__element",
+    "mcp__sysml__outline",
+    "mcp__sysml__find",
+    "mcp__sysml__relations",
+    "mcp__sysml__check",
+)
 # intended: allowed_tools auto-approves the read-only tools, can_use_tool denies everything else
 warnings.filterwarnings("ignore", category=CanUseToolShadowedWarning)
 
@@ -61,14 +69,19 @@ def model_root(project: Path) -> Path:
     """Where `sysml mcp` sees the project's model and, through `platform`, the platform's."""
     # the platform's model sits behind the `platform` symlink, which `sysml mcp --project` does
     # not follow; their common directory holds both (its two `Trace` packages merge, no collision)
-    # shortcut: the common directory can hold other models too, fine for the examples layout
-    model = project.resolve() / "model"
+    # shortcut: the common directory can hold other models too, so it is used only when it is the
+    # project or its parent (the examples layout); otherwise the platform stays unresolved
+    project = project.resolve()
+    model = project / "model"
     platform = (project / "platform" / "model").resolve()
-    return Path(os.path.commonpath([model, platform])) if platform.is_dir() else model
+    if not platform.is_dir():
+        return model
+    common = Path(os.path.commonpath([model, platform]))
+    return common if common in (project, project.parent) else model
 
 
 async def can_use_tool(name, input, context):
-    if name.startswith(("mcp__kit__", "mcp__sysml__")):
+    if name in ALLOWED:
         return PermissionResultAllow()
     return PermissionResultDeny(
         message=f"{name} is not available: the agent is read-only"
@@ -119,12 +132,7 @@ def options(project: Path, driver, embedder) -> ClaudeAgentOptions:
         strict_mcp_config=True,
         tools=[],  # no built-in tools at all: no file, shell or web access
         setting_sources=[],  # no user or project settings whose allow rules could widen this
-        allowed_tools=[
-            "mcp__kit__semantic_search",
-            "mcp__kit__cypher",
-            "mcp__kit__element",
-            *(f"mcp__sysml__{t}" for t in SYSML_TOOLS),
-        ],
+        allowed_tools=list(ALLOWED),
         can_use_tool=can_use_tool,
         max_turns=12,
     )
@@ -153,5 +161,7 @@ async def ask(options, question: str, client=ClaudeSDKClient):
                         }
                     else:
                         yield {"type": "done"}
+                    return
+        yield {"type": "error", "message": "the agent stopped without a result"}
     except Exception as e:  # noqa: BLE001 - the page gets the failure as an event
         yield {"type": "error", "message": str(e)}
