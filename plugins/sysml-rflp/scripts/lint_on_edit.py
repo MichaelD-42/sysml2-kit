@@ -55,8 +55,8 @@ with tempfile.TemporaryDirectory() as tmp:
         str(Path(tmp) / "model.json"),
         str(Path(tmp) / "needs.json"),
         *files,
-        "--platform",
-        *platform,
+        # only with a platform: a 0.1.x sysml2kit rejects the flag
+        *(["--platform", *platform] if platform else []),
         cwd=project,
     )
 if bridge.returncode != 0 or bridge.stderr:

@@ -191,11 +191,12 @@ default = false
 schema = { type = "boolean" }
 
 # set on customer or platform requirements only: `commercial` for one no architecture element can
-# meet (warranty, delivery, process); a compliance statement answers it instead of a system requirement
+# meet (warranty, delivery, process); `not-offered` for a technical one the supplier does not meet at
+# all. A compliance statement answers either instead of a system requirement (not-comply if not-offered)
 [needs.fields.scope]
-description = "Requirement scope: commercial, or empty for a technical requirement"
+description = "Requirement scope: commercial, not-offered, or empty for a technical requirement"
 default = ""
-schema = { type = "string", enum = ["", "commercial"] }
+schema = { type = "string", enum = ["", "commercial", "not-offered"] }
 
 # set on compliance statements (CST) only
 [needs.fields.compliance]

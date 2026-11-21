@@ -13,11 +13,11 @@ def closure(needs, start, link):
     return seen
 
 
-def descendants(needs):
-    """Return below(start): start plus its owned_by descendants."""
+def descendants(needs, into=lambda need: True):
+    """Return below(start): start plus its owned_by descendants, entering only children `into` accepts."""
     kids = {}
     for n, v in needs.items():
-        for parent in v.get("owned_by", []):
+        for parent in v.get("owned_by", []) if into(v) else []:
             kids.setdefault(parent, []).append(n)
 
     def below(start):
@@ -70,9 +70,12 @@ def chain_components(needs, feature_id):
     )
 
 
-def function_pcs(needs, feature_id):
-    """Per leaf function of a feature (own or inherited): the physical need ids it reaches."""
+def _function_reach(needs, feature_id):
+    """Per leaf function: (physical need ids reached, variations reached without a selection)."""
     below = descendants(needs)
+    # variants are reached only by allocation to one, or to a part specializing one
+    assembly = descendants(needs, lambda n: not n.get("variant"))
+    variations = {p for n in needs.values() if n.get("variant") for p in n["owned_by"]}
     out = {}
     for fn, components in function_components(needs, feature_id).items():
         pcs = set()
@@ -81,9 +84,26 @@ def function_pcs(needs, feature_id):
                 for pc in needs[part].get("allocated_to", []):
                     if needs[pc]["type"] == "physical":
                         # an assembly reaches its parts
-                        pcs |= {i for i in below(pc) if needs[i]["type"] == "physical"}
-        out[fn] = pcs
+                        pcs |= {
+                            i for i in assembly(pc) if needs[i]["type"] == "physical"
+                        }
+        out[fn] = (pcs, pcs & variations)
     return out
+
+
+def function_pcs(needs, feature_id):
+    """Per leaf function of a feature (own or inherited): the physical need ids it reaches.
+
+    A function reaching a variation without a selected variant reaches none."""
+    return {
+        fn: set() if unselected else pcs
+        for fn, (pcs, unselected) in _function_reach(needs, feature_id).items()
+    }
+
+
+def unselected_variations(needs, feature_id):
+    """Variations a feature's functions reach without a selected variant."""
+    return set().union(*(u for _, u in _function_reach(needs, feature_id).values()))
 
 
 def reused_pcs(needs, feature_id):

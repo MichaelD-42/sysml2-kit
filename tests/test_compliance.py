@@ -96,6 +96,55 @@ class ComplianceTest(unittest.TestCase):
             findings, ["CRS-1: matched, but its chain reaches no physical component"]
         )
 
+    def variation(self):
+        """F's component LC goes to platform variation PV, variants PV1 (elec) and PV2 (sw)."""
+        needs = model(matches=["CRS-1"])
+        del needs["PC"]
+        needs["LC"]["allocated_to"] = ["PV"]
+        needs["PV"] = need("physical", platform=True, leaf=False, domain="mech")
+        for v, domain in (("PV1", "elec"), ("PV2", "sw")):
+            needs[v] = need(
+                "physical", platform=True, variant=True, owned_by=["PV"], domain=domain
+            )
+        return needs
+
+    def test_variation_without_selection_is_a_finding(self):
+        rows, findings = compliance(self.variation())
+        self.assertEqual(rows[0][3], "incomplete")
+        self.assertEqual(rows[0][6], [])
+        self.assertIn(
+            "CRS-1: variation PV reached without a selected variant", findings
+        )
+
+    def test_selected_variant_gives_only_its_domains(self):
+        needs = self.variation()
+        needs["LC"]["allocated_to"] = ["PC"]
+        needs["PC"] = need("physical", specializes=["PV1"], domain="elec")
+        rows, findings = compliance(needs)
+        self.assertEqual(rows[0][3], "variant")
+        self.assertEqual(rows[0][6], ["elec"])
+        self.assertEqual(findings, [])
+
+    def test_not_offered_needs_a_not_comply_statement(self):
+        needs = {
+            "CRS-1": need("crs", scope="not-offered"),
+            "CST-1": need("cst", answers=["CRS-1"], compliance="partial"),
+        }
+        self.assertEqual(
+            compliance(needs)[1],
+            ["CRS-1: not offered, but its statement is not not-comply"],
+        )
+        needs["CST-1"]["compliance"] = "not-comply"
+        self.assertEqual(compliance(needs)[1], [])
+        del needs["CST-1"]
+        self.assertEqual(compliance(needs)[1], ["CRS-1: not answered"])
+        needs = model(matches=["CRS-1"])
+        needs["CRS-1"]["scope"] = "not-offered"
+        self.assertEqual(
+            compliance(needs)[1],
+            ["CRS-1: not offered, but its statement is not not-comply"],
+        )
+
     def test_table_links_each_need(self):
         needs = model(matches=["CRS-1"])
         needs["CST-1"] = need("cst", answers=["CRS-1"])

@@ -7,6 +7,7 @@ RULE_LAYERS = {
     "crs-satisfied": "R",
     "usecase-realizes": "R",
     "sysreq-satisfies": "R",
+    "cst-compliance": "R",
     "usecase-realized": "F",
     "feature-realizes": "F",
     "function-allocated": "L",

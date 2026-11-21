@@ -1,6 +1,6 @@
 import unittest
 
-from sysml2kit.reuse import reuse, reused_pcs
+from sysml2kit.reuse import reuse, reused_pcs, unselected_variations
 
 
 def need(type_, platform=False, variant=False, **links):
@@ -103,6 +103,38 @@ class ReuseTest(unittest.TestCase):
         }
         self.assertEqual(reuse(needs), {"F": "modified"})
         self.assertEqual(reused_pcs(needs, "F"), {"PA", "PC"})
+
+    def variation(self, lc_targets):
+        """Platform variation PV with variant children PV1 and PV2, in different domains."""
+        return {
+            **chain(lc_targets),
+            "PV": need("physical", platform=True, leaf=False, domain="mech"),
+            "PV1": need(
+                "physical", platform=True, variant=True, owned_by=["PV"], domain="elec"
+            ),
+            "PV2": need(
+                "physical", platform=True, variant=True, owned_by=["PV"], domain="sw"
+            ),
+        }
+
+    def test_variation_without_selection_is_incomplete(self):
+        needs = self.variation(["PV"])
+        self.assertEqual(reuse(needs), {"F": "incomplete"})
+        self.assertEqual(reused_pcs(needs, "F"), set())
+        self.assertEqual(unselected_variations(needs, "F"), {"PV"})
+
+    def test_selected_variant_reaches_only_that_variant(self):
+        needs = self.variation(["PC"])
+        needs["PC"] = need("physical", specializes=["PV1"])
+        self.assertEqual(reuse(needs), {"F": "variant"})
+        self.assertEqual(reused_pcs(needs, "F"), {"PC"})
+        self.assertEqual(unselected_variations(needs, "F"), set())
+
+    def test_allocation_to_a_variant_reaches_its_parts(self):
+        needs = self.variation(["PV1"])
+        needs["PV1P"] = need("physical", platform=True, owned_by=["PV1"])
+        self.assertEqual(reused_pcs(needs, "F"), {"PV1", "PV1P"})
+        self.assertEqual(reuse(needs), {"F": "variant"})
 
     def test_cycle_terminates(self):
         needs = {

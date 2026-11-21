@@ -159,6 +159,12 @@ MUTATIONS = [
         r"CRS-004.*\n.*\n.*\n.*crs-satisfied",
     ),
     (
+        "a compliance statement without a compliance value violates cst-compliance",
+        "all",
+        replace("docs/customer/statements.md", ":compliance: comply\n", ""),
+        r"cst-compliance",
+    ),
+    (
         "leaf logical component without a physical component violates logical-allocated",
         "all",
         replace(

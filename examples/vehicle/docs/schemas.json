@@ -67,6 +67,33 @@
       }
     },
     {
+      "id": "cst-compliance",
+      "message": "Compliance statement has no compliance value",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "cst"
+          }
+        }
+      },
+      "validate": {
+        "local": {
+          "properties": {
+            "compliance": {
+              "enum": [
+                "comply",
+                "partial",
+                "not-comply"
+              ]
+            }
+          },
+          "required": [
+            "compliance"
+          ]
+        }
+      }
+    },
+    {
       "id": "usecase-realizes",
       "message": "Use case does not realize any customer requirement",
       "select": {

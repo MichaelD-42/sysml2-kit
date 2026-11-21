@@ -1,6 +1,6 @@
 """Compliance table: per customer requirement, the features and statements that answer it."""
 
-from .reuse import chain_components, reuse, reused_pcs
+from .reuse import chain_components, reuse, reused_pcs, unselected_variations
 
 WORST_FIRST = ["incomplete", "new", "modified", "variant", "platform"]
 GAP = "partial match without a system requirement stating the gap"
@@ -34,12 +34,20 @@ def compliance(needs):
         )
         if not features and not statements:
             findings.append(f"{crs}: not answered")
+        elif need.get("scope") == "not-offered" and (
+            not statements or any(value != "not-comply" for _, value in statements)
+        ):
+            findings.append(f"{crs}: not offered, but its statement is not not-comply")
         for f in features:
             if status[f] == "incomplete":
                 findings.append(
                     f"{crs}: matched, but its chain reaches no physical component"
                 )
                 break
+        for v in sorted(
+            set().union(*(unselected_variations(needs, f) for f in features))
+        ):
+            findings.append(f"{crs}: variation {v} reached without a selected variant")
         if any(not _gap_stated(needs, crs, f) for f in part):
             findings.append(f"{crs}: {GAP}")
     return rows, findings
