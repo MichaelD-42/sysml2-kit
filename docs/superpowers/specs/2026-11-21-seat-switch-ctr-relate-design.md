@@ -15,7 +15,7 @@ The demo is for an audience that builds automotive HMI components, and the kit's
 - A customer's non-functional requirement or constraint can be satisfied by a model constraint (with an id, so the link is a sphinx-needs link), including plain values (`ipRating == "IP5K4"`), and that counts as coverage.
 - Customer test requirements (CTR) exist as needs; each is implemented by at least one supplier test case or answered by a compliance statement.
 - A realistic seat-switch RFQ (40–60 customer requirements across the four classes, 8–12 CTRs) that exercises reuse, variants per seat position, a partial match, a not-offered requirement and a commercial statement.
-- The demo's trees and V-model show the new types and links.
+- The demo's trees and V-model show the new types and links, and a meta-model view shows the method itself.
 
 ## Non-goals
 
@@ -112,9 +112,20 @@ Directories `examples/seat-switch-platform/` (platform, id tag `SSW-`) and `exam
 - V-model: CTRs on the right leg at level 1 (verification) with the supplier tests that implement them; a CRS row shows its verification route.
 - Default focus and prompt text name the seat switch.
 
+## Part 4 — Meta-model view in the demo
+
+A new view kind `metamodel` ("Meta-model") that shows the kit's method as a diagram, so the audience sees the rules behind the model before the model itself.
+
+- Nodes: the need types of the loaded project (crs, ctr, prq, cst, usecase, feature, function, component, interface, physical, physinterface, constraint, sysreq, systest, acctest, testresult), grouped by RFLP layer (R, F, L, P, V) as frames, each with its instance count in this project.
+- Edges: the link types between need types — declared ones from the project's `docs/ubproject.toml` (link names) combined with what the graph actually holds (`MATCH (a:Need)-[r]->(b:Need)` grouped by need type and relationship type), each labelled with the link name and its instance count; a declared link with no instances is drawn dashed.
+- Rules: each edge or node that a `docs/schemas.json` rule constrains carries the rule id as a tag (e.g. `crs-verified`), so the meta-model doubles as a map of what the docs build enforces.
+- Interaction: clicking a type lists its instances in the inspector (each a focus link); clicking an edge lists the link instances. The view ignores the focus otherwise.
+- Data: server reads the project's `ubproject.toml` and `schemas.json` (standard library `tomllib`, `json`) plus one graph query; no new dependency. Laid out with ELK like the other views (layers as frames).
+- Tests: the vehicle-free seat-switch RFQ shows `crs → constraint` (satisfies) and `systest → ctr` (implements) with non-zero counts; a declared link with no instances is marked unused; rule ids attach to the right edges.
+
 ## Order
 
-Part 1 → Part 2 → Part 3 (Part 3 needs Part 2's fields; demo tests move with Part 3).
+Part 1 → Part 2 → Part 3 → Part 4 (Part 3 needs Part 2's fields; demo tests move with Part 3; the meta-model view shows Part 2's types and is tested on Part 3's example).
 
 ## Left to the builder
 
