@@ -50,7 +50,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { name: sysml, path: bin }
       - run: chmod +x bin/sysml && echo "$PWD/bin" >> "$GITHUB_PATH"
-      - run: pip install -e . -r examples/vehicle/requirements.txt
+      - run: pip install -e . -r examples/seat-switch-rfq/requirements.txt
       - run: python tests/acceptance.py
 
   omg-corpus:

@@ -6,8 +6,8 @@ The <code>.sysml</code> files are the model; sphinx-needs is where traceability 
 <p align="center">
 <a href="https://github.com/MichaelD-42/sysml2-kit/actions/workflows/ci.yml"><img src="https://github.com/MichaelD-42/sysml2-kit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a><br>
-<a href="examples/vehicle">RFQ example</a> ·
-<a href="examples/edrive-platform">Platform example</a> ·
+<a href="examples/seat-switch-rfq">RFQ example</a> ·
+<a href="examples/seat-switch-platform">Platform example</a> ·
 <a href="plugins/sysml-rflp/skills/rflp-method/references/structure.md">RFLP structure and rules</a> ·
 <a href="plugins/sysml-rflp/skills/sysml-author/references/patterns.sysml">SysML patterns</a>
 </p>
@@ -25,9 +25,7 @@ It is not a modeling GUI and it does not simulate. Software components keep link
 - **Plugin `sysml-rflp`** ([`plugins/sysml-rflp/`](plugins/sysml-rflp)): skills to scaffold (`sysml-init`), author (`sysml-author`), lint (`sysml-lint`) and document (`sysml-docs`) a model, to run the RFLP workflow (`rflp`, `rflp-method`), and to answer an RFQ with an interview per layer (`rfq`, which also captures a platform bottom-up). There is an agent per layer (requirements, functional, logical, physical, test) plus a reviewer, a hook that runs `sysml check` and the bridge after every edit (language errors, duplicate ids, unlinked ends, vague requirement texts), a session-start check for missing tools, the `sysml` MCP server, and a project template.
 - **Python package `sysml2kit`** ([`src/`](src/sysml2kit)): turns `sysml export` JSON into sphinx-needs needs, warns on system requirement texts without exactly one `shall` or with a vague term, lists RFLP rule violations by layer (`sysml2kit gaps`), derives reuse status and writes the compliance table (`sysml2kit compliance`), and renders use case diagrams and the RFLP trace graph as SVG, where a click on an element opens its need in the docs. Standard library only.
 - **Example [`examples/seat-switch-platform/`](examples/seat-switch-platform)**: a platform captured bottom-up, a seat adjustment switch product line (mechanics, electronics, firmware, with cybersecurity, production and workshop needs) with mirrored housings and four button sets as variations, platform limits as constraints, from PRQ to test results.
-- **Example [`examples/seat-switch-rfq/`](examples/seat-switch-rfq)**: an RFQ project on the seat-switch platform (imported through `platform/`, a symlink here, a git submodule in a real project): an OEM's classified customer requirements and customer test requirements for the switches of four seat positions. Functional requirements are matched by platform features, non-functional ones and constraints are satisfied by constraints over the platform's rated attributes, each seat position selects a housing side and a button set, and tests implement the customer's test requirements. It has a partial satisfaction with the gap stated, a not-offered requirement, a commercial statement, a test deviation, and the compliance table.
-- **Example [`examples/edrive-platform/`](examples/edrive-platform)**: a platform captured bottom-up, an e-drive product line with a 50 kW / 80 kW motor variation, from PRQ to test results.
-- **Example [`examples/vehicle/`](examples/vehicle)**: an RFQ project that imports the platform through `platform/` (a symlink here, a git submodule in a real project), with a complete chain from CRS to test results, a partial match, a compliance statement and the compliance table. It is the acceptance fixture for the toolkit.
+- **Example [`examples/seat-switch-rfq/`](examples/seat-switch-rfq)**: an RFQ project on the seat-switch platform (imported through `platform/`, a symlink here, a git submodule in a real project): an OEM's classified customer requirements and customer test requirements for the switches of four seat positions. Functional requirements are matched by platform features, non-functional ones and constraints are satisfied by constraints over the platform's rated attributes, each seat position selects a housing side and a button set, and tests implement the customer's test requirements. It has a partial satisfaction with the gap stated, a not-offered requirement, a commercial statement, a test deviation, and the compliance table. It is the acceptance fixture for the toolkit.
 
 The docs build is the traceability report. Need tables, the trace graph and internal diagrams come out of the model, and `sphinx-build -W` fails on any RFLP rule the model breaks: a customer requirement nothing satisfies, a function allocated to no component, a logical component allocated to no physical one, a requirement no test verifies.
 
@@ -37,16 +35,16 @@ The `sysml` MCP server answers from the language's own standard library, not fro
 
 ```text
 find       { "kind": "ActionUsage", "without": "allocated_to" }
-→ VehicleFeatures::travelRange         FEAT-001   features.sysml:7
-  VehicleFeatures::propulsion          FEAT-002   features.sysml:13
-  VehicleFeatures::propulsion::propel  F-002      features.sysml:17
-  ... (5 found)
+→ SeatSwitchRfqFeatures::seatAdjustment   FEAT-101   features.sysml:11
+  SeatSwitchRfqFeatures::comfortKeys      FEAT-102   features.sysml:17
+  SeatSwitchRfqFeatures::nightDesign      FEAT-103   features.sysml:28
+  ... (6 found)
 
-relations  { "element": "SR-001" }
-→ VehicleRequirements::range
-    incoming  satisfies  VehicleLogical::vehicle::energyStore (LC-003)   architecture.sysml:32
-    incoming  verifies   VehicleSystemTests::rangeTest (STC-001)         system_tests.sysml:6
-    outgoing  annotated_by  Trace::Satisfies                             system_requirements.sysml:7
+relations  { "element": "SR-119" }
+→ SeatSwitchRfqRequirements::durabilityGap
+    incoming  satisfies  SeatSwitchRfqLogical::seatSwitches (LC-100)              architecture.sysml:134
+    incoming  verifies   SeatSwitchRfqSystemTests::keyDurabilityTest (STC-103)    system_tests.sysml:19
+    outgoing  annotated_by  Trace::Satisfies                                       system_requirements.sysml:86
 ```
 
 `find` filters by metaclass, containing element, name or short name, and by a relation the element lacks. `relations` lists every link of one element in both directions: satisfy, verify, allocate, perform, connect, succession, typing, specialization, redefinition, imports, metadata. Both take a qualified name or a short name. The plugin starts the server on the project's `model/` directory.
