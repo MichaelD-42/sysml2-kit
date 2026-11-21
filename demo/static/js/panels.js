@@ -3,8 +3,8 @@
 import * as api from "./api.js";
 import { esc } from "./render.js";
 
-// what the agent cites: need ids (PC-001, EDU-PC-003), uids, test result ids
-const KEY_SHAPED = /^(EDU-)?[A-Z]+(-[A-Z]+)*-\d+$|^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$|^testresult__\S+$/;
+// what the agent cites: need ids (PC-101, SSW-PC-002), uids, test result ids
+const KEY_SHAPED = /^[A-Z]+(-[A-Z]+)*-\d+$|^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$|^testresult__\S+$/;
 const UID = /^[0-9a-f]{8}-/;
 
 export const keyLink = (key, label) =>
@@ -69,7 +69,7 @@ export function renderTree(el, roots) {
     const label = n.key
       ? `${n.rel ? `<span class="rel">${esc(n.rel)}</span> ` : ""}${keyLink(n.key, n.name)}${n.key !== n.name && !GENERATED.test(n.key) ? ` <span class="id">${esc(n.key)}</span>` : ""}`
       : `<span class="group">${esc(n.name)}</span>`;
-    const marks = `${n.domain ? ` <span class="domain d-${esc(n.domain)}">${esc(n.domain)}</span>` : ""}${n.platform ? ' <span class="kind">platform</span>' : ""}`;
+    const marks = `${n.domain ? ` <span class="domain d-${esc(n.domain)}">${esc(n.domain)}</span>` : ""}${n.class ? ` <span class="req-class">${esc(n.class)}</span>` : ""}${n.platform ? ' <span class="kind">platform</span>' : ""}`;
     return `<li data-tree="${esc(n.key ?? "")}">
       ${kids.length ? `<button type="button" class="twisty" aria-expanded="${open}" aria-label="expand ${esc(n.name)}"></button>` : '<span class="twisty-gap"></span>'}
       ${label}${n.key && !n.rel ? ` <span class="kind">${esc(n.kind)}</span>` : ""}${marks}
@@ -108,7 +108,7 @@ export function revealInTree(el, key, linked = new Set()) {
 
 export function mountSearch(el, names) {
   el.innerHTML = `<label for="q">Search elements and needs</label>
-    <input id="q" type="search" autocomplete="off" placeholder="PC-001, cooling, peak torque">
+    <input id="q" type="search" autocomplete="off" placeholder="PC-101, housing, actuation force">
     <p class="status" aria-live="polite"></p><ul class="hits"></ul>`;
   const input = el.querySelector("input");
   const status = el.querySelector(".status");
@@ -141,7 +141,7 @@ export function mountSearch(el, names) {
 export function mountAsk(el, knownKeys, names) {
   el.innerHTML = `<div class="log" aria-live="polite"></div>
     <form><label for="ask-q">Ask about the product</label>
-    <textarea id="ask-q" rows="3" placeholder="Which constraints apply to the drive motor, and where do they come from?"></textarea>
+    <textarea id="ask-q" rows="3" placeholder="Which constraints apply to the driver switch's housing and where do they come from?"></textarea>
     <div class="row"><button type="submit" class="primary">Ask</button></div></form>`;
   const [log, form, input, send] = [".log", "form", "textarea", "button"].map((s) => el.querySelector(s));
   input.onkeydown = (e) => {
@@ -191,14 +191,24 @@ export function mountAsk(el, knownKeys, names) {
 
 export function renderCompliance(el, view, focus) {
   const rows = view.rows ?? [];
+  const ctrs = view.ctrs ?? [];
   const links = (ks) => ks.map((k) => keyLink(k)).join(", ");
+  const statements = (ss) => (ss ?? []).map(([k, v]) => `${keyLink(k)} ${esc(v)}`).join(", ");
+  const row = (key) => `<tr data-row="${esc(key)}"${key === focus ? ' class="focus"' : ""}>`;
   el.innerHTML = `<table class="compliance"><caption>Compliance of the RFQ's customer requirements</caption>
-    <thead><tr><th scope="col">CRS</th><th scope="col">Title</th><th scope="col">Features</th><th scope="col">Reuse</th>
+    <thead><tr><th scope="col">CRS</th><th scope="col">Title</th><th scope="col">Class</th><th scope="col">Features</th><th scope="col">Reuse</th>
     <th scope="col">Partial</th><th scope="col">Statements</th><th scope="col">Domains</th></tr></thead>
-    <tbody>${rows.map((r) => `<tr data-row="${esc(r.crs)}"${r.crs === focus ? ' class="focus"' : ""}>
-      <td>${keyLink(r.crs)}</td><td>${esc(r.title)}</td><td>${links(r.features ?? [])}</td><td>${esc(r.reuse)}</td>
-      <td>${r.partial ? "partial" : "full"}</td><td>${(r.statements ?? []).map(([k, v]) => `${keyLink(k)} ${esc(v)}`).join(", ")}</td>
+    <tbody>${rows.map((r) => `${row(r.crs)}
+      <td>${keyLink(r.crs)}</td><td>${esc(r.title)}</td><td>${esc(r.class)}</td><td>${links(r.features ?? [])}</td><td>${esc(r.reuse)}</td>
+      <td>${r.partial ? "partial" : "full"}</td><td>${statements(r.statements)}</td>
       <td>${(r.domains ?? []).map((d) => `<span class="domain d-${esc(d)}">${esc(d)}</span>`).join(" ")}</td></tr>`).join("")}
     </tbody></table>
+    ${ctrs.length ? `<table class="compliance"><caption>Customer test requirements and the tests that implement them</caption>
+    <thead><tr><th scope="col">CTR</th><th scope="col">Title</th><th scope="col">Purpose</th><th scope="col">Method</th>
+    <th scope="col">Implemented by</th><th scope="col">Statements</th></tr></thead>
+    <tbody>${ctrs.map((r) => `${row(r.ctr)}
+      <td>${keyLink(r.ctr)}</td><td>${esc(r.title)}</td><td>${esc(r.purpose)}</td><td>${esc(r.method)}</td>
+      <td>${links(r.implemented_by ?? [])}</td><td>${statements(r.statements)}</td></tr>`).join("")}
+    </tbody></table>` : ""}
     ${view.findings?.length ? `<h3>Findings</h3><ul class="findings">${view.findings.map((f) => `<li>${esc(typeof f === "string" ? f : JSON.stringify(f))}</li>`).join("")}</ul>` : ""}`;
 }

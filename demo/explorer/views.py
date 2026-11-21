@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from explorer.graph import LAYERS
-from sysml2kit.compliance import compliance
+from sysml2kit.compliance import compliance, ctr_rows
 
 KINDS = (
     "context",
@@ -18,7 +18,7 @@ KINDS = (
     "compliance",
     "vmodel",
 )
-NEED_LINKS = "SATISFIES|ALLOCATED_TO|VERIFIES|REALIZES|MATCHES|PARTIAL_MATCHES|ANSWERS|TESTS|REQUIRES"
+NEED_LINKS = "SATISFIES|ALLOCATED_TO|VERIFIES|REALIZES|MATCHES|PARTIAL_MATCHES|ANSWERS|TESTS|REQUIRES|APPLIES_TO|IMPLEMENTS"
 ROW = (
     "crs",
     "title",
@@ -30,6 +30,7 @@ ROW = (
     "domains",
     "constraints",
 )
+CTR_ROW = ("ctr", "title", "purpose", "method", "implemented_by", "statements")
 TREE_KINDS = [
     "Package",
     "PartDefinition",
@@ -247,10 +248,10 @@ QUERIES = {
     "usecases": USECASES,
     "trace": TRACE,
 }
-# the vehicle's logical part when there is one, else the first project part a package owns
+# the first project part a package owns
 TOP_PART = """
 MATCH (:Package)-[:OWNS]->(n:PartUsage)
-RETURN n.key ORDER BY n.qualifiedName = 'VehicleLogical::vehicle' DESC, coalesce(n.platform, false), n.key
+RETURN n.key ORDER BY coalesce(n.platform, false), n.key
 LIMIT 1"""
 DEFAULTS = {
     "context": TOP_PART,
@@ -261,7 +262,9 @@ DEFAULTS = {
     "COUNT { (n)-[:OWNS*]->(:ActionUsage) } DESC, n.key LIMIT 1",
     "variants": "MATCH (n:Node) WHERE n.isVariation RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
     "usecases": "MATCH (n:UseCaseUsage) RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
-    "trace": "MATCH (n:crs) RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
+    # a requirement with links, so the default is not a single box
+    "trace": "MATCH (n:crs) RETURN n.key ORDER BY coalesce(n.platform, false), "
+    "NOT EXISTS { (n)--(:Need) }, n.key LIMIT 1",
 }
 REASONS = {
     "activity": "has no actions",
@@ -318,12 +321,15 @@ def _nodes(graph, rows):
 
 
 def compliance_rows(needs_path: Path) -> dict:
-    """The kit's compliance rows as dicts and its findings."""
+    """The kit's compliance rows and customer test requirement rows as dicts, and its findings."""
     data = json.loads(needs_path.read_text())
-    rows, findings = compliance(
-        data["versions"][data.get("current_version", "")]["needs"]
-    )
-    return {"rows": [dict(zip(ROW, r)) for r in rows], "findings": findings}
+    needs = data["versions"][data.get("current_version", "")]["needs"]
+    rows, findings = compliance(needs)
+    return {
+        "rows": [dict(zip(ROW, r)) for r in rows],
+        "ctrs": [dict(zip(CTR_ROW, r)) for r in ctr_rows(needs)],
+        "findings": findings,
+    }
 
 
 def view(graph, kind: str, focus: str | None, needs_path: Path | None = None) -> dict:
@@ -335,15 +341,17 @@ def view(graph, kind: str, focus: str | None, needs_path: Path | None = None) ->
         if needs_path is None:
             raise ValueError("the compliance view needs needs_path")
         table = compliance_rows(needs_path)
-        rows, findings = table["rows"], table["findings"]
-        nodes = _nodes(graph, [{"key": r["crs"], "parent": None} for r in rows])
+        rows, ctrs = table["rows"], table["ctrs"]
+        keys = [r["crs"] for r in rows] + [r["ctr"] for r in ctrs]
+        nodes = _nodes(graph, [{"key": k, "parent": None} for k in keys])
         return {
             "kind": kind,
             "focus": None,
             "nodes": nodes,
             "edges": [],
             "rows": rows,
-            "findings": findings,
+            "ctrs": ctrs,
+            "findings": table["findings"],
             "reason": None if nodes else "no customer requirements",
         }
     found = _read(graph, FOCUS if focus else DEFAULTS[kind], focus=focus)
@@ -376,9 +384,12 @@ OUT_REL = {
     "REALIZES": "realizes",
     "MATCHES": "matches",
     "TESTS": "tests",
+    "IMPLEMENTS": "implements",
+    "APPLIES_TO": "applies to",
 }
 IN_REL = {
     "SATISFIES": "satisfied by",
+    "PARTIAL_SATISFIES": "satisfied by (partial)",
     "REALIZES": "realized by",
     "MATCHES": "matched by",
     "PARTIAL_MATCHES": "matched by (partial)",
@@ -386,17 +397,19 @@ IN_REL = {
     "VERIFIES": "verified by",
     "TESTS": "result",
     "REQUIRES": "required by",
+    "IMPLEMENTS": "implemented by",
+    "APPLIES_TO": "test requirement",
 }
 REQUIREMENTS = """
 MATCH (n:Need) WHERE (NOT n:Element AND NOT n:testresult) OR n:sysreq
 RETURN n.key AS key, coalesce(n.title, n.name, n.key) AS name, head([l IN labels(n) WHERE l IN $types]) AS kind,
   CASE WHEN n:sysreq THEN 'System requirements' ELSE coalesce(n.section, 'Other needs') END AS grp,
-  n.docname AS doc, coalesce(n.platform, false) AS platform,
+  n.docname AS doc, coalesce(n.platform, false) AS platform, n.class AS class,
   COLLECT { MATCH (n)-[r]->(m:Node) WHERE type(r) IN $out
             RETURN {dir: 'out', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.expression, m.key), kind: m.kind} } +
   COLLECT { MATCH (m:Node)-[r]->(n) WHERE type(r) IN $in
             RETURN {dir: 'in', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.expression, m.key), kind: m.kind} } AS links
-ORDER BY platform, CASE kind WHEN 'crs' THEN 0 WHEN 'sysreq' THEN 1 WHEN 'cst' THEN 2 ELSE 3 END, doc, key"""
+ORDER BY platform, CASE kind WHEN 'crs' THEN 0 WHEN 'ctr' THEN 1 WHEN 'sysreq' THEN 2 WHEN 'cst' THEN 3 ELSE 4 END, doc, key"""
 
 
 def requirements_tree(graph) -> list[dict]:
@@ -409,7 +422,12 @@ def requirements_tree(graph) -> list[dict]:
         out=list(OUT_REL),
         **{"in": list(IN_REL)},
     ):
-        partial = {x["key"] for x in r["links"] if x["type"] == "PARTIAL_MATCHES"}
+        # a partial match or satisfaction is also exported as the full link: show it once
+        partial = {
+            (x["type"].removeprefix("PARTIAL_"), x["key"])
+            for x in r["links"]
+            if x["type"].startswith("PARTIAL_")
+        }
         kids = [
             {
                 "key": x["key"],
@@ -419,7 +437,7 @@ def requirements_tree(graph) -> list[dict]:
                 "rel": (OUT_REL if x["dir"] == "out" else IN_REL)[x["type"]],
             }
             for x in r["links"]
-            if not (x["dir"] == "in" and x["type"] == "MATCHES" and x["key"] in partial)
+            if not (x["dir"] == "in" and (x["type"], x["key"]) in partial)
         ]
         kids.sort(key=lambda k: (k["rel"], k["key"]))
         groups.setdefault(r["grp"], []).append(
@@ -429,6 +447,7 @@ def requirements_tree(graph) -> list[dict]:
                 "kind": r["kind"],
                 "children": kids,
                 "platform": r["platform"],
+                "class": r["class"],
             }
         )
     return [
@@ -477,6 +496,7 @@ def rflp_tree(graph) -> list[dict]:
 V_PLACE = {
     "crs": (1, "left"),
     "acctest": (1, "right"),
+    "ctr": (1, "right"),
     "usecase": (2, "left"),
     "sysreq": (2, "left"),
     "systest": (2, "right"),
@@ -505,7 +525,7 @@ OPTIONAL MATCH (lc)-[:ALLOCATED_TO]->(pc:physical)
 WITH collect(n.key) + collect(fn.key) + collect(lc.key) + collect(pc.key) AS keys
 RETURN [k IN keys WHERE k IS NOT NULL] AS keys"""
 )
-V_EDGES = "SATISFIES|REALIZES|MATCHES|PARTIAL_MATCHES|PERFORMS|OWNS|ALLOCATED_TO|VERIFIES|TESTS"
+V_EDGES = "SATISFIES|REALIZES|MATCHES|PARTIAL_MATCHES|PERFORMS|OWNS|ALLOCATED_TO|VERIFIES|TESTS|IMPLEMENTS"
 
 
 def vmodel(graph, focus):

@@ -1,13 +1,13 @@
 import unittest
 
 from explorer.search import Embedder, neighbourhood, search
-from tests.support import vehicle
+from tests.support import rfq
 
 
 class SearchTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.graph = vehicle()
+        cls.graph = rfq()
         cls.embedder = Embedder()
 
     @classmethod
@@ -18,23 +18,25 @@ class SearchTest(unittest.TestCase):
         return [h["key"] for h in search(self.graph, self.embedder, q, k)]
 
     def test_exact_key_comes_first(self):
-        for key in ("PC-001", "EDU-PC-003"):
+        for key in ("PC-101", "SSW-PC-002"):
             self.assertEqual(self.keys(key)[0], key)
 
     def test_natural_query_finds_the_limit(self):
-        hits = search(self.graph, self.embedder, "what limits motor torque", 5)
-        self.assertIn("peakTorqueLimit", [h["name"] for h in hits])
+        hits = search(
+            self.graph, self.embedder, "what limits the key actuation force", 5
+        )
+        self.assertIn("actuationForceLimits", [h["name"] for h in hits])
         self.assertEqual(
             set(hits[0]),
             {"key", "name", "kind", "shortName", "owner", "score", "snippet"},
         )
 
     def test_lucene_syntax_does_not_raise(self):
-        self.assertIsInstance(self.keys("torque AND ("), list)
+        self.assertIsInstance(self.keys("force AND ("), list)
 
     def test_neighbourhood(self):
-        n = neighbourhood(self.graph, "PC-001")
-        self.assertEqual(n["node"]["key"], "PC-001")
+        n = neighbourhood(self.graph, "PC-101")
+        self.assertEqual(n["node"]["key"], "PC-101")
         self.assertTrue(n["edges"])
         self.assertNotIn("embedding", n["node"])
 

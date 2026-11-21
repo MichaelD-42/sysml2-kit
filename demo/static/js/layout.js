@@ -2,7 +2,7 @@
 
 const DOWN = new Set(["composition", "variants"]);
 const PORT_VIEWS = new Set(["boundary", "interfaces", "composition"]);
-const NEED_LINKS = new Set(["SATISFIES", "ALLOCATED_TO", "VERIFIES", "REALIZES", "MATCHES", "PARTIAL_MATCHES", "ANSWERS", "TESTS", "REQUIRES"]);
+const NEED_LINKS = new Set(["SATISFIES", "ALLOCATED_TO", "VERIFIES", "REALIZES", "MATCHES", "PARTIAL_MATCHES", "ANSWERS", "TESTS", "REQUIRES", "IMPLEMENTS", "APPLIES_TO"]);
 const PORT = 10;
 
 export const textWidth = (s, px = 12) => String(s ?? "").length * px * 0.6;

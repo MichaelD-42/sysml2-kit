@@ -5,15 +5,18 @@ from dataclasses import dataclass, field
 
 # need type -> RFLP layer
 LAYERS = {
-    **dict.fromkeys(("crs", "cst", "usecase", "sysreq"), "R"),
+    **dict.fromkeys(("crs", "cst", "usecase", "sysreq", "constraint"), "R"),
     **dict.fromkeys(("feature", "function"), "F"),
     **dict.fromkeys(("component", "interface"), "L"),
     **dict.fromkeys(("physical", "physinterface"), "P"),
-    **dict.fromkeys(("systest", "acctest", "testresult"), "V"),
+    **dict.fromkeys(("ctr", "systest", "acctest", "testresult"), "V"),
 }
 NEED_FIELDS = (
     "title",
     "content",
+    "class",
+    "purpose",
+    "method",
     "domain",
     "platform",
     "variant",
@@ -192,7 +195,8 @@ def build(export, needs):
         props = {"key": n["id"], "layer": LAYERS.get(n["type"])}
         props |= {f: n[f] for f in NEED_FIELDS if n.get(f) not in (None, "")}
         props["source"] = n.get("source")
-        props["section"] = (n.get("sections") or [None])[0]
+        # the outermost section: a document's numbered chapters group under its title
+        props["section"] = (n.get("sections") or [None])[-1]
         nodes[n["id"]] = Node(n["id"], ["Node", "Need", n["type"]], props)
 
     edges = []

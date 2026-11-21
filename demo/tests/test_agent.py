@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from explorer import agent, server
 from tests import support
-from tests.support import VEHICLE, vehicle
+from tests.support import RFQ, rfq
 
 BUILT_IN = {"Bash", "Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSearch"}
 
@@ -17,7 +17,7 @@ BUILT_IN = {"Bash", "Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSea
 class ToolsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.graph = vehicle()
+        cls.graph = rfq()
 
     @classmethod
     def tearDownClass(cls):
@@ -25,7 +25,7 @@ class ToolsTest(unittest.TestCase):
 
     def test_element(self):
         self.assertEqual(
-            json.loads(agent.element(self.graph, "PC-001"))["node"]["key"], "PC-001"
+            json.loads(agent.element(self.graph, "PC-101"))["node"]["key"], "PC-101"
         )
         self.assertIn("error", json.loads(agent.element(self.graph, "NOPE-1")))
 
@@ -43,11 +43,13 @@ class ToolsTest(unittest.TestCase):
         self.assertGreaterEqual(len(blocks), 6)
         for query in blocks:
             with self.subTest(query):
-                query = query.replace("$key", "'PC-001'")
+                query = query.replace("$key", "'PC-101'")
                 self.assertTrue(self.graph.read_only(query, None, 100, 10)["rows"])
 
     def test_semantic_search(self):
-        hits = json.loads(agent.semantic_search(self.graph, support._embedder, "motor"))
+        hits = json.loads(
+            agent.semantic_search(self.graph, support._embedder, "housing")
+        )
         self.assertIsInstance(hits, list)
         self.assertTrue(hits)
 
@@ -59,7 +61,7 @@ def deny_or_allow(options, name):
 
 class OptionsTest(unittest.TestCase):
     def setUp(self):
-        self.options = agent.options(VEHICLE, None, None)
+        self.options = agent.options(RFQ, None, None)
 
     def test_permissions(self):
         self.assertEqual(deny_or_allow(self.options, "Bash"), "deny")
@@ -80,27 +82,27 @@ class OptionsTest(unittest.TestCase):
         self.assertEqual(set(self.options.mcp_servers), {"kit", "sysml"})
         sysml = self.options.mcp_servers["sysml"]
         project = Path(sysml["args"][sysml["args"].index("--project") + 1])
-        # the vehicle's own model and the platform's, through the platform symlink
-        self.assertTrue((project / "vehicle" / "model").is_dir())
-        self.assertTrue((project / "edrive-platform" / "model").is_dir())
+        # the RFQ's own model and the platform's, through the platform symlink
+        self.assertTrue((project / "seat-switch-rfq" / "model").is_dir())
+        self.assertTrue((project / "seat-switch-platform" / "model").is_dir())
         self.assertIn("read-only", self.options.system_prompt)
 
 
 class ModelRootTest(unittest.TestCase):
     def tree(self, platform_at):
         tmp = Path(self.enterContext(tempfile.TemporaryDirectory())).resolve()
-        project, platform = tmp / "a" / "vehicle", tmp / platform_at
+        project, platform = tmp / "a" / "rfq", tmp / platform_at
         (project / "model").mkdir(parents=True)
         (platform / "model").mkdir(parents=True)
         (project / "platform").symlink_to(platform)
         return project
 
     def test_sibling_platform_uses_parent(self):
-        project = self.tree("a/edrive")
+        project = self.tree("a/platform")
         self.assertEqual(agent.model_root(project), project.parent)
 
     def test_distant_platform_falls_back_to_model(self):
-        project = self.tree("b/c/edrive")
+        project = self.tree("b/c/platform")
         self.assertEqual(agent.model_root(project), project / "model")
 
 
@@ -152,7 +154,7 @@ class AskTest(unittest.TestCase):
         self.assertEqual([e["type"] for e in events], ["error"])
 
     def post(self, graph, fake):
-        app = server.create_app(graph, None, VEHICLE, agent_factory=fake)
+        app = server.create_app(graph, None, RFQ, agent_factory=fake)
         r = TestClient(app, base_url="http://127.0.0.1").post(
             "/api/ask", json={"question": "hi"}
         )

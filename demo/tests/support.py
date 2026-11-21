@@ -5,7 +5,7 @@ from pathlib import Path
 from explorer import db, load
 from explorer.search import Embedder
 
-VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
+RFQ = Path(__file__).resolve().parents[2] / "examples" / "seat-switch-rfq"
 
 _embedder = None
 
@@ -16,8 +16,8 @@ def load_project(graph, project: Path):
     return load.load(project, graph, _embedder)
 
 
-def vehicle() -> db.Graph:
-    """A new graph with the vehicle example loaded; the caller closes it."""
+def rfq() -> db.Graph:
+    """A new graph with the seat-switch RFQ (and its platform) loaded; the caller closes it."""
     graph = db.Graph()
-    load_project(graph, VEHICLE)
+    load_project(graph, RFQ)
     return graph

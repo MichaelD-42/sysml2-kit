@@ -1,6 +1,6 @@
 .PHONY: setup test demo
 
-PROJECT ?= ../examples/vehicle
+PROJECT ?= ../examples/seat-switch-rfq
 
 setup:
 	uv sync

@@ -153,6 +153,7 @@ label { display: block; color: var(--muted); font-size: 12px; margin: 8px 0 4px;
 .domain.d-ME { color: var(--me); }
 .domain.d-EE { color: var(--ee); }
 .domain.d-SW { color: var(--sw); }
+.req-class { font-size: 11px; color: var(--muted); padding: 0 5px; border: 1px solid var(--muted); border-radius: 2px; }
 .zoom { display: flex; gap: 4px; align-items: center; }
 .zoom .legend { margin-left: auto; display: flex; gap: 6px; }
 

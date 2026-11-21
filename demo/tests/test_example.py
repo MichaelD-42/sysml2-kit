@@ -1,5 +1,5 @@
-"""The enriched vehicle example (with its platform) carries what the demo shows: attributes,
-constraints, flows, the drive-unit assembly and the vehicle context."""
+"""The seat-switch RFQ (with its platform) carries what the demo shows: attributes, constraints,
+flows, the position switches, the variant selection and the switch context."""
 
 import json
 import shutil
@@ -8,18 +8,18 @@ import tempfile
 import unittest
 from pathlib import Path
 
-VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
+RFQ = Path(__file__).resolve().parents[2] / "examples" / "seat-switch-rfq"
 export = []
 
 
 def setUpModule():
     if not shutil.which("sysml"):
         raise unittest.SkipTest("`sysml` is not on PATH")
-    # the vehicle Makefile's selection: model/ and the platform's model without its trace.sysml
-    files = sorted(VEHICLE.glob("model/**/*.sysml")) + sorted(
+    # the RFQ Makefile's selection: model/ and the platform's model without its trace.sysml
+    files = sorted(RFQ.glob("model/**/*.sysml")) + sorted(
         p
-        for p in VEHICLE.glob("platform/model/**/*.sysml")
-        if p != VEHICLE / "platform/model/trace.sysml"
+        for p in RFQ.glob("platform/model/**/*.sysml")
+        if p != RFQ / "platform/model/trace.sysml"
     )
     with tempfile.TemporaryFile("w+") as out:
         subprocess.run(["sysml", "export", *map(str, files)], stdout=out, check=True)
@@ -64,15 +64,6 @@ def count(elements, kind):
     return sum(e["@type"] == kind for e in elements)
 
 
-def requirement_constraints(elements, qualified_name):
-    e = element(elements, qualified_name)
-    return [
-        r
-        for r in owned(elements, e, "ownedRelationship")
-        if r["@type"] == "RequirementConstraintMembership"
-    ]
-
-
 def port_names(elements, qualified_name):
     """Names of the ports the element owns or inherits."""
     by_id = index(elements)
@@ -84,79 +75,74 @@ def port_names(elements, qualified_name):
     }
 
 
-def part_names(elements, qualified_name, key="ownedElement"):
-    """Names of the parts the element owns (key="feature": owns or inherits)."""
+def part_names(elements, qualified_name):
+    """Names of the parts the element owns."""
     return {
         e["name"]
-        for e in owned(elements, element(elements, qualified_name), key)
+        for e in owned(elements, element(elements, qualified_name))
         if e["@type"] == "PartUsage"
     }
 
 
-def connections_touching(elements, qualified_name):
-    """Connectors with an end on the element or on a feature chain through it (`driveUnit.hvIn`)."""
-    target = element(elements, qualified_name)["@id"]
-    kinds = {
-        "ConnectionUsage",
-        "InterfaceUsage",
-        "FlowUsage",
-        "BindingConnectorAsUsage",
+def specialized(elements, qualified_name):
+    """Qualified names of what the element subsets or redefines."""
+    by_id = index(elements)
+    return {
+        by_id.get(r["subsettedFeature"]["@id"], {}).get("qualifiedName")
+        for r in owned(elements, element(elements, qualified_name), "ownedRelationship")
+        if r["@type"] in ("Subsetting", "Redefinition")
     }
-    touching = 0
-    for connector in elements:
-        if connector["@type"] not in kinds:
-            continue
-        ends = [r["@id"] for r in connector.get("relatedFeature") or []]
-        for end in owned(elements, connector):
-            ends += [c["@id"] for c in end.get("chainingFeature") or []]
-        touching += target in ends
-    return touching
 
 
 class EnrichedExampleTest(unittest.TestCase):
     def test_attributes_with_units(self):
-        values = texts_of_attribute_values(export, "EDrivePhysical::motor::motor80kW")
-        self.assertIn("ratedPower", values)
-        self.assertRegex(values["ratedPower"], r"^80 \[kW\]$")
+        values = texts_of_attribute_values(
+            export, "SeatSwitchPhysical::seatSwitchAssembly"
+        )
+        self.assertRegex(values["actuationForce"], r"^4.5 \[N\]$")
+        self.assertRegex(values["mass"], r"^48 \[g\]$")
 
     def test_constraints(self):
-        self.assertTrue(named(export, "ConstraintUsage", "peakTorqueLimit"))
-        self.assertTrue(named(export, "ConstraintUsage", "coolantDerating"))
+        self.assertTrue(named(export, "ConstraintUsage", "actuationForceLimits"))
+        self.assertTrue(named(export, "ConstraintUsage", "driverHousingSide"))
 
-    def test_requirement_constraint_on_sr005(self):
-        self.assertTrue(
-            requirement_constraints(export, "VehicleRequirements::acceleration")
-        )
-
-    def test_drive_unit_boundary(self):
+    def test_seat_positions(self):
         self.assertEqual(
-            port_names(export, "VehiclePhysical::vehicleAssembly::driveUnit"),
-            {"hvIn", "canBus", "coolantIn", "coolantOut", "mount"},
-        )
-        self.assertGreaterEqual(
-            connections_touching(export, "VehiclePhysical::vehicleAssembly::driveUnit"),
-            5,
+            part_names(export, "SeatSwitchRfqLogical::seatSwitches"),
+            {"driverSwitch", "coDriverSwitch", "rearLeftSwitch", "rearRightSwitch"},
         )
 
-    def test_drive_unit_holds_one_motor(self):
-        # driveMotor redefines the inherited `motor` slot, so the unselected variation is gone
+    def test_variant_selection(self):
+        self.assertIn(
+            "SeatSwitchPhysical::housing::housingLH",
+            specialized(export, "SeatSwitchRfqPhysical::driverHousing"),
+        )
+        self.assertIn(
+            "SeatSwitchPhysical::housing::housingRH",
+            specialized(export, "SeatSwitchRfqPhysical::coDriverHousing"),
+        )
+
+    def test_assembly_boundary(self):
         self.assertEqual(
-            part_names(
-                export, "VehiclePhysical::vehicleAssembly::driveUnit", "feature"
-            ),
-            {"controllerFirmware", "driveMotor", "housing", "inverter"},
+            port_names(export, "SeatSwitchPhysical::seatSwitchAssembly"),
+            {"lin", "supply"},
         )
 
     def test_context(self):
         self.assertEqual(
-            part_names(export, "VehicleContext::vehicleContext"),
-            {"vehicle", "driver", "passenger", "trailer", "chargingStation", "road"},
+            part_names(export, "SeatSwitchRfqContext::seatSwitchContext"),
+            {
+                "seatSwitches",
+                "seat",
+                "seatControlUnit",
+                "occupant",
+                "workshopTester",
+                "endOfLineTester",
+            },
         )
 
     def test_flows(self):
-        self.assertGreaterEqual(
-            count(export, "FlowUsage") + count(export, "SuccessionFlowUsage"), 3
-        )
+        self.assertGreaterEqual(count(export, "FlowUsage"), 2)
 
 
 if __name__ == "__main__":

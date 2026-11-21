@@ -7,10 +7,9 @@ from fastapi.testclient import TestClient
 
 from explorer import server
 from tests import support
-from tests.support import vehicle
+from tests.support import RFQ, rfq
 
 EXAMPLES = Path(__file__).resolve().parents[2] / "examples"
-VEHICLE = EXAMPLES / "vehicle"
 
 
 def client(app):
@@ -23,9 +22,9 @@ def node_count(graph):
 
 class ServerTest(unittest.TestCase):
     def setUp(self):
-        self.graph = vehicle()
+        self.graph = rfq()
         self.addCleanup(self.graph.close)
-        self.client = client(server.create_app(self.graph, support._embedder, VEHICLE))
+        self.client = client(server.create_app(self.graph, support._embedder, RFQ))
 
     def test_view_errors(self):
         self.assertEqual(
@@ -34,11 +33,11 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(self.client.get("/api/view/nope").status_code, 400)
 
     def test_element(self):
-        r = self.client.get("/api/element/PC-001")
+        r = self.client.get("/api/element/PC-101")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(
             r.json()["node"]["qualifiedName"],
-            "VehiclePhysical::vehicleAssembly::driveUnit::driveMotor",
+            "SeatSwitchRfqPhysical::driverHousing",
         )
         self.assertEqual(self.client.get("/api/element/NOPE-1").status_code, 404)
 
@@ -51,14 +50,16 @@ class ServerTest(unittest.TestCase):
         )
         self.assertEqual(self.client.get("/api/tree?kind=nope").status_code, 400)
         self.assertTrue(self.client.get("/api/view/vmodel").json()["nodes"])
-        hits = self.client.get("/api/search?q=drive motor&k=3").json()
+        hits = self.client.get("/api/search?q=driver housing&k=3").json()
         self.assertTrue(hits)
-        self.assertIn("PC-001", self.client.get("/api/keys").json())
-        self.assertTrue(self.client.get("/api/view/compliance").json()["rows"])
+        self.assertIn("PC-101", self.client.get("/api/keys").json())
+        compliance = self.client.get("/api/view/compliance").json()
+        self.assertTrue(compliance["rows"])
+        self.assertTrue(compliance["ctrs"])
 
     def test_search_k_is_validated(self):
-        self.assertEqual(self.client.get("/api/search?q=motor&k=0").status_code, 422)
-        self.assertEqual(self.client.get("/api/search?q=motor&k=51").status_code, 422)
+        self.assertEqual(self.client.get("/api/search?q=housing&k=0").status_code, 422)
+        self.assertEqual(self.client.get("/api/search?q=housing&k=51").status_code, 422)
 
     def test_foreign_host_rejected(self):
         r = self.client.get("/api/keys", headers={"Host": "attacker.example"})
@@ -91,11 +92,11 @@ class ServerTest(unittest.TestCase):
 
     def copy_projects(self, tmp):
         ignore = shutil.ignore_patterns("build", "_build", "_generated")
-        for name in ("vehicle", "edrive-platform"):
+        for name in ("seat-switch-rfq", "seat-switch-platform"):
             shutil.copytree(
                 EXAMPLES / name, Path(tmp) / name, symlinks=True, ignore=ignore
             )
-        return Path(tmp) / "vehicle"
+        return Path(tmp) / "seat-switch-rfq"
 
     def test_reload_failure_keeps_graph(self):
         import tempfile
@@ -124,7 +125,7 @@ class ServerTest(unittest.TestCase):
 
     def test_reload_load_failure_is_500(self):
         before = node_count(self.graph)
-        c = client(server.create_app(self.graph, support._embedder, VEHICLE))
+        c = client(server.create_app(self.graph, support._embedder, RFQ))
         with (
             mock.patch.object(server.subprocess, "run") as run,
             mock.patch.object(
@@ -137,7 +138,7 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(node_count(self.graph), before)
 
     def test_concurrent_reload_rejected(self):
-        app = server.create_app(self.graph, support._embedder, VEHICLE)
+        app = server.create_app(self.graph, support._embedder, RFQ)
         c = client(app)
         app.state.reload_lock.acquire()
         try:

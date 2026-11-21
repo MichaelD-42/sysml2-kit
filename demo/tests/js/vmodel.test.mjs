@@ -53,3 +53,14 @@ test("layoutV tags a feature with the requirements it matches and never draws bo
   assert.ok(!out.edges.some((e) => e.src === "PC-1"));
   assert.ok(!out.edges.some((e) => e.type === "PARTIAL_MATCHES"));
 });
+
+test("layoutV puts a customer test requirement on the right leg with the test that implements it", () => {
+  const out = layoutV({
+    ...view,
+    nodes: [...view.nodes, n("CTR-1", 1, "right", { kind: "ctr" })],
+    edges: [...view.edges, { src: "STC-1", dst: "CTR-1", type: "IMPLEMENTS" }],
+  });
+  const ctr = out.nodes.find((x) => x.key === "CTR-1");
+  assert.ok(ctr.x > out.width / 2 && ctr.y < out.nodes.find((x) => x.key === "STC-1").y);
+  assert.ok(out.edges.some((e) => e.type === "IMPLEMENTS"));
+});
