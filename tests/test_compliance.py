@@ -285,7 +285,10 @@ class ComplianceTest(unittest.TestCase):
         )
 
     def test_scoped_ctr_needs_a_statement(self):
-        needs = {"CTR-1": need("ctr", scope="commercial")}
+        needs = {
+            "CTR-1": need("ctr", scope="commercial"),
+            "STC-1": need("systest", implements=["CTR-1"]),
+        }
         self.assertEqual(compliance(needs)[1], ["CTR-1: not answered"])
         needs["CST-1"] = need("cst", answers=["CTR-1"], compliance="comply")
         self.assertEqual(compliance(needs)[1], [])

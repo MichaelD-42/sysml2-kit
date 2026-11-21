@@ -103,12 +103,11 @@ def compliance(needs):
         ):
             findings.append(f"{req}: {NOT_VERIFIED}")
     for ctr, *_, tests, statements in ctrs:
-        if not needs[ctr].get("scope") and not tests:
+        if needs[ctr].get("scope"):
+            # a scoped CTR is answered by a CST only, even when a test implements it
+            findings += _answer_findings(ctr, needs[ctr], statements, statements)
+        elif not tests:
             findings.append(f"{ctr}: not implemented")
-        else:
-            findings += _answer_findings(
-                ctr, needs[ctr], tests or statements, statements
-            )
     return rows, findings
 
 
