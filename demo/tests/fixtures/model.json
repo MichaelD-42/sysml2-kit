@@ -514,5 +514,66 @@
   "owner": {
    "@id": "req"
   }
+ },
+ {
+  "@type": "ItemDefinition",
+  "@id": "Heat",
+  "qualifiedName": "Sys::Heat",
+  "name": "Heat",
+  "owner": {
+   "@id": "pkg"
+  }
+ },
+ {
+  "@type": "FlowUsage",
+  "@id": "flow2",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "drive"
+  },
+  "relatedFeature": [
+   {
+    "@id": "aout"
+   },
+   {
+    "@id": "bin"
+   }
+  ],
+  "ownedElement": [
+   {
+    "@id": "pf2"
+   }
+  ]
+ },
+ {
+  "@type": "PayloadFeature",
+  "@id": "pf2",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "flow2"
+  },
+  "ownedElement": [
+   {
+    "@id": "pft2"
+   }
+  ]
+ },
+ {
+  "@type": "FeatureTyping",
+  "@id": "pft2",
+  "qualifiedName": null,
+  "name": null,
+  "owner": {
+   "@id": "pf2"
+  },
+  "typedFeature": {
+   "@id": "pf2"
+  },
+  "type": {
+   "@id": "Heat"
+  },
+  "isImplied": false
  }
 ]

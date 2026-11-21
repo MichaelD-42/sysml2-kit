@@ -155,9 +155,10 @@ def build(export, needs):
             "qualifiedName": e.get("qualifiedName"),
             "shortName": e.get("shortName"),
             "kind": e["@type"],
+            "isVariation": e.get("isVariation"),
             "doc": docs.get(e["@id"]),
         }
-        labels = ["Element", e["@type"]]
+        labels = ["Node", "Element", e["@type"]]
         if (n := need_of.get(e["@id"])) is not None:
             labels += ["Need", n["type"]]
             props |= {f: n[f] for f in NEED_FIELDS if n.get(f) not in (None, "")}
@@ -182,7 +183,7 @@ def build(export, needs):
         props = {"key": n["id"], "layer": LAYERS.get(n["type"])}
         props |= {f: n[f] for f in NEED_FIELDS if n.get(f) not in (None, "")}
         props["source"] = n.get("source")
-        nodes[n["id"]] = Node(n["id"], ["Need", n["type"]], props)
+        nodes[n["id"]] = Node(n["id"], ["Node", "Need", n["type"]], props)
 
     edges = []
 
@@ -251,7 +252,7 @@ def build(export, needs):
 
     seen, unique = set(), []
     for edge in edges:
-        k = (edge.src, edge.type, edge.dst)
+        k = (edge.src, edge.type, edge.dst, tuple(sorted(edge.props.items())))
         if k not in seen:
             seen.add(k)
             unique.append(edge)

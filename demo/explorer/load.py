@@ -37,12 +37,15 @@ def write(graph: Graph, driver) -> None:
             rows = [{"src": e.src, "dst": e.dst, "props": e.props} for e in group]
             for batch in batches(rows):
                 tx.run(
-                    "UNWIND $rows AS r MATCH (a {key: r.src}), (b {key: r.dst}) "
+                    "UNWIND $rows AS r MATCH (a:Node {key: r.src}), (b:Node {key: r.dst}) "
                     f"CREATE (a)-[x:`{type}`]->(b) SET x = r.props",
                     rows=batch,
                 )
 
     with driver.session() as session:
+        session.run(
+            "CREATE CONSTRAINT node_key IF NOT EXISTS FOR (n:Node) REQUIRE n.key IS UNIQUE"
+        ).consume()
         session.execute_write(tx_work)
 
 

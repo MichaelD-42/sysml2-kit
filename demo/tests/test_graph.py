@@ -57,7 +57,7 @@ class BuildTest(unittest.TestCase):
     def test_physical_component_labels(self):
         self.assertEqual(
             self.graph.nodes["PC-001"].labels,
-            ["Element", "PartUsage", "Need", "physical"],
+            ["Node", "Element", "PartUsage", "Need", "physical"],
         )
         props = self.graph.nodes["PC-001"].props
         self.assertEqual(
@@ -65,15 +65,22 @@ class BuildTest(unittest.TestCase):
             ("P", "EE", "phys.sysml:3"),
         )
 
+    def test_variation_flag(self):
+        self.assertIs(self.graph.nodes["PC-001"].props["isVariation"], True)
+
+    def test_every_node_has_the_common_label(self):
+        self.assertTrue(all(n.labels[0] == "Node" for n in self.graph.nodes.values()))
+
     def test_customer_requirement_is_need_only(self):
-        self.assertEqual(self.graph.nodes["CRS-001"].labels, ["Need", "crs"])
+        self.assertEqual(self.graph.nodes["CRS-001"].labels, ["Node", "Need", "crs"])
 
     def test_succession_flow_connects_performs(self):
         convert, produce = self.by_name("convert").key, self.by_name("produce").key
         self.assertEqual(self.edges("SUCCESSION"), {(convert, produce)})
-        (flow,) = [e for e in self.graph.edges if e.type == "FLOW"]
+        flows = [e for e in self.graph.edges if e.type == "FLOW"]
         self.assertEqual(
-            (flow.src, flow.dst, flow.props), (convert, produce, {"item": "Power"})
+            sorted((e.src, e.dst, e.props["item"]) for e in flows),
+            [(convert, produce, "Heat"), (convert, produce, "Power")],
         )
         self.assertEqual(
             self.edges("CONNECTS"),
