@@ -7,15 +7,17 @@ from neo4j import GraphDatabase
 from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from explorer import load
+from explorer.search import Embedder
 
 
 def driver_or_skip(testcase):
     uri = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
     password = os.environ.get("NEO4J_PASSWORD")
-    if not password:
+    no_auth = os.environ.get("NEO4J_AUTH") == "none"
+    if not (password or no_auth):
         testcase.skipTest(f"Neo4j not reachable at {uri}")
     driver = GraphDatabase.driver(
-        uri, auth=(os.environ.get("NEO4J_USER", "neo4j"), password)
+        uri, auth=None if no_auth else (os.environ.get("NEO4J_USER", "neo4j"), password)
     )
     try:
         driver.verify_connectivity()
@@ -26,7 +28,14 @@ def driver_or_skip(testcase):
     return driver
 
 
+_embedder = None
+
+
 def load_project(driver, project: Path):
+    global _embedder
+    _embedder = _embedder or Embedder()  # loading the model is slow: once per run
     graph = load.read_project(project)
+    load.embed(graph, _embedder)
     load.write(graph, driver)
+    load.indexes(driver, _embedder.dims)
     return graph

@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import sys
 from itertools import groupby
 from pathlib import Path
@@ -9,13 +10,52 @@ from pathlib import Path
 from neo4j import GraphDatabase
 
 from explorer.graph import Graph, build
+from explorer.search import Embedder
 
 BATCH = 500
+CAMEL = re.compile(r"(?<=[a-z])(?=[A-Z])")
 
 
 def batches(rows):
     for i in range(0, len(rows), BATCH):
         yield rows[i : i + BATCH]
+
+
+def embed(graph: Graph, embedder) -> None:
+    nodes = list(graph.nodes.values())
+    # words split out of the camelCase name and the constraint expression help the embedding
+    texts = [
+        "\n".join(
+            filter(
+                None,
+                (
+                    CAMEL.sub(" ", n.props.get("name") or ""),
+                    n.props.get("searchText") or n.key,
+                    n.props.get("expression"),
+                ),
+            )
+        )
+        for n in nodes
+    ]
+    for batch_nodes, vectors in zip(
+        batches(nodes), (embedder.embed(b) for b in batches(texts))
+    ):
+        for n, v in zip(batch_nodes, vectors):
+            n.props["embedding"] = v
+
+
+def indexes(driver, dims: int) -> None:
+    driver.execute_query(
+        "CREATE VECTOR INDEX element_embedding IF NOT EXISTS FOR (n:Node) ON (n.embedding) "
+        "OPTIONS {indexConfig: {`vector.dimensions`: $dims, "
+        "`vector.similarity_function`: 'cosine'}}",
+        dims=dims,
+    )
+    driver.execute_query(
+        "CREATE FULLTEXT INDEX element_text IF NOT EXISTS FOR (n:Node) "
+        "ON EACH [n.name, n.shortName, n.title, n.searchText]"
+    )
+    driver.execute_query("CALL db.awaitIndexes(300)")
 
 
 def write(graph: Graph, driver) -> None:
@@ -60,11 +100,16 @@ def main(argv=None):
     if len(argv) != 1:
         sys.exit("usage: python -m explorer.load <project-dir>")
     graph = read_project(Path(argv[0]))
+    embedder = Embedder()
+    embed(graph, embedder)
     with GraphDatabase.driver(
         os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
-        auth=(os.environ.get("NEO4J_USER", "neo4j"), os.environ["NEO4J_PASSWORD"]),
+        auth=None
+        if os.environ.get("NEO4J_AUTH") == "none"
+        else (os.environ.get("NEO4J_USER", "neo4j"), os.environ["NEO4J_PASSWORD"]),
     ) as driver:
         write(graph, driver)
+        indexes(driver, embedder.dims)
     print(f"loaded {len(graph.nodes)} nodes, {len(graph.edges)} edges")
 
 
