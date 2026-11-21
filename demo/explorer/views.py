@@ -499,6 +499,7 @@ V_PLACE = {
     "ctr": (1, "right"),
     "usecase": (2, "left"),
     "sysreq": (2, "left"),
+    "constraint": (2, "left"),
     "systest": (2, "right"),
     "feature": (3, "left"),
     "function": (3, "left"),
@@ -525,7 +526,7 @@ OPTIONAL MATCH (lc)-[:ALLOCATED_TO]->(pc:physical)
 WITH collect(n.key) + collect(fn.key) + collect(lc.key) + collect(pc.key) AS keys
 RETURN [k IN keys WHERE k IS NOT NULL] AS keys"""
 )
-V_EDGES = "SATISFIES|REALIZES|MATCHES|PARTIAL_MATCHES|PERFORMS|OWNS|ALLOCATED_TO|VERIFIES|TESTS|IMPLEMENTS"
+V_EDGES = "SATISFIES|REALIZES|MATCHES|PARTIAL_MATCHES|PERFORMS|OWNS|ALLOCATED_TO|VERIFIES|TESTS|IMPLEMENTS|APPLIES_TO"
 
 
 def vmodel(graph, focus):

@@ -64,3 +64,13 @@ test("layoutV puts a customer test requirement on the right leg with the test th
   assert.ok(ctr.x > out.width / 2 && ctr.y < out.nodes.find((x) => x.key === "STC-1").y);
   assert.ok(out.edges.some((e) => e.type === "IMPLEMENTS"));
 });
+
+test("layoutV tags a customer test requirement with the requirements it applies to instead of drawing the lines", () => {
+  const out = layoutV({
+    ...view,
+    nodes: [...view.nodes, n("CTR-1", 1, "right", { kind: "ctr" })],
+    edges: [...view.edges, { src: "CTR-1", dst: "CRS-1", type: "APPLIES_TO" }],
+  });
+  assert.ok(out.nodes.find((x) => x.key === "CTR-1").tags.includes("applies to CRS-1"));
+  assert.ok(!out.edges.some((e) => e.type === "APPLIES_TO"));
+});

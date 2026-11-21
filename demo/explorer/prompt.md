@@ -27,15 +27,10 @@ RETURN DISTINCT o.key, o.name, c.key, c.expression, r.key
 
 A constraint also comes from a system requirement that the part satisfies (`(s)-[:SATISFIES]->(:sysreq)-[:REQUIRES]->(:ConstraintUsage)`). Then follow the requirement upward (`SATISFIES`, `REALIZES`, `MATCHES` to a `crs`) to the customer requirement behind it.
 
-Attribute values (`value`, `unit`) sit on the part itself or on what it specialises or is typed by: a selected variant, a platform part, a definition. A part that owns no attributes usually inherits them this way (`PC-101` owns none and specialises the platform variant `SSW-PC-002`). A definition can declare an attribute without a value; then the value sits on a part typed by the same definition, such as the platform's rated assembly. Follow every `SPECIALIZES` and `TYPED_BY` branch and prefer the nearest value (the shortest path). When a constraint mentions an attribute, look up that attribute's nearest value with the query below, then state the value and whether the constraint holds for it. Never say a value is missing or unspecified without running these queries:
+Attribute values (`value`, `unit`) sit on the part itself or on what it specialises or is typed by: a selected variant, a platform part, a definition. A part that owns no attributes usually inherits them this way (`PC-101` owns none and specialises the platform variant `SSW-PC-002`). Follow every `SPECIALIZES` and `TYPED_BY` branch and prefer the nearest value (the shortest path). When a constraint mentions an attribute, look up that attribute's nearest value with the query below, then state the value and whether the constraint holds for it. Never say a value is missing or unspecified without running this query:
 
 ```cypher
 MATCH p=(:Node {key:$key})-[:SPECIALIZES|TYPED_BY*0..]->(s)-[:OWNS]->(a:AttributeUsage) RETURN s.key, a.name, a.value, a.unit ORDER BY length(p)
-```
-
-```cypher
-MATCH (:Node {key:$key})<-[:ALLOCATED_TO*0..1]-()-[:SPECIALIZES|TYPED_BY*0..]->(d:PartDefinition)<-[:TYPED_BY]-(u:PartUsage)-[:OWNS]->(a:AttributeUsage)
-WHERE a.value IS NOT NULL RETURN u.key, u.name, a.name, a.value, a.unit
 ```
 
 The `cypher` tool takes no parameters: write the key in place of `$key`, as `{key:'PC-101'}`.

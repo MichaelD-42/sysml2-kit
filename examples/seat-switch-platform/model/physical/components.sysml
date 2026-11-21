@@ -12,28 +12,32 @@ package SeatSwitchPhysical {
 
     // what every assembled switch states, and the platform's limits on it as constraints (plain values included)
     part def SwitchAssembly {
-        doc /* Characteristics of an assembled seat switch, whatever its housing side and button set. */
-        attribute actuationForce : ForceValue;
-        attribute keyTravel : LengthValue;
-        attribute minOperatingVoltage : ElectricPotentialDifferenceValue;
-        attribute maxOperatingVoltage : ElectricPotentialDifferenceValue;
-        attribute minOperatingTemperature : ThermodynamicTemperatureValue;
-        attribute maxOperatingTemperature : ThermodynamicTemperatureValue;
-        attribute ipRating : String;
-        attribute esdContactLevel : ElectricPotentialDifferenceValue;
-        attribute esdAirLevel : ElectricPotentialDifferenceValue;
-        attribute durabilityCycles : Integer;
-        attribute symbolLuminance : LuminanceValue;
-        attribute linVersion : String;
-        attribute emcSeverityClass : Integer;
-        attribute mass : MassValue;
-        attribute symbolColour : String;
-        attribute levelIndicatorColour : String;
-        attribute quiescentCurrent : ElectricCurrentValue;
+        doc /* An assembled seat switch, whatever its housing side and button set: the platform's rated values
+         * and its two ports. */
+        attribute actuationForce : ForceValue = 4.5 [N];
+        attribute keyTravel : LengthValue = 0.6 [mm];
+        attribute minOperatingVoltage : ElectricPotentialDifferenceValue = 9 [V];
+        attribute maxOperatingVoltage : ElectricPotentialDifferenceValue = 16 [V];
+        attribute minOperatingTemperature : ThermodynamicTemperatureValue = -40 ['°C'];
+        attribute maxOperatingTemperature : ThermodynamicTemperatureValue = 85 ['°C'];
+        attribute ipRating : String = "IP5K4";
+        attribute esdContactLevel : ElectricPotentialDifferenceValue = 8000 [V];
+        attribute esdAirLevel : ElectricPotentialDifferenceValue = 15000 [V];
+        attribute durabilityCycles : Integer = 200000;
+        attribute symbolLuminance : LuminanceValue = 20 [cd/m^2];
+        attribute linVersion : String = "2.2A";
+        attribute emcSeverityClass : Integer = 3;
+        attribute mass : MassValue = 48 [g];
+        attribute symbolColour : String = "white";
+        attribute levelIndicatorColour : String = "amber";
+        attribute quiescentCurrent : ElectricCurrentValue = 0.00005 [A];  // 50 µA, bus asleep
         // set by our own production and workshop requirements, not by a customer
-        attribute endOfLineTestTime : DurationValue;
-        attribute partMarking : String;
-        attribute reflashTime : DurationValue;
+        attribute endOfLineTestTime : DurationValue = 9 [s];
+        attribute partMarking : String = "laser Data Matrix";
+        attribute reflashTime : DurationValue = 95 [s];
+
+        port lin : LinPort;
+        port supply : ~PowerPort;
 
         constraint <'SSW-CON-001'> actuationForceWindow {
             @Satisfies { need = "SSW-PRQ-009"; }
@@ -191,28 +195,7 @@ package SeatSwitchPhysical {
     }
 
     part seatSwitchAssembly : SwitchAssembly {
-        doc /* The switch as delivered, with the platform's rated values: one housing, one button set, behind two ports. */
-        attribute :>> actuationForce = 4.5 [N];
-        attribute :>> keyTravel = 0.6 [mm];
-        attribute :>> minOperatingVoltage = 9 [V];
-        attribute :>> maxOperatingVoltage = 16 [V];
-        attribute :>> minOperatingTemperature = -40 ['°C'];
-        attribute :>> maxOperatingTemperature = 85 ['°C'];
-        attribute :>> ipRating = "IP5K4";
-        attribute :>> esdContactLevel = 8000 [V];
-        attribute :>> esdAirLevel = 15000 [V];
-        attribute :>> durabilityCycles = 200000;
-        attribute :>> symbolLuminance = 20 [cd/m^2];
-        attribute :>> linVersion = "2.2A";
-        attribute :>> emcSeverityClass = 3;
-        attribute :>> mass = 48 [g];
-        attribute :>> symbolColour = "white";
-        attribute :>> levelIndicatorColour = "amber";
-        attribute :>> quiescentCurrent = 0.00005 [A];  // 50 µA, bus asleep
-        attribute :>> endOfLineTestTime = 9 [s];
-        attribute :>> partMarking = "laser Data Matrix";
-        attribute :>> reflashTime = 95 [s];
-
+        doc /* The switch as delivered: one housing, one button set, behind the definition's two ports. */
         ref part housing :> SeatSwitchPhysical::housing;
         ref part knob :> SeatSwitchPhysical::knob;
         ref part buttonCaps :> SeatSwitchPhysical::buttonCaps;
@@ -223,9 +206,6 @@ package SeatSwitchPhysical {
         ref part leds :> SeatSwitchPhysical::leds;
         ref part buttonSet :> SeatSwitchPhysical::buttonSet;
         ref part switchFirmware :> SeatSwitchPhysical::switchFirmware;
-
-        port lin : LinPort;
-        port supply : ~PowerPort;
 
         interface : LinInterface connect linTransceiver.linPin to switchFirmware.linStack;
 

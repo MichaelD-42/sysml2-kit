@@ -96,9 +96,7 @@ def specialized(elements, qualified_name):
 
 class EnrichedExampleTest(unittest.TestCase):
     def test_attributes_with_units(self):
-        values = texts_of_attribute_values(
-            export, "SeatSwitchPhysical::seatSwitchAssembly"
-        )
+        values = texts_of_attribute_values(export, "SeatSwitchPhysical::SwitchAssembly")
         self.assertRegex(values["actuationForce"], r"^4.5 \[N\]$")
         self.assertRegex(values["mass"], r"^48 \[g\]$")
 
@@ -124,7 +122,7 @@ class EnrichedExampleTest(unittest.TestCase):
 
     def test_assembly_boundary(self):
         self.assertEqual(
-            port_names(export, "SeatSwitchPhysical::seatSwitchAssembly"),
+            port_names(export, "SeatSwitchPhysical::SwitchAssembly"),
             {"lin", "supply"},
         )
 

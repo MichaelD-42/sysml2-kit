@@ -70,14 +70,7 @@ class ViewsTest(unittest.TestCase):
 
     def test_boundary_of_the_driver_switch(self):
         v = self.view("boundary", "LC-101")
-        inside = {n["key"] for n in v["nodes"] if n["parent"] == v["focus"]}
-        self.assertLessEqual({"SSW-LC-005", "SSW-LC-007"}, inside)
-        # its LIN port, on the platform's communication component
-        self.assertIn("SSW-LI-008", {n["key"] for n in v["nodes"]})
-
-    def test_boundary_of_the_delivered_switch(self):
-        v = self.view("boundary", "SeatSwitchPhysical::seatSwitchAssembly")
-        ports = {n["name"] for n in v["nodes"] if n["parent"] == v["focus"]}
+        ports = {n["name"] for n in v["nodes"] if n["parent"] == "LC-101"}
         self.assertLessEqual({"lin", "supply"}, ports)
 
     def test_activity(self):
@@ -227,6 +220,7 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(at["ATC-101"], (1, "right"))
         self.assertEqual(at["CTR-003"], (1, "right"))
         self.assertEqual(at["SR-101"], (2, "left"))
+        self.assertEqual(at["CON-101"], (2, "left"))
         self.assertEqual(at["STC-101"], (2, "right"))
         self.assertEqual(at["FEAT-102"], (3, "left"))
         self.assertEqual(at["LC-101"], (4, "left"))
@@ -235,6 +229,9 @@ class ViewsTest(unittest.TestCase):
         edges = {(e["src"], e["dst"], e["type"]) for e in v["edges"]}
         self.assertIn(("STC-101", "CTR-003", "IMPLEMENTS"), edges)
         self.assertIn(("ATC-106", "CTR-009", "IMPLEMENTS"), edges)
+        self.assertIn(("CON-101", "CRS-301", "SATISFIES"), edges)
+        self.assertIn(("STC-102", "CON-103", "VERIFIES"), edges)
+        self.assertIn(("CTR-003", "CRS-301", "APPLIES_TO"), edges)
         self.assertEqual(v["empty"], [3, 4])
 
     def test_vmodel_of_another_focus_is_the_whole_v(self):
