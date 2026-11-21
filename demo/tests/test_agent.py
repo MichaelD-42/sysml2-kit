@@ -150,7 +150,9 @@ class AskTest(unittest.TestCase):
 
     def post(self, driver, fake):
         app = server.create_app(driver, None, VEHICLE, agent_factory=fake)
-        r = TestClient(app).post("/api/ask", json={"question": "hi"})
+        r = TestClient(app, base_url="http://127.0.0.1").post(
+            "/api/ask", json={"question": "hi"}
+        )
         self.assertEqual(r.headers["content-type"].split(";")[0], "text/event-stream")
         return [
             json.loads(line[5:])

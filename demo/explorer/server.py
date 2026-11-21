@@ -9,7 +9,8 @@ import sys
 import threading
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from neo4j import GraphDatabase
@@ -34,8 +35,17 @@ def error(status, message):
     return JSONResponse({"error": message}, status_code=status)
 
 
+def json_only(request: Request):
+    """A cross-site form or fetch without CORS cannot send JSON, so this blocks CSRF."""
+    kind = request.headers.get("content-type", "").split(";")[0].strip().lower()
+    if kind != "application/json":
+        raise HTTPException(415, "Content-Type must be application/json")
+
+
 def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
     app = FastAPI()
+    # DNS rebinding: a page on another name that resolves to 127.0.0.1 is refused
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
     app.state.reload_lock = threading.Lock()
     needs_path = project / "build" / "needs" / "needs.json"
     if agent_factory is None:
@@ -79,18 +89,18 @@ def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
         return views.view(driver, kind, focus, needs_path)
 
     @app.get("/api/search")
-    def find(q: str, k: int = 10):
+    def find(q: str, k: int = Query(10, ge=1, le=50)):
         return search.search(driver, embedder, q, k)
 
     @app.get("/api/cypher/examples")
     def examples():
         return cypher.EXAMPLES
 
-    @app.post("/api/cypher")
+    @app.post("/api/cypher", dependencies=[Depends(json_only)])
     def run(body: CypherBody):
         return cypher.run_read(driver, body.query, body.params)
 
-    @app.post("/api/ask")
+    @app.post("/api/ask", dependencies=[Depends(json_only)])
     async def ask(body: AskBody):
         async def events():
             try:
@@ -105,7 +115,7 @@ def create_app(driver, embedder, project: Path, agent_factory=None) -> FastAPI:
 
         return StreamingResponse(events(), media_type="text/event-stream")
 
-    @app.post("/api/reload")
+    @app.post("/api/reload", dependencies=[Depends(json_only)])
     def reload():
         if not app.state.reload_lock.acquire(blocking=False):
             return error(409, "a reload is already running")
