@@ -26,7 +26,7 @@ RETURN s.key, s.name, r.key, c1.key, c1.expression, c2.key, c2.expression
 
 Then follow the requirement upward (`SATISFIES`, `REALIZES`, `MATCHES` to a `crs`) to the customer requirement behind it.
 
-Attribute values (`value`, `unit`) sit on the part itself or on what it specialises or is typed by: a selected variant, a platform part, a definition. A part that owns no attributes usually inherits them this way (`PC-001` owns none and specialises `EDU-PC-003`). Follow every `SPECIALIZES` and `TYPED_BY` branch and prefer the nearest value (the shortest path). Never say a value is missing or unspecified without running this query:
+Attribute values (`value`, `unit`) sit on the part itself or on what it specialises or is typed by: a selected variant, a platform part, a definition. A part that owns no attributes usually inherits them this way (`PC-001` owns none and specialises `EDU-PC-003`). Follow every `SPECIALIZES` and `TYPED_BY` branch and prefer the nearest value (the shortest path). When a constraint mentions an attribute, look up that attribute's nearest value with the query below, then state the value and whether the constraint holds for it. Never say a value is missing or unspecified without running this query:
 
 ```cypher
 MATCH p=(:Node {key:$key})-[:SPECIALIZES|TYPED_BY*0..]->(s)-[:OWNS]->(a:AttributeUsage) RETURN s.key, a.name, a.value, a.unit ORDER BY length(p)
