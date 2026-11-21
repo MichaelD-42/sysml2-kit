@@ -68,20 +68,36 @@ class EnrichedExampleTest(unittest.TestCase):
         values = texts_of_attribute_values(export, "EDrivePhysical::motor::motor80kW")
         self.assertIn("ratedPower", values)
         self.assertRegex(values["ratedPower"], r"^80 \[kW\]$")
+
     def test_constraints(self):
         self.assertTrue(named(export, "ConstraintUsage", "peakTorqueLimit"))
         self.assertTrue(named(export, "ConstraintUsage", "coolantDerating"))
+
     def test_requirement_constraint_on_sr005(self):
-        self.assertTrue(requirement_constraints(export, "VehicleRequirements::acceleration"))
+        self.assertTrue(
+            requirement_constraints(export, "VehicleRequirements::acceleration")
+        )
+
     def test_drive_unit_boundary(self):
-        self.assertEqual(port_names(export, "VehiclePhysical::vehicleAssembly::driveUnit"),
-                         {"hvIn", "canBus", "coolantIn", "coolantOut", "mount"})
-        self.assertGreaterEqual(connections_touching(export, "VehiclePhysical::vehicleAssembly::driveUnit"), 5)
+        self.assertEqual(
+            port_names(export, "VehiclePhysical::vehicleAssembly::driveUnit"),
+            {"hvIn", "canBus", "coolantIn", "coolantOut", "mount"},
+        )
+        self.assertGreaterEqual(
+            connections_touching(export, "VehiclePhysical::vehicleAssembly::driveUnit"),
+            5,
+        )
+
     def test_context(self):
-        self.assertEqual(part_names(export, "VehicleContext::vehicleContext"),
-                         {"vehicle", "driver", "passenger", "trailer", "chargingStation", "road"})
+        self.assertEqual(
+            part_names(export, "VehicleContext::vehicleContext"),
+            {"vehicle", "driver", "passenger", "trailer", "chargingStation", "road"},
+        )
+
     def test_flows(self):
-        self.assertGreaterEqual(count(export, "FlowUsage") + count(export, "SuccessionFlowUsage"), 3)
+        self.assertGreaterEqual(
+            count(export, "FlowUsage") + count(export, "SuccessionFlowUsage"), 3
+        )
 ```
 
 Helpers walk `owningRelationship`/`ownedMember`-style refs in the export; port names and inherited ports come through the `:> eDriveUnit` subsetting (use the export's `feature` / `inheritedMember` refs if present, else declare the ports on `driveUnit` too — say which in the report). The exact metaclass names for flows come from the export; check them on a probe first.
