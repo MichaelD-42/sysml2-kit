@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Model explorer</title>
+<link rel="stylesheet" href="app.css">
+<script>
+  // theme choice, and every uncaught error or console.error as an inline banner (the page is debugged by eye)
+  try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+  (() => {
+    const show = (msg) => {
+      const b = document.getElementById("banner");
+      if (!b) return void addEventListener("DOMContentLoaded", () => show(msg));
+      const p = document.createElement("p");
+      p.textContent = msg;
+      b.querySelector(".messages").append(p);
+      b.hidden = false;
+    };
+    const error = console.error.bind(console);
+    console.error = (...args) => (error(...args), show(args.map((a) => a?.message ?? String(a)).join(" ")));
+    addEventListener("error", (e) => show(e.message || `failed to load ${e.target?.src ?? e.target?.href ?? "a resource"}`), true);
+    addEventListener("unhandledrejection", (e) => show(e.reason?.message ?? String(e.reason)));
+  })();
+</script>
+<script src="vendor/elk.bundled.js"></script>
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+<div id="banner" class="banner" role="alert" hidden>
+  <div class="messages"></div>
+  <button type="button" onclick="this.parentElement.hidden = true; this.previousElementSibling.replaceChildren()">Dismiss</button>
+</div>
+<header class="top">
+  <h1>Model explorer</h1>
+  <p class="sub">SysML v2 model and needs, from the graph</p>
+  <div class="actions">
+    <button type="button" id="back" disabled>Back</button>
+    <button type="button" id="reload">Rebuild and reload</button>
+    <span id="reload-status" class="status" aria-live="polite"></span>
+    <button type="button" id="theme" aria-label="Switch light or dark theme">Theme</button>
+  </div>
+</header>
+<main class="grid">
+  <nav class="col tree-col" aria-labelledby="tree-h">
+    <h2 id="tree-h">Hierarchy</h2>
+    <div id="tree"></div>
+  </nav>
+  <section class="col view-col" aria-label="Diagram">
+    <div id="kinds" role="tablist" aria-label="Views"></div>
+    <nav id="breadcrumb" aria-label="Owner path"></nav>
+    <div id="inspector"></div>
+    <div class="zoom" role="group" aria-label="Zoom">
+      <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+      <button type="button" id="zoom-fit">Fit</button>
+      <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+      <span class="legend"><span class="domain d-ME">ME</span><span class="domain d-EE">EE</span><span class="domain d-SW">SW</span></span>
+    </div>
+    <p id="note" class="note" aria-live="polite"></p>
+    <div id="canvas" role="tabpanel" tabindex="-1"></div>
+  </section>
+  <aside class="col side-col" aria-label="Ask, search and Cypher">
+    <div id="side-tabs" role="tablist">
+      <button type="button" role="tab" data-panel="ask" aria-selected="true">Ask</button>
+      <button type="button" role="tab" data-panel="search" aria-selected="false">Search</button>
+      <button type="button" role="tab" data-panel="cypher" aria-selected="false">Cypher</button>
+    </div>
+    <section id="ask" class="side-panel" role="tabpanel"></section>
+    <section id="search" class="side-panel" role="tabpanel" hidden></section>
+    <section id="cypher" class="side-panel" role="tabpanel" hidden></section>
+  </aside>
+</main>
+</body>
+</html>
