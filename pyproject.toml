@@ -16,3 +16,7 @@ sysml2kit = "sysml2kit.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff.lint.isort]
+# demo/ is not on the root source path, so ruff would sort its imports as third-party
+known-first-party = ["explorer", "tests"]
