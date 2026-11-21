@@ -7,7 +7,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "plugins/sysml-rflp/templates/project"
-EXAMPLES = [ROOT / "examples/vehicle", ROOT / "examples/edrive-platform"]
+EXAMPLES = [
+    ROOT / "examples/vehicle",
+    ROOT / "examples/edrive-platform",
+    ROOT / "examples/seat-switch-platform",
+]
 SAME = [
     "docs/ubproject.toml",
     "docs/schemas.json",
