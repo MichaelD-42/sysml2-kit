@@ -1,4 +1,4 @@
-"""Write a Graph into Neo4j, replacing what is there: `python -m explorer.load <project-dir>`."""
+"""Write a Graph into Neo4j, replacing its :Node graph: `python -m explorer.load <project-dir>`."""
 
 import json
 import os
@@ -60,7 +60,7 @@ def indexes(driver, dims: int) -> None:
 
 def write(graph: Graph, driver) -> None:
     def tx_work(tx):
-        tx.run("MATCH (n) DETACH DELETE n")
+        tx.run("MATCH (n:Node) DETACH DELETE n")
         nodes = sorted(graph.nodes.values(), key=lambda n: n.labels)
         for labels, group in groupby(nodes, key=lambda n: n.labels):
             label = ":".join(f"`{x}`" for x in labels)

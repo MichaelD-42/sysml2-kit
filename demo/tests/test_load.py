@@ -17,10 +17,20 @@ class WriteTest(unittest.TestCase):
         graph = load.read_project(VEHICLE)
         for _ in range(2):  # the second write must not double it
             load.write(graph, driver)
-            self.assertEqual(count(driver), len(graph.nodes))
+            self.assertEqual(
+                count(driver, "MATCH (n:Node) RETURN count(n) AS c"), len(graph.nodes)
+            )
         self.assertEqual(
-            count(driver, "MATCH ()-[r]->() RETURN count(r) AS c"), len(graph.edges)
+            count(driver, "MATCH (:Node)-[r]->(:Node) RETURN count(r) AS c"),
+            len(graph.edges),
         )
+
+    def test_write_leaves_other_data_alone(self):
+        driver = driver_or_skip(self)
+        driver.execute_query("CREATE (:NotOurs {tag: 'keep'})")
+        self.addCleanup(driver.execute_query, "MATCH (n:NotOurs) DELETE n")
+        load.write(load.read_project(VEHICLE), driver)
+        self.assertEqual(count(driver, "MATCH (n:NotOurs) RETURN count(n) AS c"), 1)
 
 
 if __name__ == "__main__":

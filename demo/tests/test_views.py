@@ -2,11 +2,38 @@ import re
 import unittest
 from pathlib import Path
 
-from explorer import views
+from explorer import load, views
+from explorer.graph import Edge, Graph, Node
 from tests.support import driver_or_skip, load_project
 
 VEHICLE = Path(__file__).resolve().parents[2] / "examples" / "vehicle"
 NEEDS = VEHICLE / "build" / "needs" / "needs.json"
+
+
+def part(key, qualified, platform=None, kind="PartUsage"):
+    labels = ["Node", "Element", kind]
+    props = {"key": key, "name": qualified.split("::")[-1], "qualifiedName": qualified}
+    return Node(key, labels, props | {"kind": kind, "platform": platform})
+
+
+class DefaultFocusTest(unittest.TestCase):
+    """A project without VehicleLogical::vehicle: the first top-level project part."""
+
+    def test_falls_back_to_a_top_level_project_part(self):
+        driver = driver_or_skip(self)
+        nodes = [
+            part("pkg", "Shop", kind="Package"),
+            part("A-1", "Shop::platformBench", platform=True),
+            part("A-2", "Shop::bench::vice"),
+            part("B-1", "Shop::bench"),
+            part("C-1", "Shop::lathe"),
+        ]
+        owns = [("pkg", "A-1"), ("pkg", "B-1"), ("pkg", "C-1"), ("B-1", "A-2")]
+        graph = Graph({n.key: n for n in nodes}, [Edge(a, "OWNS", b) for a, b in owns])
+        load.write(graph, driver)
+        for kind in ("context", "boundary", "interfaces", "composition"):
+            with self.subTest(kind=kind):
+                self.assertEqual(views.view(driver, kind, None)["focus"], "B-1")
 
 
 class ViewsTest(unittest.TestCase):
@@ -99,7 +126,8 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(len(names), len(set(names)))
 
     def test_defaults_prefer_the_project_over_the_platform(self):
-        self.assertEqual(self.view("activity")["focus"], "FEAT-001")
+        # the project feature with the most actions, so the default is not a single box
+        self.assertEqual(self.view("activity")["focus"], "FEAT-002")
         self.assertEqual(self.view("usecases")["focus"], "UC-001")
 
     def test_compliance(self):

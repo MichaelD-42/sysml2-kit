@@ -231,13 +231,18 @@ QUERIES = {
     "usecases": USECASES,
     "trace": TRACE,
 }
-LOGICAL = "MATCH (n:Node {qualifiedName: 'VehicleLogical::vehicle'}) RETURN n.key"
+# the vehicle's logical part when there is one, else the first project part a package owns
+TOP_PART = """
+MATCH (:Package)-[:OWNS]->(n:PartUsage)
+RETURN n.key ORDER BY n.qualifiedName = 'VehicleLogical::vehicle' DESC, coalesce(n.platform, false), n.key
+LIMIT 1"""
 DEFAULTS = {
-    "context": LOGICAL,
-    "boundary": LOGICAL,
-    "interfaces": LOGICAL,
-    "composition": LOGICAL,
-    "activity": "MATCH (n:feature) RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
+    "context": TOP_PART,
+    "boundary": TOP_PART,
+    "interfaces": TOP_PART,
+    "composition": TOP_PART,
+    "activity": "MATCH (n:feature) RETURN n.key ORDER BY coalesce(n.platform, false), "
+    "COUNT { (n)-[:OWNS*]->(:ActionUsage) } DESC, n.key LIMIT 1",
     "variants": "MATCH (n:Node) WHERE n.isVariation RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
     "usecases": "MATCH (n:UseCaseUsage) RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
     "trace": "MATCH (n:crs) RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
