@@ -23,12 +23,13 @@ For each of R, F, L, P (the `rflp` steps 1 to 4):
 
 1. Ask. Go through the topics of this layer in `references/questions.md`. Skip every topic the inputs already answer; ask only what is left open, one topic at a time, and wait for each answer. Never invent a value: an unanswered quantity goes into the model as a placeholder and onto the open-question list.
 2. Create. Hand the layer and the answers to its agent (`requirements-analyst`, `functional-architect`, `logical-architect`, `physical-architect`). After R and F, tell the agent which platform features and PCs exist so it specializes and reuses instead of redrawing.
-3. Validate. Run the `rflp-reviewer` agent on the layer; fix blocking findings through the authoring agent, up to 3 rounds.
-4. Approve. Show the user what was added (ids, one-line titles), the open questions, and for P the reuse status per matched feature. Stop. Do not start the next layer without a yes.
+3. Match (P only). After the `physical-architect` and before the review, state coverage as described under Matching, so the reuse status exists.
+4. Validate. Run the `rflp-reviewer` agent on the layer; fix blocking findings through the authoring agent, up to 3 rounds.
+5. Approve. Show the user what was added (ids, one-line titles), the open questions, and for P the reuse status per matched feature. Stop. Do not start the next layer without a yes.
 
 ## Matching
 
-After P, when the reuse status is visible, the main session (not an agent) states with the user what each customer requirement is met by, and writes the claims the user agrees to into the features: `@Matches { need = "CRS-001"; }` inside the feature that covers it, one per CRS; add `partial = true` when the feature meets it only in part (value not reached, condition excluded). A partial match needs an SR that states the gap, satisfied by a component in that feature's chain. Write only claims the user agrees with; the reuse status (platform, variant, modified, new, incomplete) is derived from the chain, never written.
+At step 3 of P, once the chain reaches physical components, the main session (not an agent) states with the user what each customer requirement is met by, and writes the claims the user agrees to into the features: `@Matches { need = "CRS-001"; }` inside the feature that covers it, one per CRS; add `partial = true` when the feature meets it only in part (value not reached, condition excluded). A partial match needs an SR that states the gap, satisfied by a component in that feature's chain. Write only claims the user agrees with; the reuse status (platform, variant, modified, new, incomplete) is derived from the chain, never written.
 
 A CRS no feature can meet (commercial terms, delivery, certification, or a technical gap) is answered by a compliance statement: a `cst` directive in `docs/customer/statements.md` with `:answers:` and `:compliance:` (`comply`, `partial`, `not-comply`). The compliance value is the user's decision.
 
