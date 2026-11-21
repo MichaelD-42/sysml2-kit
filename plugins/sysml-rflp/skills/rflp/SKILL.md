@@ -14,7 +14,7 @@ Work one layer at a time. Never start a layer before the user approved the previ
 | 1 R | `requirements-analyst` | UC, SR, CON constraints, CST for commercial and not-offered CRS | `crs-class`, `crs-satisfied`, `constraint-satisfies`, `usecase-realizes`, `sysreq-satisfies`, `cst-compliance` |
 | 2 F | `functional-architect` | FEAT, F (nested), `perform` in UCs | `usecase-realized`, `feature-realizes` |
 | 3 L | `logical-architect` | LC, LI, connections, `allocate` F to LC, `satisfy` | `function-allocated`, `component-used`, `sysreq-satisfied` |
-| 4 P | `physical-architect` | PC, PI, `allocate` LC to PC and LI to PI | `logical-allocated`, `physical-used` |
+| 4 P | `physical-architect` | PC, PI, `allocate` LC to PC and LI to PI | `logical-allocated`, `physical-used`, `swcomponent-used`, `software-used` |
 | 5 V | `test-designer` | STC (SysML), ATC (Markdown or RST) | all remaining: `systest-verifies`, `systest-implements`, `constraint-verified`, `ctr-implemented`, `acctest-verifies`, `acctest-implements`, `sysreq-verified`, `usecase-verified`; plus the compliance findings of `sysml2kit compliance`, which include `<CRS>: not verified (no acceptance test, no implemented CTR applying to it)` |
 
 A CRS with `:scope: commercial` or `:scope: not-offered` is exempt from `crs-satisfied` and the not-verified finding; a CRS of class `information` carries no obligation; it needs a compliance statement (CST) instead. Platform needs are never rule-checked here; the platform's own build checks them.

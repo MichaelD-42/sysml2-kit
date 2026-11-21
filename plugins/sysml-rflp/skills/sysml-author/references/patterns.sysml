@@ -8,8 +8,10 @@ package PumpPatterns {
     private import ScalarValues::*;
 
     // --- R: use cases realize customer requirements (RST needs) and perform functions ---
+    // The objective's doc is the need title, "The <actor> wants to <goal>"; the name stays the identifier.
     use case <'UC-101'> coolEngine {
         @Realizes { need = "CRS-101"; }                 // one annotation per need is the safe form
+        objective { doc /* The driver wants to drive under load without overheating the engine */ }
         doc /* The driver drives under load; the engine stays within temperature limits. */
         subject pumpSystem;
         actor driver;
@@ -90,6 +92,30 @@ package PumpPatterns {
     allocate pumpSystem.pump to pumpUnit;               // LC => PC
     allocate pumpSystem.radiator to heatExchanger;
     allocate pumpSystem.pump.outlet to pumpUnit.hoseOutlet;   // LI => PI
+
+    // --- P: software architecture and design are physical components: SW components and SW units ---
+    // Firmware owns SW components, a SW component owns its SW units; each carries its own #Software.
+    // A SW component's interfaces are ports, wired by connections. Software requirements (SWR, in the
+    // docs) realize the SW component or unit that implements them; unit tests verify the SWRs (JUnit).
+    #Software part <'PC-107'> pumpFirmware {
+        doc /* Pump controller firmware, module PMP-FW-100. */
+        #Software part <'PC-108'> motorControl {
+            doc /* SW component: runs the pump motor at the commanded speed. */
+            #Software port <'PI-102'> speedCommand;
+            #Software part <'PC-109'> speedController {
+                doc /* SW unit: PI loop from speed set point to PWM duty. */
+                port setpoint;
+                port duty;
+            }
+            #Software part <'PC-110'> pwmDriver {
+                doc /* SW unit: drives the PWM timer. */
+                port duty;
+            }
+            bind speedCommand = speedController.setpoint;
+            connect speedController.duty to pwmDriver.duty;
+        }
+    }
+    allocate pumpSystem.pump to pumpFirmware.motorControl;   // LC => SW component, not to its units
 
     // --- P: variation (platform side): variants are members; ids on variants need the kit's sysml fork ---
     #Electrical variation part <'PC-103'> controller {

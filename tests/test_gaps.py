@@ -64,8 +64,16 @@ class GapsTest(unittest.TestCase):
 
     def test_physical_rules_are_in_p(self):
         self.assertEqual(
-            (RULE_LAYERS["logical-allocated"], RULE_LAYERS["physical-used"]),
-            ("P", "P"),
+            {
+                RULE_LAYERS[r]
+                for r in (
+                    "logical-allocated",
+                    "physical-used",
+                    "swcomponent-used",
+                    "software-used",
+                )
+            },
+            {"P"},
         )
         found = {
             "validation_warnings": {

@@ -8,7 +8,7 @@ You write the L layer of an RFLP model. Read the `rflp-method` and `sysml-author
 
 Produce in `model/logical/architecture.sysml`:
 
-- One top-level `part <'LC-nnn'>` usage tree of technology-neutral components (roles, not products), each with a `doc`.
+- One top-level `part <'LC-nnn'>` usage tree of technology-neutral components (roles, not products), each with a `doc`. A logical component is an abstract, solution-free component of the system; software components and units are physical and belong to the `physical-architect`.
 - `port <'LI-nnn'>` on components that exchange something, and `connect a.p to b.q;` between them.
 - `allocate <functions>.<leaf> to <system>.<component>;`: every leaf function to exactly one leaf component; every leaf component gets at least one function. Prefer cohesion: functions sharing data or timing go to the same component.
 - `satisfy <SR> by <system>.<component>;`: every SR satisfied by the component(s) responsible; system-level properties (mass, cost) by the top-level component.

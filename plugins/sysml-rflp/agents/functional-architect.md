@@ -8,8 +8,8 @@ You write the F layer of an RFLP model. Read the `rflp-method` and `sysml-author
 
 Produce in `model/functional/features.sysml`:
 
-- One `#Feature action <'FEAT-nnn'> nounName` per thing the product offers (a noun: `adaptiveCruiseControl`, `travelRange`), with a `doc`. A feature is what the product does for a use case, not a function.
-- Each feature owns its functions as nested `action <'F-nnn'>` usages; split a function into sub-functions where it has distinct steps. Functions are verb + noun, solution-neutral, each with a `doc`. Order where it matters with `first a then b;`.
+- One `#Feature action <'FEAT-nnn'> nounName` per thing the product offers (a noun: `adaptiveCruiseControl`, `travelRange`), with a `doc`. A feature is a capability/property of the system to fulfil a use case, someone finds valuable (usually a noun); it is not a function.
+- Each feature owns its functions as nested `action <'F-nnn'>` usages; split a function into sub-functions where it has distinct steps. A function is how a feature is implemented (needs a verb): verb + noun, solution-neutral, each with a `doc`. Order where it matters with `first a then b;`.
 - In each use case, `perform <feature>;` for every feature it needs (this is the realizes link). Every use case performs at least one feature; every feature is performed by one.
 - Cover the functional content of the SRs: an SR that implies behaviour needs a function that can later be allocated to the component satisfying it.
 - RFQ project with a platform: where a platform feature already does the job, specialize it (`#Feature action <'FEAT-010'> acc :> PlatformFeatures::adaptiveCruiseControl;`) instead of redrawing it. Do not write `@Matches`; the `rfq` skill states coverage after the user agrees.

@@ -526,6 +526,90 @@
           },
           "platform": {
             "const": false
+          },
+          "domain": {
+            "enum": [
+              "ME",
+              "EE"
+            ]
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "allocated_to": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "component"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "swcomponent-used",
+      "message": "SW component has no logical component allocated",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "physical"
+          },
+          "domain": {
+            "const": "SW"
+          },
+          "leaf": {
+            "const": false
+          },
+          "owned_by": {
+            "minItems": 1
+          },
+          "platform": {
+            "const": false
+          }
+        }
+      },
+      "validate": {
+        "network_back": {
+          "allocated_to": {
+            "contains": {
+              "local": {
+                "properties": {
+                  "type": {
+                    "const": "component"
+                  }
+                }
+              }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "software-used",
+      "message": "Software without SW components has no logical component allocated",
+      "select": {
+        "properties": {
+          "type": {
+            "const": "physical"
+          },
+          "domain": {
+            "const": "SW"
+          },
+          "leaf": {
+            "const": true
+          },
+          "owned_by": {
+            "maxItems": 0
+          },
+          "platform": {
+            "const": false
           }
         }
       },

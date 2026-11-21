@@ -129,6 +129,51 @@ class ConvertTest(unittest.TestCase):
         self.assertEqual(n["SR-1"]["source"], "model/r.sysml:3")
         self.assertEqual(n["F-2"]["owned_by"], ["F-1"])
 
+    def test_use_case_objective_is_the_title(self):
+        n = needs_of(
+            model(
+                uc=el(
+                    "uc",
+                    "UseCaseUsage",
+                    "UC-1",
+                    "commute",
+                    owner="pkg",
+                    ownedRelationship=ids("om"),
+                ),
+                om=el("om", "ObjectiveMembership", owner="uc", ownedElement=ids("obj")),
+                obj=el("obj", "RequirementUsage", owner="om", documentation=ids("od")),
+                od={
+                    "@id": "od",
+                    "@type": "Documentation",
+                    "body": "The driver wants to get to work",
+                },
+            )
+        )
+        self.assertEqual(n["UC-1"]["title"], "The driver wants to get to work")
+        self.assertEqual(n["UC-1"]["qualified_name"], "P::commute")
+        self.assertEqual(n["F-1"]["title"], "operate")  # no objective: the name
+
+    def test_a_verification_objective_is_not_the_title(self):
+        n = needs_of(
+            model(
+                stc=el(
+                    "stc",
+                    "VerificationCaseUsage",
+                    "STC-1",
+                    "weigh",
+                    owner="pkg",
+                    verifiedRequirement=ids("sr"),
+                    ownedRelationship=ids("om"),
+                ),
+                om=el(
+                    "om", "ObjectiveMembership", owner="stc", ownedElement=ids("obj")
+                ),
+                obj=el("obj", "RequirementUsage", owner="om", documentation=ids("od")),
+                od={"@id": "od", "@type": "Documentation", "body": "Check the mass"},
+            )
+        )
+        self.assertEqual(n["STC-1"]["title"], "weigh")
+
     def test_leaf_counts_children_of_the_same_type_only(self):
         n = needs_of(model())
         self.assertFalse(n["F-1"]["leaf"])

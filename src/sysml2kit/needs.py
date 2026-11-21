@@ -202,11 +202,21 @@ def convert(elements, locations, platform_files=()):
             )
             continue
         docs = [by_id[d]["body"] for d in refs(e, "documentation") if d in by_id]
+        # a use case's `objective { doc /* The driver wants to ... */ }` is its title
+        objective = [
+            by_id[d]["body"]
+            for m in refs(e, "ownedRelationship")
+            if kind == "usecase"
+            and by_id.get(m, {}).get("@type") == "ObjectiveMembership"
+            for r in refs(by_id[m], "ownedElement")
+            for d in refs(by_id.get(r, {}), "documentation")
+            if d in by_id
+        ]
         needs[short] = {
             "id": short,
             "type": kind,
             "domain": DOMAINS[domains[0]] if domains else "",
-            "title": e.get("name") or short,
+            "title": " ".join(objective) or e.get("name") or short,
             "content": RST_INLINE.sub(r"\\\1", "\n\n".join(docs)),
             "qualified_name": e.get("qualifiedName") or "",
             "sysml_kind": e["@type"],

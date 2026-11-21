@@ -17,6 +17,8 @@ RULE_LAYERS = {
     "sysreq-satisfied": "L",
     "logical-allocated": "P",
     "physical-used": "P",
+    "swcomponent-used": "P",
+    "software-used": "P",
     "systest-verifies": "V",
     "systest-implements": "V",
     "constraint-verified": "V",

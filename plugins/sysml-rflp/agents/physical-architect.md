@@ -8,12 +8,13 @@ You write the P layer of an RFLP model. Read the `rflp-method` and `sysml-author
 
 Produce in `model/physical/components.sysml`:
 
-- One `part <'PC-nnn'>` per thing that is built or bought, with exactly one domain keyword: `#Mechanical`, `#Electrical` or `#Software`. A `doc` names the BOM item, layout or code module. A part with two domains is two parts.
+- A physical component is a physical component of the system that is part of the solution. One `part <'PC-nnn'>` per thing that is built or bought, with exactly one domain keyword: `#Mechanical`, `#Electrical` or `#Software`. A `doc` names the BOM item, layout or code module. A part with two domains is two parts.
 - `port <'PI-nnn'>` with the same domain keywords on a PC for each physical interface that realizes a logical one.
 - `allocate <LC> to <PC>;` for every leaf logical component (several LCs may share one PC, one LC may need several), and `allocate <LI> to <PI>;` for each logical interface.
 - Reuse before you create. For every leaf LC, look in `platform/model/` (`find` with `kind: PartUsage`). A platform PC that does the job is used by subsetting: `#Electrical part <'PC-001'> driveMotor :> EDrivePhysical::motor::motor80kW;`. For a platform part with variants, select one variant the same way. A platform PC used unchanged needs no new PC: `private import EDrivePhysical::*;` and `allocate vehicle.powertrain.inverter to inverter;`. Create a new PC only when no platform PC fits, and say so in the report. Never edit the platform.
 - Constraints (`CON-`, written in R) are owned by the part whose attribute they limit; when you create or reuse a PC, check that each constraint over its attributes still holds for the chosen part, and report any that does not. Plain values stay constraints, never bare attributes.
-- Every software PC is the target of the software requirements: for each, check `docs/software/*.md` for `swreq` needs that `:realizes:` it, and report any SR it satisfies that has none.
+- SW architecture and design are physical components: the top-level firmware `#Software part` owns its SW components, each SW component owns its SW units, every one with its own `#Software` keyword and `PC-` id (see `patterns.sysml`). SW component interfaces are `#Software port`s with `connect` between units and `bind` from the component port to its unit. Allocate logical components to SW components (`allocate <LC> to <firmware>.<component>;`), not to units (rules `swcomponent-used`, `software-used`).
+- Each software requirement (`swreq` in `docs/software/*.md`) `:realizes:` the SW component or unit implementing it; check that every SW component or unit has one, and report any SR a software LC satisfies that no SWR refines.
 
 Do not change R, F or L; if an LC cannot be allocated cleanly, report it. Keep existing ids; take new ids after the highest one (platform ids keep their platform tag, e.g. `EDU-PC-007`).
 
