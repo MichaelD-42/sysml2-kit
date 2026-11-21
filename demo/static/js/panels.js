@@ -212,3 +212,14 @@ export function renderCompliance(el, view, focus) {
     </tbody></table>` : ""}
     ${view.findings?.length ? `<h3>Findings</h3><ul class="findings">${view.findings.map((f) => `<li>${esc(typeof f === "string" ? f : JSON.stringify(f))}</li>`).join("")}</ul>` : ""}`;
 }
+
+/** Inspector HTML for a meta-model need type or link: its count, the rules on it, its instances. */
+export function instanceList(item) {
+  const type = (k) => k.replace(/^type:/, "");
+  const title = item.src ? `${type(item.src)} ${item.type.toLowerCase()} ${type(item.dst)}` : `${item.name} «${item.kind}»`;
+  const count = `${item.count} instance${item.count === 1 ? "" : "s"}${item.unused ? ", declared but unused" : ""}`;
+  const rows = (item.instances ?? []).map((x) => `<li>${Array.isArray(x) ? `${keyLink(x[0])} → ${keyLink(x[1])}` : keyLink(x)}</li>`);
+  return `<strong>${esc(title)}</strong> <span>${esc(count)}</span>
+    ${item.rules?.length ? `<p>Rules: ${esc(item.rules.join(", "))}</p>` : ""}
+    ${rows.length ? `<ul class="instances">${rows.join("")}</ul>` : ""}`;
+}

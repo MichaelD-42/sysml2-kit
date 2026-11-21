@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+import tomllib
+
 from explorer.graph import LAYERS
 from sysml2kit.compliance import compliance, ctr_rows
 
@@ -17,6 +19,7 @@ KINDS = (
     "trace",
     "compliance",
     "vmodel",
+    "metamodel",
 )
 NEED_LINKS = "SATISFIES|ALLOCATED_TO|VERIFIES|REALIZES|MATCHES|PARTIAL_MATCHES|ANSWERS|TESTS|REQUIRES|APPLIES_TO|IMPLEMENTS"
 ROW = (
@@ -332,9 +335,19 @@ def compliance_rows(needs_path: Path) -> dict:
     }
 
 
-def view(graph, kind: str, focus: str | None, needs_path: Path | None = None) -> dict:
+def view(
+    graph,
+    kind: str,
+    focus: str | None,
+    needs_path: Path | None = None,
+    project: Path | None = None,
+) -> dict:
     if kind not in KINDS:
         raise ValueError(f"unknown view kind {kind!r}")
+    if kind == "metamodel":
+        if project is None:
+            raise ValueError("the meta-model view needs the project")
+        return metamodel(graph, project)
     if kind == "vmodel":
         return vmodel(graph, focus)
     if kind == "compliance":
@@ -576,6 +589,109 @@ def vmodel(graph, focus):
         "edges": edges,
         "empty": [lv for lv in (1, 2, 3, 4) if lv not in right],
         "reason": None if nodes else "no requirements to place",
+    }
+
+
+LAYER_TITLES = {
+    "R": "Requirements",
+    "F": "Functional",
+    "L": "Logical",
+    "P": "Physical",
+    "V": "Verification",
+}
+META_EDGES = """
+MATCH (a:Need)-[r]->(b:Need)
+RETURN head([l IN labels(a) WHERE l IN $types]) AS src, type(r) AS type,
+  head([l IN labels(b) WHERE l IN $types]) AS dst, a.key AS a, b.key AS b
+ORDER BY a, b"""
+META_NODES = """
+MATCH (n:Need) RETURN head([l IN labels(n) WHERE l IN $types]) AS type, n.key AS key ORDER BY key"""
+
+
+def _rule_types(schema):
+    t = schema.get("properties", {}).get("type", {})
+    return t["enum"] if "enum" in t else [t["const"]]
+
+
+def metamodel(graph, project: Path) -> dict:
+    """The project's need types by RFLP layer, the links between them, and the rules on each."""
+    conf = tomllib.loads((project / "docs" / "ubproject.toml").read_text())["needs"]
+    schemas = json.loads((project / "docs" / "schemas.json").read_text())["schemas"]
+    types = {t["directive"]: t["title"] for t in conf["types"]}
+    declared = conf.get("links", {})
+    instances = {t: [] for t in types}
+    for r in _read(graph, META_NODES, types=list(types)):
+        if r["type"]:
+            instances[r["type"]].append(r["key"])
+    edges = {}
+
+    def edge(src, link, dst):
+        return edges.setdefault(
+            (src, link, dst),
+            {"instances": [], "rules": [], "declared": link in declared},
+        )
+
+    for r in _read(graph, META_EDGES, types=list(types)):
+        if r["src"] and r["dst"]:
+            edge(r["src"], r["type"].lower(), r["dst"])["instances"].append(
+                [r["a"], r["b"]]
+            )
+    node_rules = {t: [] for t in types}
+    # a rule's link check is an edge from the selected type (network) or into it (network_back)
+    for rule in schemas:
+        selected, checks = _rule_types(rule["select"]), rule["validate"]
+        linked = False
+        for direction in ("network", "network_back"):
+            for link, check in checks.get(direction, {}).items():
+                linked = True
+                for s in selected:
+                    for o in _rule_types(check["contains"]["local"]):
+                        ends = (s, o) if direction == "network" else (o, s)
+                        edge(ends[0], link, ends[1])["rules"].append(rule["id"])
+        if not linked:
+            for s in selected:
+                node_rules[s].append(rule["id"])
+    used = {link for (_, link, _), e in edges.items() if e["instances"]}
+    layers = {t: LAYERS[t] for t in types}
+    nodes = [
+        {
+            "key": f"layer:{lv}",
+            "name": f"{lv} · {title}",
+            "kind": "layer",
+            "parent": None,
+            "count": sum(len(instances[t]) for t in types if layers[t] == lv),
+        }
+        for lv, title in LAYER_TITLES.items()
+    ] + [
+        {
+            "key": f"type:{t}",
+            "name": title,
+            "kind": t,
+            "parent": f"layer:{layers[t]}",
+            "count": len(instances[t]),
+            "instances": instances[t],
+            "rules": node_rules[t],
+        }
+        for t, title in types.items()
+    ]
+    return {
+        "kind": "metamodel",
+        "focus": None,
+        "nodes": nodes,
+        "edges": [
+            {
+                "src": f"type:{s}",
+                "dst": f"type:{d}",
+                "type": link.upper(),
+                "label": f"{declared.get(link, {}).get('outgoing', link)} ({len(e['instances'])})",
+                "count": len(e["instances"]),
+                "unused": not e["instances"],
+                **e,
+            }
+            for (s, link, d), e in sorted(edges.items())
+        ],
+        "unused_links": sorted(set(declared) - used),
+        "reason": None,
     }
 
 

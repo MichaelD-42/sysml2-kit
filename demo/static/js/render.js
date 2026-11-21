@@ -87,7 +87,10 @@ function edge(e, domain) {
   if (e.points.length < 2) return "";
   const d = e.points.map((p, i) => `${i ? "L" : "M"}${p.x},${p.y}`).join(" ");
   const label = e.label ? text(e.label.x, e.label.y + e.label.height - 2, e.label.text, "t-edge") : "";
-  return `<g class="e e-${esc(e.type)}${domainClass(domain)}"><path d="${d}" ${edgeMarkers(e.type)}/>${label}</g>`;
+  // a meta-model link is picked to list its instances; one declared but never used is dashed
+  const meta = e.count === undefined ? "" : ` meta${e.unused ? " unused" : ""}`;
+  const pick = meta ? ` data-edge="${esc(e.key)}" tabindex="0" role="button" aria-label="${esc(`${e.src.replace("type:", "")} ${e.label?.text ?? e.type.toLowerCase()} ${e.dst.replace("type:", "")}`)}"` : "";
+  return `<g class="e e-${esc(e.type)}${domainClass(domain)}${meta}"${pick}><path d="${d}" ${edgeMarkers(e.type)}/>${label}</g>`;
 }
 
 // a V-model level: its title, and a dashed slot where the right leg has no tests at this level

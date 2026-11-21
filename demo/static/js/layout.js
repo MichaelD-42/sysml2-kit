@@ -36,7 +36,10 @@ function describe(node, actors, compound) {
   if (node.selected === true && node.variant) tags.push("selected");
   if (node.selected === false) tags.push("not selected");
   if (node.lane) tags.push(`allocated to ${node.lane.name}`);
-  const id = node.shortName ?? (/^[0-9a-f]{8}-/.test(node.key) ? null : node.key);
+  // a meta-model need type (or layer): its instance count and the rules on it; its key is no id
+  const typeBox = node.count !== undefined;
+  if (typeBox) tags.push(`${node.count} instance${node.count === 1 ? "" : "s"}`, ...(node.rules ?? []).map((r) => `rule ${r}`));
+  const id = typeBox ? null : node.shortName ?? (/^[0-9a-f]{8}-/.test(node.key) ? null : node.key);
   const header = [`«${keyword(node.kind)}»`, id, node.domain].filter(Boolean).join(" ");
   return { ...node, shape, header, lines, tags };
 }
@@ -97,6 +100,8 @@ export function toElk(view) {
       if (item.ports.length) item.layoutOptions["elk.nodeSize.constraints"] = "PORTS MINIMUM_SIZE";
       item.layoutOptions["elk.nodeSize.minimum"] = `(${item.width}, ${item.height})`;
     }
+    // meta-model layers are frames kept in RFLP order, left to right
+    if (n.kind === "layer") item.layoutOptions["elk.partitioning.partition"] = String("RFLPV".indexOf(n.key.slice(-1)));
     elk.set(n.key, item);
   }
   const root = {
@@ -111,6 +116,7 @@ export function toElk(view) {
       "elk.layered.spacing.nodeNodeBetweenLayers": "56",
       "elk.spacing.edgeLabel": "4",
       "elk.padding": "[top=16,left=16,bottom=16,right=16]",
+      ...(view.kind === "metamodel" ? { "elk.partitioning.activate": "true" } : {}),
     },
     children: [],
   };

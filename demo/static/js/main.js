@@ -1,4 +1,4 @@
-// Wires the page: one focus element, nine views laid out by ELK, and the side panels.
+// Wires the page: one focus element, eleven views laid out by ELK, and the side panels.
 import * as api from "./api.js";
 import { focus, setFocus, breadcrumb, history } from "./state.js";
 import { toElk, fromElk, layoutV, keyword } from "./layout.js";
@@ -16,6 +16,7 @@ const KINDS = {
   trace: "Traceability",
   compliance: "Compliance",
   vmodel: "V-model",
+  metamodel: "Meta-model",
 };
 const $ = (s) => document.querySelector(s);
 const elk = new globalThis.ELK();
@@ -98,7 +99,7 @@ async function show(kind, key) {
   canvas.setAttribute("aria-busy", "true");
   const note = $("#note");
   try {
-    let view = await api.view(kind, kind === "compliance" ? null : key);
+    let view = await api.view(kind, kind === "compliance" || kind === "metamodel" ? null : key);
     let why = "";
     if (view.reason && key) {
       // the focus has no such view: show the default one and say why
@@ -112,6 +113,7 @@ async function show(kind, key) {
     }
     if (mine !== token) return;
     note.innerHTML = why;
+    if (view.unused_links?.length) note.textContent = `Declared links with no instance: ${view.unused_links.join(", ")}`;
     await label(view.nodes);
     if (mine !== token) return;
     current.view = view;
@@ -179,13 +181,23 @@ function onFocus(key) {
   // in the V a customer requirement (level 1, left leg) narrows the view to its chain
   const crs = current.kind === "vmodel" && current.view?.nodes.some((n) => n.key === key && n.level === 1 && n.side === "left");
   if (crs && key !== current.view.focus) show(current.kind, key);
-  else if (current.kind === "compliance" || current.keys.has(key)) highlight(key);
+  else if (current.kind === "compliance" || current.kind === "metamodel" || current.keys.has(key)) highlight(key);
   else show(current.kind, key);
+}
+
+// a meta-model type or link lists its instances in the inspector; its boxes are not elements
+function pick(el) {
+  const item = el.dataset.edge
+    ? current.laid.edges.find((x) => x.key === el.dataset.edge)
+    : current.view.nodes.find((x) => x.key === el.dataset.key);
+  if (item) $("#inspector").innerHTML = panels.instanceList(item);
 }
 
 function wire() {
   // every key link and diagram element moves the focus
   document.addEventListener("click", (e) => {
+    const meta = current.kind === "metamodel" && e.target.closest("#canvas [data-key], #canvas [data-edge]");
+    if (meta) return e.preventDefault(), pick(meta);
     const el = e.target.closest("[data-key]");
     if (el) e.preventDefault(), setFocus(el.dataset.key);
     const open = e.target.closest("[data-open]");
@@ -193,6 +205,7 @@ function wire() {
   });
   const canvas = $("#canvas");
   const drill = (el) => {
+    if (current.kind === "metamodel") return;
     const n = current.view.nodes.find((x) => x.key === el.dataset.key) ?? { kind: "PortUsage" };
     const kind = drillKind(n, current.kind);
     setFocus(el.dataset.key);
@@ -203,8 +216,9 @@ function wire() {
     if (el) drill(el);
   });
   canvas.addEventListener("keydown", (e) => {
-    const el = e.target.closest("g[data-key]");
+    const el = e.target.closest("g[data-key], g[data-edge]");
     if (!el || e.key !== "Enter") return;
+    if (current.kind === "metamodel") return pick(el);
     e.shiftKey ? drill(el) : setFocus(el.dataset.key);
   });
   $("#back").onclick = () => focus.back();

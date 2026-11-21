@@ -5,7 +5,9 @@ from dataclasses import dataclass, field
 
 # need type -> RFLP layer
 LAYERS = {
-    **dict.fromkeys(("crs", "cst", "usecase", "sysreq", "constraint"), "R"),
+    **dict.fromkeys(
+        ("crs", "prq", "cst", "usecase", "sysreq", "swreq", "constraint"), "R"
+    ),
     **dict.fromkeys(("feature", "function"), "F"),
     **dict.fromkeys(("component", "interface"), "L"),
     **dict.fromkeys(("physical", "physinterface"), "P"),

@@ -82,7 +82,7 @@ def create_app(graph, embedder, project: Path, agent_factory=None) -> FastAPI:
 
     @app.get("/api/view/{kind}")
     def view(kind: str, focus: str | None = None):
-        return views.view(graph, kind, focus, needs_path)
+        return views.view(graph, kind, focus, needs_path, project)
 
     @app.get("/api/search")
     def find(q: str, k: int = Query(10, ge=1, le=50)):

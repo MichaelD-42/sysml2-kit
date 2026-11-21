@@ -97,3 +97,22 @@ test("toElk shows an attribute without a value as its name only", () => {
   });
   assert.deepEqual(g.children[0].meta.lines, ["t", "u"]);
 });
+
+test("toElk frames meta-model layers in RFLP order and boxes types without an id", () => {
+  const g = toElk({
+    kind: "metamodel",
+    nodes: [
+      { key: "layer:V", name: "V · Verification", kind: "layer", parent: null, count: 1 },
+      { key: "layer:R", name: "R · Requirements", kind: "layer", parent: null, count: 1 },
+      { key: "type:crs", name: "Customer requirement", kind: "crs", parent: "layer:R", count: 1, rules: ["crs-class"] },
+      { key: "type:ctr", name: "Customer test requirement", kind: "ctr", parent: "layer:V", count: 1, rules: [] },
+    ],
+    edges: [],
+  });
+  assert.equal(g.layoutOptions["elk.partitioning.activate"], "true");
+  assert.deepEqual(g.children.map((c) => [c.id, c.layoutOptions["elk.partitioning.partition"], c.meta.shape]),
+    [["layer:V", "4", "frame"], ["layer:R", "0", "frame"]]);
+  const crs = g.children[1].children[0].meta;
+  assert.equal(crs.header, "«crs»");
+  assert.deepEqual(crs.tags, ["1 instance", "rule crs-class"]);
+});

@@ -47,7 +47,7 @@ class ViewsTest(unittest.TestCase):
         cls.graph.close()
 
     def view(self, kind, focus=None):
-        v = views.view(self.graph, kind, focus, NEEDS)
+        v = views.view(self.graph, kind, focus, NEEDS, RFQ)
         self.assertEqual(bool(v["reason"]), not v["nodes"])
         return v
 
@@ -244,6 +244,34 @@ class ViewsTest(unittest.TestCase):
         self.assertLessEqual({"CTR-003", "STC-101"}, keys)
         self.assertNotIn("CRS-302", keys)
         self.assertNotIn("CTR-001", keys)
+
+    def test_metamodel(self):
+        v = self.view("metamodel")
+        kinds = {n["key"]: n["kind"] for n in v["nodes"]}
+        edges = {(kinds[e["src"]], e["type"], kinds[e["dst"]]): e for e in v["edges"]}
+        types = {n["kind"]: n for n in v["nodes"] if n["parent"]}
+        self.assertEqual(types["crs"]["parent"], "layer:R")
+        self.assertEqual(types["ctr"]["parent"], "layer:V")
+        self.assertEqual(types["crs"]["count"], len(types["crs"]["instances"]))
+        self.assertGreater(types["crs"]["count"], 0)
+        self.assertEqual(types["crs"]["rules"], ["crs-class"])
+        self.assertEqual(types["prq"]["count"], 0)  # declared, none in this project
+        satisfies = edges[("constraint", "SATISFIES", "crs")]
+        self.assertGreater(satisfies["count"], 0)
+        self.assertEqual(satisfies["count"], len(satisfies["instances"]))
+        self.assertIn("crs-satisfied", satisfies["rules"])
+        self.assertIn("constraint-satisfies", satisfies["rules"])
+        self.assertFalse(satisfies["unused"])
+        implements = edges[("systest", "IMPLEMENTS", "ctr")]
+        self.assertGreater(implements["count"], 0)
+        self.assertEqual(
+            sorted(implements["rules"]), ["ctr-implemented", "systest-implements"]
+        )
+        # a rule's link the project has no instance of
+        unused = edges[("sysreq", "SATISFIES", "prq")]
+        self.assertEqual((unused["count"], unused["unused"]), (0, True))
+        self.assertIn("partial_matches", v["unused_links"])
+        self.assertNotIn("satisfies", v["unused_links"])
 
     def test_unknown_kind(self):
         with self.assertRaises(ValueError):
