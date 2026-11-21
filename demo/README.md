@@ -24,17 +24,17 @@ One focus element is shared by all views. Selecting an element anywhere (a view,
 
 ## HTTP API
 
-All JSON, read-only except reload. Errors are `{"error": "..."}`: 400 for a bad value or query, 404 for an unknown key.
+All JSON, read-only except reload. Errors are `{"error": "..."}`: 400 for a bad value or query, 404 for an unknown key. Request validation errors (a missing field, `k` out of range) are 422 `{"detail": ...}`. The POST endpoints need `Content-Type: application/json` and answer 415 `{"detail"}` without it, so a cross-site form cannot trigger them. A `Host` header other than `127.0.0.1` or `localhost` gets 400, against DNS rebinding.
 
 - `GET /api/tree`: the composition hierarchy for the tree panel.
 - `GET /api/keys`: every node key, for resolving ids in answers.
 - `GET /api/element/{key}`: one element or need with its properties and direct edges.
-- `GET /api/view/{kind}?focus={key}`: nodes and edges of one view, laid out by the client. `kind` is `context`, `boundary`, `interfaces`, `activity`, `composition`, `variants`, `usecases`, `trace` or `compliance`.
-- `GET /api/search?q=&k=`: hybrid semantic and full-text hits.
+- `GET /api/view/{kind}?focus={key}`: nodes and edges of one view, laid out by the client. `kind` is `context`, `boundary`, `interfaces`, `activity`, `composition`, `variants`, `usecases`, `trace` or `compliance`. Without `focus`, the structure views open on `VehicleLogical::vehicle` if the project has it, else on the first top-level part a package owns that is not a platform need (by key); activity opens on the project feature with the most actions (propulsion, `FEAT-002`, for the vehicle); variants, use cases and trace open on the first project variation, use case and CRS by key.
+- `GET /api/search?q=&k=`: hybrid semantic and full-text hits, `k` from 1 to 50 (default 10).
 - `GET /api/cypher/examples`: the example queries.
 - `POST /api/cypher` with `{"query", "params"}`: one query in a read-access transaction, with a row limit and a timeout.
 - `POST /api/ask` with `{"question"}`: server-sent events: `text`, `tool` (name and short summary), `done` or `error`.
-- `POST /api/reload`: runs `make docs STRICT=` in the project, then the loader. 409 while another reload runs, 422 if the build fails.
+- `POST /api/reload`: runs `make docs STRICT=` in the project, then the loader. 200 `{"nodes", "edges"}`; 409 while another reload runs, 422 with the build log's tail if the build fails (the graph is kept), 500 if the load fails. The page sends an empty JSON body `{}`.
 
 ## Graph schema
 
@@ -46,7 +46,7 @@ Edges: `OWNS`, `TYPED_BY`, `SPECIALIZES` (subsetting, redefinition and subclassi
 
 ## Integrating
 
-Copy `explorer/` into your application and point it at a project directory. `load.py` builds the graph from the project's build output and has no web dependency; `graph.py` is the pure transformation, `views.py`, `search.py` and `cypher.py` are the queries, `server.py` is a thin FastAPI layer, and `agent.py` is the Claude setup, short enough to read in one sitting. The agent has three in-process graph tools (`semantic_search`, `cypher`, `element`) and four tools from the `sysml` MCP server (`outline`, `find`, `relations`, `check`). It has no built-in file, shell or web tools. `prompt.md` holds its instructions, including the rule to cite ids from tool results.
+Copy `explorer/` into your application and point it at a project directory. `load.py` builds the graph from the project's build output and has no web dependency; `graph.py` is the pure transformation, `views.py`, `search.py` and `cypher.py` are the queries, `server.py` is a thin FastAPI layer, and `agent.py` is the Claude setup, short enough to read in one sitting. The agent has three in-process graph tools (`semantic_search`, `cypher`, `element`) and four tools from the `sysml` MCP server (`outline`, `find`, `relations`, `check`). It has no built-in file, shell or web tools. `prompt.md` holds its instructions, including the rule to cite ids from tool results. Each tool call the agent makes is shown as a tool event in the Ask panel above the answer, with the first 120 characters of its input, so its Cypher queries are visible.
 
 Limit: the `sysml` MCP tools accept file paths, so the agent can read SysML files outside the project, read-only. Run it only where that is acceptable, or replace those tools with graph queries.
 

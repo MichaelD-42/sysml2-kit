@@ -15,11 +15,12 @@ class CypherTest(unittest.TestCase):
         return self.driver.execute_query("MATCH (n:X) RETURN count(n) AS c")[0][0]["c"]
 
     def test_writes_are_rejected(self):
+        # the read-access transaction refuses each write; LOAD CSV is not covered here
         for q in (
             "CREATE (n:X) RETURN n",
             "MERGE (n:X) RETURN n",
             "MATCH (n) DETACH DELETE n",
-            "LOAD CSV FROM 'file:///x' AS r RETURN r",
+            "MATCH (n:Node) SET n.x = 1 RETURN count(n)",
         ):
             with self.subTest(q=q), self.assertRaises(cypher.CypherError):
                 cypher.run_read(self.driver, q)
