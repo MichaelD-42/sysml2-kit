@@ -50,7 +50,6 @@ package SeatSwitchRequirements {
     }
     requirement <'SSW-SR-012'> nodeAddressing {
         @Satisfies { need = "SSW-PRQ-004"; }
-        @Satisfies { need = "SSW-PRQ-008"; }
         doc /* The switch shall answer diagnostic and configuration requests addressed to the node address coded at end of line or to the broadcast address, and no others. */
     }
     requirement <'SSW-SR-013'> busSleepAndWake {
@@ -59,6 +58,6 @@ package SeatSwitchRequirements {
     }
     requirement <'SSW-SR-014'> framePlausibility {
         @Satisfies { need = "SSW-PRQ-004"; }
-        doc /* The switch shall discard every received LIN frame with a wrong checksum, a repeated alive counter or a signal out of its range. */
+        doc /* The switch shall discard every received LIN frame with a wrong checksum, and every received command frame with a repeated alive counter or a signal out of its range. */
     }
 }

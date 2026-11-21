@@ -5,7 +5,7 @@ package SeatSwitchRfqContext {
         doc /* The seat switches in use, with everything outside them that they exchange with. */
         part seatSwitches :> SeatSwitchRfqLogical::seatSwitches { doc /* The seat switches under development, one per seat position. */ }
         part seat { doc /* Carries the switch in its side trim; the seat control unit moves it. */ }
-        part seatControlUnit { doc /* Seat ECU: LIN commander that reads the key states and drives the seat motors, heating, cooling and massage. */ }
+        part seatControlUnit { doc /* Seat ECU: LIN master that reads the key states and drives the seat motors, heating, cooling and massage. */ }
         part seatHarness {
             doc /* Seat wiring harness: KL30, KL31 and the seat LIN from the seat control unit to the 6-pin connector of each switch. */
             port kl30 : SeatSwitchItems::PowerPort;

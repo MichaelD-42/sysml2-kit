@@ -11,7 +11,7 @@ package SeatSwitchItems {
 
     // LIN 2.2A at 19.2 kbit/s, enhanced checksum; the customer's LDF lays out frames and signals, the model names them only
     item def LinFrame {
-        doc /* A LIN frame: header from the commander (break, sync, protected identifier), response of up to 8 data bytes and checksum. */
+        doc /* A LIN frame: header from the master (break, sync, protected identifier), response of up to 8 data bytes and checksum. */
         attribute frameId : Integer;
     }
     item def SwitchStatusFrame :> LinFrame {
@@ -33,12 +33,12 @@ package SeatSwitchItems {
         attribute aliveCounter : Integer;
     }
     item def MasterRequestFrame :> LinFrame {
-        doc /* Diagnostic frame 0x3C from the commander: node address (NAD), PCI and a UDS request or a LIN node configuration request. */
+        doc /* Diagnostic frame 0x3C, header and response from the master: node address (NAD), PCI and a UDS request or a LIN node configuration request. */
         attribute :>> frameId = 60;               // 0x3C
         attribute nad : Integer;
     }
     item def SlaveResponseFrame :> LinFrame {
-        doc /* Diagnostic frame 0x3D from the addressed switch: its NAD, PCI and the UDS or node configuration response. */
+        doc /* Diagnostic frame 0x3D: header from the master, response from the addressed switch with its NAD, PCI and the UDS or node configuration response. */
         attribute :>> frameId = 61;               // 0x3D
         attribute nad : Integer;
     }
@@ -56,6 +56,7 @@ package SeatSwitchItems {
     }
     port def UartPort { doc /* TxD and RxD, logic-level serial lines between the LIN transceiver and the microcontroller UART; not a LIN port. */ }
     port def TransceiverModePort { doc /* EN line from the microcontroller (normal or sleep mode), and the transceiver's wake-up indication on RxD. */ }
+    port def InhibitPort { doc /* INH output of the LIN transceiver: high while awake, low in sleep. */ }
     port def PowerPort { doc /* Supplies power. */ out item power : SupplyPower; }
     port def GroundPort { doc /* Ground return (KL31), also the LIN reference. */ }
     port def LightPort { doc /* Emits light through a key symbol. */ out item light : Light; }
@@ -64,6 +65,10 @@ package SeatSwitchItems {
     port def SensorBusPort { doc /* Serial sensor bus (SPI) between the hall sensors and the microcontroller. */ }
     port def SignalPort { doc /* Signals exchanged between SW components, by name per the LDF. */ }
     port def DiagnosticPort { doc /* UDS requests and responses between SW components. */ }
+    port def FaultPort { doc /* Fault events (stuck key, open LED, supply out of range) reported to the fault memory. */ }
+    port def CodingPort { doc /* Values written by end-of-line coding: button set and node address (NAD). */ }
+    port def DownloadPort { doc /* Firmware image blocks from UDS RequestDownload and TransferData. */ in item image : FirmwareImage; }
+    port def ImageStatusPort { doc /* Whether the application image is downloaded and verified for start. */ }
     port def ClipPort { doc /* Snap-fit clip joint into the seat trim. */ }
 
     interface def KeyInterface {

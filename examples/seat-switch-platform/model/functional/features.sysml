@@ -54,6 +54,7 @@ package SeatSwitchFeatures {
         action <'SSW-F-011'> sendKeyStates { doc /* Send the current key states in the switch's LIN frame. */ }
         action <'SSW-F-012'> receiveVehicleCommands { doc /* Read commands and status sent by the vehicle. */ }
         action <'SSW-F-013'> checkMessagePlausibility { doc /* Discard received frames with a wrong checksum, counter or value range. */ }
+        action <'SSW-F-022'> supplyProtectedPower { doc /* Supply the electronics from the vehicle supply across 9 V to 16 V and survive reverse polarity and transients. */ }
 
         first receiveVehicleCommands then checkMessagePlausibility;
     }

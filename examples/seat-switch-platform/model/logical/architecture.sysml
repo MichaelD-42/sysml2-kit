@@ -18,7 +18,7 @@ package SeatSwitchLogical {
             port <'SSW-LI-002'> directionStates;
         }
         part <'SSW-LC-004'> switchController {
-            doc /* Debounces and maps inputs, keeps the fault memory, guards access and the firmware, from a protected supply. */
+            doc /* Debounces and maps inputs, keeps the fault memory, guards access and the firmware. */
             port <'SSW-LI-003'> keyInput;
             port <'SSW-LI-004'> directionInput;
             port <'SSW-LI-005'> busData;
@@ -32,6 +32,10 @@ package SeatSwitchLogical {
         part <'SSW-LC-006'> illumination {
             doc /* Lights key symbols and level indicators. */
             port <'SSW-LI-009'> lightDrive;
+        }
+        part <'SSW-LC-008'> powerSupply {
+            doc /* Supplies the switch's electronics from the vehicle supply. */
+            port <'SSW-LI-011'> vehicleSupply;
         }
         part <'SSW-LC-007'> enclosure {
             doc /* Holds and seals the switch, guides knob, lumbar pad and keys, mounts it in the seat trim. */
@@ -57,6 +61,7 @@ package SeatSwitchLogical {
     allocate vehicleCommunication.sendKeyStates to seatSwitch.linCommunication;
     allocate vehicleCommunication.receiveVehicleCommands to seatSwitch.linCommunication;
     allocate vehicleCommunication.checkMessagePlausibility to seatSwitch.linCommunication;
+    allocate vehicleCommunication.supplyProtectedPower to seatSwitch.powerSupply;
     allocate diagnostics.storeFaultCodes to seatSwitch.switchController;
     allocate diagnostics.answerDiagnosticRequests to seatSwitch.switchController;
     allocate diagnostics.grantSecurityAccess to seatSwitch.switchController;

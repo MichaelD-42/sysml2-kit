@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <testsuites>
-  <testsuite name="firmware-unit-tests" tests="13" failures="0" errors="0" skipped="0" timestamp="2026-11-19T08:00:00">
+  <testsuite name="firmware-unit-tests" tests="14" failures="0" errors="0" skipped="0" timestamp="2026-11-19T08:00:00">
     <testcase classname="firmware.bootManager.signatureCheck" name="boot_rejects_bad_signature" time="0.02">
       <properties><property name="verifies" value="SSW-SWR-001"/></properties>
     </testcase>
@@ -40,8 +40,11 @@
     <testcase classname="firmware.diagnosticsManager.endOfLineServices" name="coding_needs_authenticated_session" time="0.02">
       <properties><property name="verifies" value="SSW-SWR-013"/></properties>
     </testcase>
+    <testcase classname="firmware.bootManager.bootSelector" name="stays_in_boot_mode_on_invalid_image" time="0.02">
+      <properties><property name="verifies" value="SSW-SWR-014"/></properties>
+    </testcase>
   </testsuite>
-  <testsuite name="system-tests" tests="21" failures="0" errors="0" skipped="0" timestamp="2026-11-20T10:00:00">
+  <testsuite name="system-tests" tests="22" failures="0" errors="0" skipped="0" timestamp="2026-11-20T10:00:00">
     <testcase classname="system" name="adjustment_directions" time="600">
       <properties><property name="verifies" value="SSW-STC-001"/></properties>
     </testcase>
@@ -104,6 +107,9 @@
     </testcase>
     <testcase classname="system" name="side_keyed_assembly" time="300">
       <properties><property name="verifies" value="SSW-STC-021"/></properties>
+    </testcase>
+    <testcase classname="system" name="frame_plausibility" time="600">
+      <properties><property name="verifies" value="SSW-STC-022"/></properties>
     </testcase>
   </testsuite>
   <testsuite name="acceptance-tests" tests="5" failures="0" errors="0" skipped="0" timestamp="2026-11-20T14:00:00">

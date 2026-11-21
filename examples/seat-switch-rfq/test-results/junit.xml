@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <testsuites>
-  <testsuite name="system-tests" tests="20" failures="0" errors="0" skipped="0" timestamp="2026-11-14T08:00:00">
+  <testsuite name="system-tests" tests="21" failures="0" errors="0" skipped="0" timestamp="2026-11-14T08:00:00">
     <testcase classname="system" name="haptic_measurement" time="1800">
       <properties><property name="verifies" value="STC-101"/></properties>
     </testcase>
@@ -60,6 +60,9 @@
     </testcase>
     <testcase classname="system" name="seat_in_place_replacement" time="1800">
       <properties><property name="verifies" value="STC-120"/></properties>
+    </testcase>
+    <testcase classname="system" name="message_plausibility" time="600">
+      <properties><property name="verifies" value="STC-121"/></properties>
     </testcase>
   </testsuite>
   <testsuite name="acceptance-tests" tests="6" failures="0" errors="0" skipped="0" timestamp="2026-11-19T09:00:00">

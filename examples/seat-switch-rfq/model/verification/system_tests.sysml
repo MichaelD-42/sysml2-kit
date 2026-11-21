@@ -47,8 +47,8 @@ package SeatSwitchRfqSystemTests {
     verification <'STC-108'> linConformanceTest {
         @Implements { need = "CTR-008"; }
         @Verifies { need = "CON-109"; }
-        doc /* Run the LIN 2.2A conformance suite and the OEM-LIN-300 frame tests, including frames with wrong checksum, repeated alive counter and out-of-range signals; pass if every case passes, every changed key state is sent within 50 ms and every bad frame is discarded. */
-        objective { verify keyStateReporting; verify messagePlausibility; }
+        doc /* Run the LIN 2.2A conformance suite and the OEM-LIN-300 test catalogue of CTR-008; pass if every case passes and every changed key state is sent within 50 ms. */
+        objective { verify keyStateReporting; }
     }
     verification <'STC-109'> markingInspection {
         @Verifies { need = "CON-110"; }
@@ -106,6 +106,11 @@ package SeatSwitchRfqSystemTests {
     verification <'STC-119'> materialDataReview {
         doc /* Check the material data system entry of every part against the bill of materials and the OEM-MAT-500 restricted list; pass if every part is declared and none contains a restricted substance. */
         objective { verify materialDeclaration; }
+    }
+    // alive counter and signal ranges are OEM-level checks, not LIN conformance
+    verification <'STC-121'> messagePlausibilityTest {
+        doc /* On the HIL bench, send frames with a wrong checksum, and command frames with a frozen alive counter or a signal out of its LDF range; pass if the switch discards each and acts on the next valid frame. */
+        objective { verify messagePlausibility; }
     }
     verification <'STC-120'> seatInPlaceReplacementTest {
         doc /* With a seat fitted in a vehicle body, remove and refit each switch with the trim tool; pass if each takes at most 5 minutes and the switch works afterwards. */

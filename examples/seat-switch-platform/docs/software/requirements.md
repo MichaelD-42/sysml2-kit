@@ -9,8 +9,8 @@ that implements it. Unit and integration test results link to them from `test-re
 :allocated_to: SSW-PC-024
 :tags: cybersecurity
 
-The boot loader shall check the application image's ECDSA signature against the public key in
-write-protected flash at every start and stay in boot mode if the check fails.
+The signature check shall verify the application image's ECDSA signature against the public key
+in write-protected flash at every start.
 :::
 
 :::{swreq} Tester authentication
@@ -29,7 +29,7 @@ private key, and shall refuse further attempts for 10 s after three failed ones.
 :satisfies: SSW-SR-004
 :allocated_to: SSW-PC-034
 
-The LIN stack shall operate as a LIN 2.2A responder at 19.2 kbit/s with the enhanced checksum,
+The LIN stack shall operate as a LIN 2.2A slave at 19.2 kbit/s with the enhanced checksum,
 publishing the status frame and subscribing to the command frame and the diagnostic frames of the
 customer's LDF.
 :::
@@ -123,4 +123,13 @@ The update manager shall mark a downloaded image valid for start only after its 
 
 The end-of-line services shall write the button-set code and the NAD to write-protected memory only
 in an authenticated end-of-line session.
+:::
+
+:::{swreq} Boot selection
+:id: SSW-SWR-014
+:satisfies: SSW-SR-006
+:allocated_to: SSW-PC-025
+:tags: cybersecurity
+
+The boot selector shall stay in boot mode and accept a reflash when the signature check fails.
 :::

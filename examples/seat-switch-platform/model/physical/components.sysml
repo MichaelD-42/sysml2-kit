@@ -30,7 +30,9 @@ package SeatSwitchPhysical {
         attribute mass : MassValue = 48 [g];
         attribute symbolColour : String = "white";
         attribute levelIndicatorColour : String = "amber";
-        attribute quiescentCurrent : ElectricCurrentValue = 0.00005 [A];  // 50 µA, bus asleep
+        // 50 µA with the bus asleep: only the transceiver (sleep mode, at most 20 µA) and the reverse-polarity TVS leakage draw;
+        // the transceiver's INH switches the regulator off, so microcontroller, hall sensors and LED drivers are unpowered
+        attribute quiescentCurrent : ElectricCurrentValue = 0.00005 [A];
         // set by our own production and workshop requirements, not by a customer
         attribute endOfLineTestTime : DurationValue = 9 [s];
         attribute partMarking : String = "laser Data Matrix";
@@ -164,8 +166,9 @@ package SeatSwitchPhysical {
             #Electrical port kl30Protected : PowerPort;
         }
         #Electrical part <'SSW-PC-018'> voltageRegulator {
-            doc /* 5 V low-dropout regulator with low quiescent current for the microcontroller and the hall sensors, BOM SSW-REG-502. */
+            doc /* 5 V low-dropout regulator for the microcontroller and the hall sensors, enabled by the transceiver's INH so it is off with the bus asleep, BOM SSW-REG-502. */
             #Electrical port input : ~PowerPort;
+            #Electrical port enable : ~InhibitPort;
             #Electrical port output : PowerPort;
         }
         #Electrical part <'SSW-PC-017'> microcontroller {
@@ -188,6 +191,7 @@ package SeatSwitchPhysical {
             #Electrical port vbat : ~PowerPort;
             #Electrical port uart : ~UartPort;
             #Electrical port mode : ~TransceiverModePort;
+            #Electrical port inh : InhibitPort;
         }
         #Electrical part <'SSW-PC-008'> hallSensors {
             doc /* 3D hall sensors under the knob parts and the lumbar pad, read over SPI, BOM SSW-HAL-510. */
@@ -209,6 +213,7 @@ package SeatSwitchPhysical {
         bind kl30 = reversePolarityProtection.kl30In;
         connect reversePolarityProtection.kl30Protected to linTransceiver.vbat;
         connect reversePolarityProtection.kl30Protected to voltageRegulator.input;
+        connect linTransceiver.inh to voltageRegulator.enable;
         connect voltageRegulator.output to microcontroller.supply;
         connect voltageRegulator.output to hallSensors.supply;
         bind linBus = linEsdProtection.connectorSide;
@@ -266,7 +271,7 @@ package SeatSwitchPhysical {
 
         #Software part <'SSW-PC-023'> bootManager {
             doc /* SW component: secure boot, module SSW-SW-710. */
-            #Software port imageStatus;
+            #Software port imageStatus : ~ImageStatusPort;
             #Software part <'SSW-PC-024'> signatureCheck {
                 doc /* SW unit: verifies the application image's ECDSA signature against the public key in write-protected flash. */
                 #Software port verdict;
@@ -283,7 +288,7 @@ package SeatSwitchPhysical {
         #Software part <'SSW-PC-026'> inputProcessing {
             doc /* SW component: turns switch contacts and hall sensor readings into key states, module SSW-SW-720. */
             #Software port keyStates : SignalPort;
-            #Software port faults : DiagnosticPort;
+            #Software port faults : FaultPort;
             #Software part <'SSW-PC-027'> keyScan {
                 doc /* SW unit: reads the switch contacts of the coded button set. */
                 #Software port raw;
@@ -313,7 +318,7 @@ package SeatSwitchPhysical {
         #Software part <'SSW-PC-031'> illuminationControl {
             doc /* SW component: night design and comfort level indication, module SSW-SW-730. */
             #Software port commands : SignalPort;
-            #Software port faults : DiagnosticPort;
+            #Software port faults : FaultPort;
             #Software part <'SSW-PC-032'> ledControl {
                 doc /* SW unit: sets the PWM duty of the symbol LEDs from the dimming level and lights the level LEDs from the comfort levels. */
                 #Software port commands;
@@ -327,10 +332,10 @@ package SeatSwitchPhysical {
         }
 
         #Software part <'SSW-PC-034'> linStack {
-            doc /* SW component: LIN 2.2A responder at 19.2 kbit/s with enhanced checksum, module SSW-SW-740. */
+            doc /* SW component: LIN 2.2A slave at 19.2 kbit/s with enhanced checksum, module SSW-SW-740. */
             #Software port <'SSW-PI-004'> signals : SignalPort;
             #Software port diagnostics : DiagnosticPort;
-            #Software port coding : DiagnosticPort;
+            #Software port coding : ~CodingPort;
             #Software part <'SSW-PC-035'> linDriver {
                 doc /* SW unit: UART driver, break and sync field detection, transceiver mode control. */
                 #Software port bytes;
@@ -375,9 +380,9 @@ package SeatSwitchPhysical {
         #Software part <'SSW-PC-041'> diagnosticsManager {
             doc /* SW component: UDS diagnostics with security access, fault memory and end-of-line services, module SSW-SW-750. */
             #Software port requests : DiagnosticPort;
-            #Software port faults : DiagnosticPort;
-            #Software port coding : DiagnosticPort;
-            #Software port download : DiagnosticPort;
+            #Software port faults : ~FaultPort;
+            #Software port coding : CodingPort;
+            #Software port download : DownloadPort;
             #Software part <'SSW-PC-042'> udsServer {
                 doc /* SW unit: dispatches UDS services (identification, fault memory, routines, download) and checks session and security level. */
                 #Software port requests;
@@ -409,8 +414,8 @@ package SeatSwitchPhysical {
 
         #Software part <'SSW-PC-046'> updateManager {
             doc /* SW component: firmware download over UDS and activation of verified images, module SSW-SW-760. */
-            #Software port download : DiagnosticPort;
-            #Software port imageStatus;
+            #Software port download : ~DownloadPort;
+            #Software port imageStatus : ImageStatusPort;
             #Software part <'SSW-PC-047'> flashDownload {
                 doc /* SW unit: erases and programs the application flash from UDS RequestDownload and TransferData. */
                 #Software port download;
@@ -469,9 +474,9 @@ package SeatSwitchPhysical {
     allocate seatSwitch.keypad to buttonSet.massageHeatingCooling;
     allocate seatSwitch.positionSensing to pcb.hallSensors;
     allocate seatSwitch.switchController to pcb.microcontroller;
-    // the supply path has no logical component of its own: it serves the controller
-    allocate seatSwitch.switchController to pcb.voltageRegulator;
-    allocate seatSwitch.switchController to pcb.reversePolarityProtection;
+    allocate seatSwitch.powerSupply to pcb.voltageRegulator;
+    allocate seatSwitch.powerSupply to pcb.reversePolarityProtection;
+    allocate seatSwitch.powerSupply to vehicleConnector;
     allocate seatSwitch.linCommunication to pcb.linTransceiver;
     allocate seatSwitch.linCommunication to pcb.linEsdProtection;
     allocate seatSwitch.linCommunication to vehicleConnector;
@@ -488,5 +493,6 @@ package SeatSwitchPhysical {
     allocate seatSwitch.enclosure.trimMount to housing.housingLH.clipsLH;
     allocate seatSwitch.enclosure.trimMount to housing.housingRH.clipsRH;
     allocate seatSwitch.linCommunication.vehicleBus to vehicleConnector.pin3Lin;
+    allocate seatSwitch.powerSupply.vehicleSupply to vehicleConnector.pin1Kl30;
     allocate seatSwitch.linCommunication.controllerLink to switchFirmware.linStack.signals;
 }

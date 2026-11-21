@@ -72,8 +72,8 @@ package SeatSwitchSystemTests {
     }
     verification <'SSW-STC-017'> linConformanceTest {
         @Verifies { need = "SSW-CON-009"; }
-        doc /* Run the LIN 2.2A protocol conformance test suite, with frames to the coded and to foreign node addresses, go-to-sleep and wake-up, and frames with wrong checksum, repeated alive counter and out-of-range signals; pass if every case passes. */
-        objective { verify nodeAddressing; verify busSleepAndWake; verify framePlausibility; }
+        doc /* Run the LIN 2.2A protocol conformance test suite, with frames to the coded and to foreign node addresses, go-to-sleep and wake-up; pass if every case passes. */
+        objective { verify nodeAddressing; verify busSleepAndWake; }
     }
     verification <'SSW-STC-018'> endOfLineCycleTimeTest {
         @Verifies { need = "SSW-CON-010"; }
@@ -86,6 +86,10 @@ package SeatSwitchSystemTests {
     verification <'SSW-STC-020'> workshopReflashTest {
         @Verifies { need = "SSW-CON-012"; }
         doc /* With the workshop tester on the vehicle LIN, read the fault memory, reflash, and read it again; pass if the sequence takes at most 120 s. */
+    }
+    verification <'SSW-STC-022'> framePlausibilityTest {
+        doc /* On the HIL bench, send frames with a wrong checksum, and command frames with a repeated alive counter or a signal out of its LDF range; pass if the switch discards each and acts on the next valid frame. */
+        objective { verify framePlausibility; }
     }
     verification <'SSW-STC-021'> sideKeyedAssemblyCheck {
         doc /* Try to assemble each housing with the knob carrier and keymat of the other side; pass if no combination can be assembled. */
