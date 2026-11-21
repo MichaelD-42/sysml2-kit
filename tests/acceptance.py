@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "seat-switch-rfq"
@@ -22,17 +23,22 @@ TOOLS = {
 }
 
 
+@contextmanager
 def build(target, edit=None, example=EXAMPLE):
-    """Copy the example, apply edit(project_dir), run make target; return (exit code, output, project dir)."""
-    work = Path(tempfile.mkdtemp(prefix="sysml2kit-acc-")) / example.name
-    shutil.copytree(
-        example, work, ignore=shutil.ignore_patterns("build", "_build", "_generated")
-    )
-    if edit:
-        edit(work)
-    args = ["make", "-C", str(work), target] + [f"{k}={v}" for k, v in TOOLS.items()]
-    result = subprocess.run(args, check=False, capture_output=True, text=True)
-    return result.returncode, result.stdout + result.stderr, work
+    """Copy the example, apply edit(project_dir), run make target; yield (exit code, output, project dir), then remove the copy."""
+    with tempfile.TemporaryDirectory(prefix="sysml2kit-acc-") as tmp:
+        work = Path(tmp) / example.name
+        shutil.copytree(
+            example,
+            work,
+            ignore=shutil.ignore_patterns("build", "_build", "_generated"),
+        )
+        if edit:
+            edit(work)
+        args = ["make", "-C", str(work), target]
+        args += [f"{k}={v}" for k, v in TOOLS.items()]
+        result = subprocess.run(args, check=False, capture_output=True, text=True)
+        yield result.returncode, result.stdout + result.stderr, work
 
 
 def replace(relpath, old, new):
@@ -299,8 +305,8 @@ MUTATIONS = [
 def mutations(cases, example):
     failures = 0
     for name, target, edit, expected in cases:
-        code, out, _ = build(target, edit, example)
-        ok = code != 0 and re.search(expected, out)
+        with build(target, edit, example) as (code, out, _):
+            ok = code != 0 and re.search(expected, out)
         print(f"{'ok  ' if ok else 'FAIL'} {name}")
         if not ok:
             failures += 1
@@ -310,37 +316,37 @@ def mutations(cases, example):
 
 def platform():
     """The seat-switch product line builds clean on its own (PRQ in the CRS role), and a break is caught."""
-    code, out, _ = build("all", example=PLATFORM)
-    failed = report("platform baseline: make all", code == 0, out)
+    with build("all", example=PLATFORM) as (code, out, _):
+        failed = report("platform baseline: make all", code == 0, out)
     return failed + mutations(PLATFORM_MUTATIONS, PLATFORM)
 
 
 def main():
     # the platform reports on its own, so a broken RFQ build does not hide its result
     failures = platform()
-    code, out, work = build("all")
-    if code != 0:
-        print(f"FAIL baseline: make all exited {code}\n{out[-3000:]}")
-        return 1
-    html = (work / "docs/_build/html/model.html").read_text()
-    checks = {
-        "SR-119 shows its satisfying component": re.search(
-            r'id="SR-119".*?satisfied by.*?LC-100', html, re.DOTALL
-        ),
-        "SR-119 shows its system test": re.search(
-            r'id="SR-119".*?verified by.*?STC-103', html, re.DOTALL
-        ),
-        "internal diagrams are embedded": "_images/seatSwitches.svg" in html,
-        "use cases link to their needs": 'href="#UC-101"' in html,
-        **compliance_rows(work / "docs/_generated/compliance.md"),
-        **links_resolve(work / "docs/_build/html"),
-    }
-    for name, ok in checks.items():
-        print(f"{'ok  ' if ok else 'FAIL'} baseline: {name}")
-        failures += not ok
-    failures += mutations(MUTATIONS, EXAMPLE)
-    failures += information()
-    return 1 if failures + incremental(work) + hook(work) else 0
+    with build("all") as (code, out, work):
+        if code != 0:
+            print(f"FAIL baseline: make all exited {code}\n{out[-3000:]}")
+            return 1
+        html = (work / "docs/_build/html/model.html").read_text()
+        checks = {
+            "SR-119 shows its satisfying component": re.search(
+                r'id="SR-119".*?satisfied by.*?LC-100', html, re.DOTALL
+            ),
+            "SR-119 shows its system test": re.search(
+                r'id="SR-119".*?verified by.*?STC-103', html, re.DOTALL
+            ),
+            "internal diagrams are embedded": "_images/seatSwitches.svg" in html,
+            "use cases link to their needs": 'href="#UC-101"' in html,
+            **compliance_rows(work / "docs/_generated/compliance.md"),
+            **links_resolve(work / "docs/_build/html"),
+        }
+        for name, ok in checks.items():
+            print(f"{'ok  ' if ok else 'FAIL'} baseline: {name}")
+            failures += not ok
+        failures += mutations(MUTATIONS, EXAMPLE)
+        failures += information()
+        return 1 if failures + incremental(work) + hook(work) else 0
 
 
 def information():
@@ -358,12 +364,12 @@ def information():
             '@Satisfies { need = "CRS-301"; }',
         )(work)
 
-    code, out, _ = build("all", edit)
-    return report(
-        "an information requirement without a system requirement builds clean",
-        code == 0,
-        out,
-    )
+    with build("all", edit) as (code, out, _):
+        return report(
+            "an information requirement without a system requirement builds clean",
+            code == 0,
+            out,
+        )
 
 
 def links_resolve(html_dir):
