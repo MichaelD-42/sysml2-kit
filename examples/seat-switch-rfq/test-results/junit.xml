@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+  <testsuite name="system-tests" tests="20" failures="0" errors="0" skipped="0" timestamp="2026-11-14T08:00:00">
+    <testcase classname="system" name="haptic_measurement" time="1800">
+      <properties><property name="verifies" value="STC-101"/></properties>
+    </testcase>
+    <testcase classname="system" name="luminance_measurement" time="600">
+      <properties><property name="verifies" value="STC-102"/></properties>
+    </testcase>
+    <testcase classname="system" name="key_durability" time="604800">
+      <properties><property name="verifies" value="STC-103"/></properties>
+    </testcase>
+    <testcase classname="system" name="environmental_programme" time="1209600">
+      <properties><property name="verifies" value="STC-104"/></properties>
+    </testcase>
+    <testcase classname="system" name="ingress_ip5k4" time="43200">
+      <properties><property name="verifies" value="STC-105"/></properties>
+    </testcase>
+    <testcase classname="system" name="esd" time="3600">
+      <properties><property name="verifies" value="STC-106"/></properties>
+    </testcase>
+    <testcase classname="system" name="emc_class3" time="86400">
+      <properties><property name="verifies" value="STC-107"/></properties>
+    </testcase>
+    <testcase classname="system" name="lin_conformance" time="7200">
+      <properties><property name="verifies" value="STC-108"/></properties>
+    </testcase>
+    <testcase classname="system" name="marking_inspection" time="1800">
+      <properties><property name="verifies" value="STC-109"/></properties>
+    </testcase>
+    <testcase classname="system" name="workshop_update" time="300">
+      <properties><property name="verifies" value="STC-110"/></properties>
+    </testcase>
+    <testcase classname="system" name="dimensional_inspection" time="3600">
+      <properties><property name="verifies" value="STC-111"/></properties>
+    </testcase>
+    <testcase classname="system" name="position_variant_check" time="900">
+      <properties><property name="verifies" value="STC-112"/></properties>
+    </testcase>
+    <testcase classname="system" name="adjustment_directions" time="600">
+      <properties><property name="verifies" value="STC-113"/></properties>
+    </testcase>
+    <testcase classname="system" name="comfort_keys" time="600">
+      <properties><property name="verifies" value="STC-114"/></properties>
+    </testcase>
+    <testcase classname="system" name="night_design" time="300">
+      <properties><property name="verifies" value="STC-115"/></properties>
+    </testcase>
+    <testcase classname="system" name="diagnostics" time="900">
+      <properties><property name="verifies" value="STC-116"/></properties>
+    </testcase>
+    <testcase classname="system" name="penetration_test" time="432000">
+      <properties><property name="verifies" value="STC-117"/></properties>
+    </testcase>
+    <testcase classname="system" name="end_of_line" time="600">
+      <properties><property name="verifies" value="STC-118"/></properties>
+    </testcase>
+    <testcase classname="system" name="material_data_review" time="7200">
+      <properties><property name="verifies" value="STC-119"/></properties>
+    </testcase>
+    <testcase classname="system" name="seat_in_place_replacement" time="1800">
+      <properties><property name="verifies" value="STC-120"/></properties>
+    </testcase>
+  </testsuite>
+  <testsuite name="acceptance-tests" tests="6" failures="0" errors="0" skipped="0" timestamp="2026-11-19T09:00:00">
+    <testcase classname="acceptance" name="seat_adjustment_vehicle" time="3600">
+      <properties><property name="verifies" value="ATC-101"/></properties>
+    </testcase>
+    <testcase classname="acceptance" name="comfort_night_design_vehicle" time="3600">
+      <properties><property name="verifies" value="ATC-102"/></properties>
+    </testcase>
+    <testcase classname="acceptance" name="workshop_procedure" time="5400">
+      <properties><property name="verifies" value="ATC-103"/></properties>
+    </testcase>
+    <testcase classname="acceptance" name="end_of_line_witnessed" time="14400">
+      <properties><property name="verifies" value="ATC-104"/></properties>
+    </testcase>
+    <testcase classname="acceptance" name="in_vehicle_validation" time="2419200">
+      <properties><property name="verifies" value="ATC-105"/></properties>
+    </testcase>
+    <testcase classname="acceptance" name="initial_sample_inspection" time="28800">
+      <properties><property name="verifies" value="ATC-106"/></properties>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -11,6 +11,7 @@ EXAMPLES = [
     ROOT / "examples/vehicle",
     ROOT / "examples/edrive-platform",
     ROOT / "examples/seat-switch-platform",
+    ROOT / "examples/seat-switch-rfq",
 ]
 SAME = [
     "docs/ubproject.toml",
