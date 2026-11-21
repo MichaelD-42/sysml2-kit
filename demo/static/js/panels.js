@@ -158,7 +158,10 @@ export async function mountCypher(el, knownKeys) {
     }
   };
   run.onclick = go;
-  query.onkeydown = (e) => e.key === "Enter" && (e.ctrlKey || e.metaKey) && go();
+  // block bodies: an on-handler that returns false cancels the key, so nothing could be typed
+  query.onkeydown = (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) go();
+  };
 }
 
 export function mountAsk(el, knownKeys, names) {
@@ -167,7 +170,9 @@ export function mountAsk(el, knownKeys, names) {
     <textarea id="ask-q" rows="3" placeholder="Which constraints apply to the drive motor, and where do they come from?"></textarea>
     <div class="row"><button type="submit" class="primary">Ask</button></div></form>`;
   const [log, form, input, send] = [".log", "form", "textarea", "button"].map((s) => el.querySelector(s));
-  input.onkeydown = (e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), form.requestSubmit());
+  input.onkeydown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) e.preventDefault(), form.requestSubmit();
+  };
   form.onsubmit = async (e) => {
     e.preventDefault();
     const question = input.value.trim() || input.placeholder; // empty box: ask the example
