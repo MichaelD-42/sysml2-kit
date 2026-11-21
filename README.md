@@ -105,6 +105,7 @@ There is no OMG Pilot Implementation gate (Java/Eclipse is out); the corpus run 
 - No derive/refine mapping: SysML v2 has no `refine` keyword.
 - ubCode support for `network_back` schema rules is untested here.
 - The platform is pulled in as a git submodule (or symlink) only; sysand packages are not supported. Reuse status follows the chain feature → functions → LC → PC through `specializes` links, so reuse written any other way (copying a platform part) counts as new.
+- Reuse is about platform components, not whether a requirement's value is met (that is `partial`).
 - Document inputs other than the Markdown CRS (PDF, Word, drawings) are read by Claude as context; there is no ReqIF or Excel import.
 - `make tools` and CI build the fork tag in `SYSML_TAG`. To take a newer fork commit, tag it, change `SYSML_TAG` in the template and example Makefiles and release; CI reads the tag from the template Makefile.
 
