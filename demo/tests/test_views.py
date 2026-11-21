@@ -105,6 +105,7 @@ class ViewsTest(unittest.TestCase):
     def test_trace_stops_at_other_requirements(self):
         keys = {n["key"] for n in self.view("trace", "CRS-001")["nodes"]}
         self.assertNotIn("CRS-002", keys)
+        self.assertNotIn("ATC-003", keys)
 
     def test_trace_shows_the_constraint(self):
         v = self.view("trace", "CRS-003")
@@ -216,6 +217,9 @@ class ViewsTest(unittest.TestCase):
         keys = {n["key"] for n in views.view(self.driver, "vmodel", "CRS-003")["nodes"]}
         self.assertIn("SR-005", keys)
         self.assertNotIn("CRS-001", keys)
+        # the shared use case UC-001 must not pull in battery and seating
+        self.assertNotIn("PC-002", keys)
+        self.assertNotIn("ATC-001", keys)
 
     def test_unknown_kind(self):
         with self.assertRaises(ValueError):

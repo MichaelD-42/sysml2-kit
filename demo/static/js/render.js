@@ -71,7 +71,7 @@ function shape(n) {
 }
 
 function node(n, focus) {
-  const cls = `n s-${n.shape}${domainClass(n.domain)}${n.key === focus ? " focus" : ""}${n.selected === false ? " unselected" : ""}`;
+  const cls = `n s-${n.shape}${domainClass(n.domain)}${n.outcome ? ` o-${esc(n.outcome)}` : ""}${n.key === focus ? " focus" : ""}${n.selected === false ? " unselected" : ""}`;
   return `<g class="${cls}" data-key="${esc(n.key)}" tabindex="0" role="button" aria-label="${esc(`${n.header} ${n.name}`)}"><title>${esc(n.name)} (Enter: focus, Shift+Enter: drill down)</title>${shape(n)}</g>`;
 }
 

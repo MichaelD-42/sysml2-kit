@@ -199,6 +199,10 @@ export function layoutV(view) {
     const meta = describe(n, new Set(), false);
     // a test result shows its outcome, not its generated id
     if (n.result !== undefined) Object.assign(meta, { header: `«result» ${n.result ?? "no outcome"}`, outcome: n.result });
+    // a feature's match to customer requirements spans levels, so it is a tag, not a line
+    const matched = (view.edges ?? []).filter((e) => e.src === n.key && e.type === "MATCHES").map((e) => e.dst);
+    const partial = new Set((view.edges ?? []).filter((e) => e.src === n.key && e.type === "PARTIAL_MATCHES").map((e) => e.dst));
+    if (matched.length) meta.tags = [...meta.tags, `matches ${matched.map((k) => (partial.has(k) ? `${k} (partial)` : k)).join(", ")}`];
     const [width, height] = size(meta);
     return { ...meta, shape: "block", width, height, depth: 0 };
   });
@@ -245,9 +249,10 @@ export function layoutV(view) {
   }
   const at = new Map(metas.map((m) => [m.key, m]));
   // only links between neighbouring levels and across the V; longer jumps are in the trace view
-  const near = (a, b) => Math.abs(a.level - b.level) <= 1 || a.side !== b.side;
+  const across = (a, b) => new Set([a.side, b.side]).size === 2 && a.side !== "bottom" && b.side !== "bottom";
+  const near = (a, b) => (Math.abs(a.level - b.level) <= 1 || across(a, b));
   const edges = (view.edges ?? [])
-    .filter((e) => at.has(e.src) && at.has(e.dst) && near(at.get(e.src), at.get(e.dst)))
+    .filter((e) => e.type !== "PARTIAL_MATCHES" && at.has(e.src) && at.has(e.dst) && near(at.get(e.src), at.get(e.dst)))
     .map((e, i) => {
       const a = at.get(e.src), b = at.get(e.dst);
       return { ...e, key: `e${i}`, points: [border(a, b), border(b, a)], label: null };

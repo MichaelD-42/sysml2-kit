@@ -176,7 +176,10 @@ function onFocus(key) {
   $("#back").disabled = !history.length;
   revealTrees(key);
   inspect(key);
-  if (current.kind === "compliance" || current.keys.has(key)) highlight(key);
+  // in the V a customer requirement (level 1, left leg) narrows the view to its chain
+  const crs = current.kind === "vmodel" && current.view?.nodes.some((n) => n.key === key && n.level === 1 && n.side === "left");
+  if (crs && key !== current.view.focus) show(current.kind, key);
+  else if (current.kind === "compliance" || current.keys.has(key)) highlight(key);
   else show(current.kind, key);
 }
 

@@ -41,3 +41,15 @@ test("layoutV leaves out links that skip a level on the same leg and shows a res
   assert.ok(out.edges.some((e) => e.src === "R-1"));
   assert.equal(out.nodes.find((x) => x.key === "R-1").header, "«result» passed");
 });
+
+test("layoutV tags a feature with the requirements it matches and never draws bottom links as across", () => {
+  const out = layoutV({
+    ...view,
+    nodes: [...view.nodes, n("FEAT-1", 3, "left")],
+    edges: [...view.edges, { src: "FEAT-1", dst: "CRS-1", type: "MATCHES" }, { src: "FEAT-1", dst: "CRS-1", type: "PARTIAL_MATCHES" },
+      { src: "PC-1", dst: "SR-1", type: "SATISFIES" }],
+  });
+  assert.ok(out.nodes.find((x) => x.key === "FEAT-1").tags.includes("matches CRS-1 (partial)"));
+  assert.ok(!out.edges.some((e) => e.src === "PC-1"));
+  assert.ok(!out.edges.some((e) => e.type === "PARTIAL_MATCHES"));
+});

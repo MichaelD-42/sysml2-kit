@@ -216,9 +216,11 @@ RETURN [{key: s.key, parent: null}] + [uc IN ucs | {key: uc.key, parent: s.key}]
 
 TRACE = f"""
 MATCH (f:Node {{key: $focus}})
-// another customer requirement ends the chain: the view is this requirement's RFLP chain
+// another customer requirement ends the chain, and a shared use case is not walked through:
+// the view is this requirement's RFLP chain
 WITH [f] + COLLECT {{
   MATCH p = (f)-[:{NEED_LINKS}*1..6]-(n) WHERE none(x IN nodes(p)[1..] WHERE x:crs)
+    AND none(x IN nodes(p)[1..-1] WHERE x:usecase)
   RETURN DISTINCT n
 }} AS ns
 WITH [n IN ns | {{key: n.key, parent: null}}] AS nodes""" + _close(NEED_LINKS)
@@ -381,9 +383,9 @@ RETURN n.key AS key, coalesce(n.title, n.name, n.key) AS name, head([l IN labels
   CASE WHEN n:sysreq THEN 'System requirements' ELSE coalesce(n.section, 'Other needs') END AS grp,
   n.docname AS doc, coalesce(n.platform, false) AS platform,
   COLLECT { MATCH (n)-[r]->(m:Node) WHERE type(r) IN $out
-            RETURN {dir: 'out', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.key), kind: m.kind} } +
+            RETURN {dir: 'out', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.expression, m.key), kind: m.kind} } +
   COLLECT { MATCH (m:Node)-[r]->(n) WHERE type(r) IN $in
-            RETURN {dir: 'in', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.key), kind: m.kind} } AS links
+            RETURN {dir: 'in', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.expression, m.key), kind: m.kind} } AS links
 ORDER BY platform, CASE kind WHEN 'crs' THEN 0 WHEN 'sysreq' THEN 1 WHEN 'cst' THEN 2 ELSE 3 END, doc, key"""
 
 
@@ -409,8 +411,15 @@ def requirements_tree(driver) -> list[dict]:
             for x in r["links"]
             if not (x["dir"] == "in" and x["type"] == "MATCHES" and x["key"] in partial)
         ]
+        kids.sort(key=lambda k: (k["rel"], k["key"]))
         groups.setdefault(r["grp"], []).append(
-            {"key": r["key"], "name": r["name"], "kind": r["kind"], "children": kids}
+            {
+                "key": r["key"],
+                "name": r["name"],
+                "kind": r["kind"],
+                "children": kids,
+                "platform": r["platform"],
+            }
         )
     return [
         {"key": None, "name": g, "kind": "group", "children": items}
@@ -441,7 +450,9 @@ def rflp_tree(driver) -> list[dict]:
     def node(key, seen):
         n = dict(info[key])
         n["children"] = [
-            node(k, seen | {key}) for k in sorted(kids.get(key, [])) if k not in seen
+            node(k, seen | {key})
+            for k in sorted(kids.get(key, []), key=lambda k: (info[k]["platform"], k))
+            if k not in seen
         ]
         return n
 
@@ -474,7 +485,8 @@ MATCH (f:crs {key: $focus})
 WITH f, [f] + COLLECT {
   MATCH p = (f)-[:"""
     + NEED_LINKS
-    + """*1..6]-(n) WHERE none(x IN nodes(p)[1..] WHERE x:crs) RETURN DISTINCT n
+    + """*1..6]-(n) WHERE none(x IN nodes(p)[1..] WHERE x:crs)
+    AND none(x IN nodes(p)[1..-1] WHERE x:usecase) RETURN DISTINCT n
 } AS ns
 UNWIND ns AS n
 OPTIONAL MATCH (n:feature)-[:OWNS*]->(fn:function)
@@ -483,7 +495,7 @@ OPTIONAL MATCH (lc)-[:ALLOCATED_TO]->(pc:physical)
 WITH collect(n.key) + collect(fn.key) + collect(lc.key) + collect(pc.key) AS keys
 RETURN [k IN keys WHERE k IS NOT NULL] AS keys"""
 )
-V_EDGES = "SATISFIES|REALIZES|MATCHES|PERFORMS|OWNS|ALLOCATED_TO|VERIFIES|TESTS"
+V_EDGES = "SATISFIES|REALIZES|MATCHES|PARTIAL_MATCHES|PERFORMS|OWNS|ALLOCATED_TO|VERIFIES|TESTS"
 
 
 def vmodel(driver, focus):

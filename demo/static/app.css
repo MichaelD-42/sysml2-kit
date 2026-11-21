@@ -254,3 +254,5 @@ caption { text-align: left; color: var(--muted); padding: 8px; }
 .band-rule { stroke: var(--rule); stroke-width: 1; }
 .t-band { font-size: 12px; font-weight: 700; fill: var(--muted); }
 .slot { fill: none; stroke: var(--line); stroke-dasharray: 5 4; }
+.n.o-passed .box { stroke: var(--ok, #3fa66b); }
+.n.o-failed .box, .n.o-error .box { stroke: var(--bad, #d0564f); stroke-width: 2; }

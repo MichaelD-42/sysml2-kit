@@ -59,12 +59,15 @@ function inline(text, knownKeys, names) {
     .join("");
 }
 
+// test result and uid keys are generated, not ids a reader cites
+const GENERATED = /^(testresult__|[0-9a-f]{8}-)/;
+
 export function renderTree(el, roots) {
   const item = (n, depth) => {
     const kids = n.children ?? [];
     const open = depth < 1;
     const label = n.key
-      ? `${n.rel ? `<span class="rel">${esc(n.rel)}</span> ` : ""}${keyLink(n.key, n.name)}${n.key !== n.name ? ` <span class="id">${esc(n.key)}</span>` : ""}`
+      ? `${n.rel ? `<span class="rel">${esc(n.rel)}</span> ` : ""}${keyLink(n.key, n.name)}${n.key !== n.name && !GENERATED.test(n.key) ? ` <span class="id">${esc(n.key)}</span>` : ""}`
       : `<span class="group">${esc(n.name)}</span>`;
     const marks = `${n.domain ? ` <span class="domain d-${esc(n.domain)}">${esc(n.domain)}</span>` : ""}${n.platform ? ' <span class="kind">platform</span>' : ""}`;
     return `<li data-tree="${esc(n.key ?? "")}">

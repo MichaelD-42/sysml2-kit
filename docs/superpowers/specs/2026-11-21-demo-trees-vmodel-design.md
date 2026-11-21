@@ -37,7 +37,9 @@ Edges: down the left leg the need links between adjacent levels (satisfies, real
 ## Server and graph
 
 - Loader keeps `docname` and `section` (`sections[0]`) on need nodes; test results keep their outcome property as `result` if the needs carry one.
-- `GET /api/tree?kind=requirements|rflp` replaces `GET /api/tree` (no `kind` → 400).
+- `GET /api/tree?kind=packages|requirements|rflp` (default `packages`, still fetched for names and the breadcrumb; an unknown kind → 400).
+- A CRS-focused chain does not walk through a shared use case (it would pull in other requirements' chains); the trace view follows the same rule.
+- The V draws links between neighbouring levels and across the legs; a feature's match to customer requirements is a tag on the feature box.
 - `views.KINDS` gains `vmodel`; nodes carry `level` (1–5) and `side` (`left`, `right`, `bottom`).
 
 ## Tests
