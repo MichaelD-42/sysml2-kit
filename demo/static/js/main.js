@@ -2,7 +2,7 @@
 import * as api from "./api.js";
 import { focus, setFocus, breadcrumb, history } from "./state.js";
 import { toElk, fromElk, layoutV, keyword } from "./layout.js";
-import { svg, esc, drillKind, offered } from "./render.js";
+import { svg, esc, drillKind, offered, viewsFor } from "./render.js";
 import * as panels from "./panels.js";
 
 const KINDS = {
@@ -27,7 +27,7 @@ const current = { kind: "context", keys: new Set(), view: null };
 let token = 0;
 let scale = 1;
 
-const related = new Map(); // key -> keys linked to it through a requirement (both directions)
+const related = new Map(); // key -> keys linked to it through a requirement or a platform use (both directions)
 const reqLinks = new Map(); // requirement key -> its links [{rel, key, name}]
 const TREES = ["#req-tree", "#rflp-tree", "#plat-tree"];
 
@@ -50,6 +50,8 @@ async function loadModel() {
       reqLinks.set(r.key, r.links);
       for (const l of r.links) link(r.key, l.key), link(l.key, r.key);
     }
+  // a project element and the platform element it uses mark each other
+  panels.usesLinks([...rflp, ...platform], link);
   const named = (n) => (n.key && !names.has(n.key) && names.set(n.key, n.name), (n.children ?? []).forEach(named));
   [...reqs, ...rflp, ...platform, ...[...reqLinks.values()].flat()].forEach(named);
   panels.renderTree($("#req-tree"), reqs);
@@ -57,7 +59,7 @@ async function loadModel() {
   panels.renderTree($("#plat-tree"), platform);
 }
 
-// the focus in every tree, plus what it is linked to through a requirement
+// the focus in every tree, plus what it is linked to through a requirement or a platform use
 function revealTrees(key) {
   for (const id of TREES) panels.revealInTree($(id), key, related.get(key) ?? new Set());
 }
@@ -119,7 +121,7 @@ async function show(kind, key) {
     if (view.reason && key) {
       // the focus has no such view: show the default one and say why
       const { node } = await api.element(key).catch(() => ({ node: {} }));
-      const fitting = drillKind(node, kind);
+      const fitting = viewsFor(node).find((k) => k !== kind) ?? kind;
       const name = await panels.nameOf(key, names);
       const reason = view.reason.startsWith(key) ? name + view.reason.slice(key.length) : view.reason;
       why = `${esc(reason)}; showing the default ${esc(KINDS[kind].toLowerCase())}.
@@ -177,12 +179,13 @@ function inspect(key, found) {
     if (owner && !parents.has(key)) parents.set(key, owner.other), names.set(owner.other, owner.name ?? owner.other);
     const name = (node.kind === "UseCaseUsage" && node.title) || (node.name ?? node.title ?? node.expression ?? key);
     names.set(key, name);
-    const links = reqLinks.get(key) ?? [...(related.get(key) ?? [])].map((k) => ({ rel: "requirements", key: k, name: names.get(k) ?? k }));
+    const links = reqLinks.get(key) ?? [...(related.get(key) ?? [])].filter((k) => reqLinks.has(k)).map((k) => ({ rel: "requirements", key: k, name: names.get(k) ?? k }));
     crumbs.innerHTML = breadcrumb(key, parents)
       .map((k) => (k === key ? `<span aria-current="true">${esc(name)}</span>` : panels.keyLink(k, names.get(k) ?? k)))
       .join('<span class="sep" aria-hidden="true">/</span>');
     const value = node.value !== undefined ? `${node.value}${node.unit ? ` ${node.unit}` : ""}` : null;
-    info.innerHTML = `<strong>${esc(name)}</strong> <span class="kind">«${esc(keyword(node.kind))}»</span>
+    // a need from a document has no metaclass, so no keyword
+    info.innerHTML = `<strong>${esc(name)}</strong> ${node.kind ? `<span class="kind">«${esc(keyword(node.kind))}»</span>` : ""}
       ${node.shortName || !/^[0-9a-f]{8}-/.test(key) ? `<span class="id">${esc(node.shortName ?? key)}</span>` : ""}
       ${node.domain ? `<span class="domain d-${esc(node.domain)}">${esc(node.domain)}</span>` : ""}
       ${value ? `<span>= ${esc(value)}</span>` : ""}${node.expression ? `<span>${esc(node.expression)}</span>` : ""}

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { viewsFor, offered, drillKind } from "../../static/js/render.js";
+import { usesLinks } from "../../static/js/panels.js";
 
 // element props as /api/element returns them for seat-switch ids
 const usecase = { key: "UC-101", kind: "UseCaseUsage", layer: "R" };
@@ -40,4 +41,10 @@ test("drillKind keeps an offered view and otherwise opens the element's first vi
   assert.equal(drillKind(usecase, "trace"), "trace");
   assert.equal(drillKind(usecase, "context"), "usecases");
   assert.equal(drillKind(crs, "compliance"), "trace");
+});
+
+test("usesLinks links project and platform elements both ways", () => {
+  const seen = [];
+  usesLinks([{ key: "PC-101", uses: ["SSW-PC-001"], children: [{ key: "x", children: [] }] }], (a, b) => seen.push([a, b]));
+  assert.deepEqual(seen, [["PC-101", "SSW-PC-001"], ["SSW-PC-001", "PC-101"]]);
 });

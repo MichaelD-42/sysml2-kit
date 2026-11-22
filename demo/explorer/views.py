@@ -61,15 +61,18 @@ RETURN nodes, COLLECT {{
 
 
 # parts below f, walking definitions and specialized parts; a child of a definition shows under
-# the part that uses it, a part another child redefines is left out, and variants stay in their view
+# every part that uses it (`parents`; `parent` is the first, for nesting), a part another child
+# redefines is left out, and variants stay in their view
 PARTS = """
 WITH f, COLLECT {
   MATCH p = (f)-[:OWNS|SPECIALIZES|TYPED_BY*0..]->(x)-[:OWNS]->(c:PartUsage)
   WHERE all(n IN nodes(p)[1..-1] WHERE n:PartUsage OR n:PartDefinition)
     AND none(n IN nodes(p)[..-1] WHERE n.isVariation)
   WITH c, nodes(p) AS ns, [i IN range(0, length(p) - 2) WHERE type(relationships(p)[i]) = 'OWNS'] AS owns
-  WITH c, collect(CASE owns WHEN [] THEN f ELSE ns[last(owns) + 1] END)[0] AS parent
-  RETURN {n: c, parent: parent}
+  WITH c, collect(DISTINCT CASE owns WHEN [] THEN f ELSE ns[last(owns) + 1] END) AS parents
+  // a part the focus inherits and its children also use hangs under the children only
+  WITH c, CASE WHEN size(parents) > 1 THEN [x IN parents WHERE x <> f] ELSE parents END AS parents
+  RETURN {n: c, parent: parents[0], parents: parents}
 } AS found
 WITH f, found, COLLECT {
   UNWIND found AS q WITH q.n AS o MATCH (o)-[:SPECIALIZES]->(c) RETURN c
@@ -184,7 +187,10 @@ MATCH (f:Node {key: $focus})"""
     + PARTS
     + """
 WITH [{key: f.key, parent: null}] + [p IN parts | {key: p.n.key, parent: null}] AS nodes,
-  [p IN parts | {src: p.parent.key, dst: p.n.key, type: 'OWNS', label: null}] AS edges
+  COLLECT {
+    UNWIND parts AS p UNWIND p.parents AS o
+    RETURN {src: o.key, dst: p.n.key, type: 'OWNS', label: null}
+  } AS edges
 RETURN nodes, edges"""
 )
 
@@ -443,9 +449,9 @@ RETURN n.key AS key, coalesce(n.title, n.name, n.key) AS name, head([l IN labels
   CASE WHEN n:sysreq THEN 'System requirements' ELSE coalesce(n.section, 'Other needs') END AS grp,
   n.docname AS doc, coalesce(n.platform, false) AS platform, n.class AS class,
   COLLECT { MATCH (n)-[r]->(m:Node) WHERE type(r) IN $out
-            RETURN {dir: 'out', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.expression, m.key), kind: m.kind} } +
+            RETURN {dir: 'out', type: type(r), key: m.key, name: coalesce(CASE WHEN m:usecase THEN m.title END, m.name, m.title, m.expression, m.key), kind: m.kind} } +
   COLLECT { MATCH (m:Node)-[r]->(n) WHERE type(r) IN $in
-            RETURN {dir: 'in', type: type(r), key: m.key, name: coalesce(m.name, m.title, m.expression, m.key), kind: m.kind} } AS links
+            RETURN {dir: 'in', type: type(r), key: m.key, name: coalesce(CASE WHEN m:usecase THEN m.title END, m.name, m.title, m.expression, m.key), kind: m.kind} } AS links
 ORDER BY platform, CASE kind WHEN 'crs' THEN 0 WHEN 'ctr' THEN 1 WHEN 'sysreq' THEN 2 WHEN 'cst' THEN 3 ELSE 4 END, doc, key"""
 
 
@@ -500,6 +506,12 @@ WHERE (type(r) = 'PERFORMS' AND a:usecase AND b:feature)
    OR (type(r) = 'ALLOCATED_TO' AND a:function AND b:component)
    OR (type(r) = 'ALLOCATED_TO' AND a:component AND b:physical)
 RETURN a.key AS src, b.key AS dst"""
+# a project RFLP element and the platform one it specializes, is typed by or is a variant of
+RFLP_USES = """
+MATCH (a:usecase|feature|function|component|physical)-[:SPECIALIZES|TYPED_BY|VARIANT_OF*1..3]->
+  (b:usecase|feature|function|component|physical)
+WHERE NOT coalesce(a.platform, false) AND b.platform
+RETURN DISTINCT a.key AS a, b.key AS b"""
 RFLP_NODES = """
 MATCH (n:usecase|feature|function|component|physical)
 RETURN n.key AS key, coalesce(CASE WHEN n:usecase THEN n.title END, n.name, n.title, n.key) AS name,
@@ -508,12 +520,17 @@ RETURN n.key AS key, coalesce(CASE WHEN n:usecase THEN n.title END, n.name, n.ti
 
 def rflp_tree(graph, platform: bool = False) -> list[dict]:
     """Use case > feature > function (nested) > logical > physical, of the project or of its
-    platform; a shared element repeats."""
+    platform; a shared element repeats. Each node lists the elements on the other side it uses
+    or is used by (`uses`)."""
     info = {
         r["key"]: r
         for r in _read(graph, RFLP_NODES, types=NEED_TYPES)
         if r["platform"] == platform
     }
+    uses = {}
+    for r in _read(graph, RFLP_USES):
+        mine, other = (r["b"], r["a"]) if platform else (r["a"], r["b"])
+        uses.setdefault(mine, []).append(other)
     kids = {}
     for r in _read(graph, RFLP):
         if r["src"] in info and r["dst"] in info:
@@ -521,6 +538,7 @@ def rflp_tree(graph, platform: bool = False) -> list[dict]:
 
     def node(key, seen):
         n = dict(info[key])
+        n["uses"] = sorted(uses.get(key, []))
         n["children"] = [
             node(k, seen | {key}) for k in sorted(kids.get(key, [])) if k not in seen
         ]

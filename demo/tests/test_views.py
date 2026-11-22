@@ -281,6 +281,32 @@ class ViewsTest(unittest.TestCase):
             own[0]["name"], "The occupant wants to adjust the seat position"
         )
 
+    def test_rflp_trees_carry_what_uses_the_platform(self):
+        def walk(nodes):
+            for n in nodes:
+                yield n
+                yield from walk(n["children"])
+
+        own = {n["key"]: n for n in walk(views.rflp_tree(self.graph))}
+        platform = {
+            n["key"]: n for n in walk(views.rflp_tree(self.graph, platform=True))
+        }
+        self.assertIn("SSW-PC-001", own["PC-101"]["uses"])
+        self.assertIn("SSW-LC-001", own["LC-101"]["uses"])
+        # the housing variation is no RFLP node; its variants are
+        self.assertIn("PC-101", platform["SSW-PC-002"]["uses"])
+
+    def test_requirement_links_name_use_cases_by_title(self):
+        names = {
+            x["key"]: x["name"]
+            for g in views.requirements_tree(self.graph)
+            for r in g["children"]
+            for x in r["links"]
+        }
+        self.assertEqual(
+            names["UC-101"], "The occupant wants to adjust the seat position"
+        )
+
     def test_vmodel_levels_and_sides(self):
         v = views.view(self.graph, "vmodel", None)
         at = {n["key"]: (n["level"], n["side"]) for n in v["nodes"]}
@@ -404,6 +430,19 @@ class ViewsTest(unittest.TestCase):
         edges = {(e["src"], e["dst"]) for e in v["edges"]}
         self.assertIn(("SSW-PC-016", "SSW-PC-034"), edges)
         self.assertIn(("SSW-PC-034", "SSW-PC-035"), edges)
+
+    def test_composition_shows_shared_platform_parts_under_every_user(self):
+        v = self.view("composition", "LC-100")
+        edges = {(e["src"], e["dst"]) for e in v["edges"]}
+        for switch in ("LC-101", "LC-102", "LC-103", "LC-104"):
+            with self.subTest(switch=switch):
+                self.assertIn((switch, "SSW-LC-003"), edges)
+        self.assertNotIn(("LC-100", "SSW-LC-003"), edges)
+        keys = [n["key"] for n in v["nodes"]]
+        self.assertEqual(len(keys), len(set(keys)))
+        # a tree stays a tree: one owner edge per part
+        firmware = self.view("composition", "SSW-PC-016")
+        self.assertEqual(len(firmware["edges"]), len(firmware["nodes"]) - 1)
 
     def test_composition_of_a_leaf(self):
         v = views.view(self.graph, "composition", "SSW-PC-035")

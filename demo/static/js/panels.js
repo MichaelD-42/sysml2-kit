@@ -213,6 +213,12 @@ export function renderCompliance(el, view, focus) {
     ${view.findings?.length ? `<h3>Findings</h3><ul class="findings">${view.findings.map((f) => `<li>${esc(typeof f === "string" ? f : JSON.stringify(f))}</li>`).join("")}</ul>` : ""}`;
 }
 
+/** Calls link(a, b) and link(b, a) for every node in RFLP trees and each element in its `uses`. */
+export function usesLinks(roots, link) {
+  const walk = (n) => ((n.uses ?? []).forEach((k) => (link(n.key, k), link(k, n.key))), n.children.forEach(walk));
+  roots.forEach(walk);
+}
+
 /** Inspector HTML for links [{rel, key, name}]: one line per relation, each key a focus link. */
 export function linkList(links) {
   const byRel = new Map();
