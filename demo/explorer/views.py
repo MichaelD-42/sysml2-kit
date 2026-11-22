@@ -6,7 +6,13 @@ from pathlib import Path
 import tomllib
 
 from explorer.graph import LAYERS
-from sysml2kit.compliance import CONSTRAINED, compliance, ctr_rows
+from sysml2kit.compliance import (
+    CONSTRAINED,
+    NOT_VERIFIED,
+    TECHNICAL,
+    compliance,
+    ctr_rows,
+)
 
 KINDS = (
     "product",
@@ -367,10 +373,69 @@ def compliance_rows(needs_path: Path) -> dict:
         # a non-functional or constraint CRS is answered by constraints or textual SRs
         texts = sorted(srs.get(r["crs"], [])) if r["class"] in CONSTRAINED else []
         r["satisfied_by"] = list(r["constraints"]) + texts
+        r["rating"] = _rating(r, needs[r["crs"]], findings)
+    ctrs = [dict(zip(CTR_ROW, r)) for r in ctr_rows(needs)]
     return {
         "rows": out,
-        "ctrs": [dict(zip(CTR_ROW, r)) for r in ctr_rows(needs)],
+        "ctrs": ctrs,
         "findings": findings,
+        "summary": _summary(out, ctrs, needs, findings),
+    }
+
+
+def _rating(row, need, findings) -> str:
+    if row["class"] == "information":
+        return "information"
+    if need.get("scope") == "not-offered":
+        return "not offered"
+    if need.get("scope") == "commercial":
+        return "commercial"
+    if f"{row['crs']}: not answered" in findings:
+        return "not answered"
+    return "partial" if row["partial"] else "comply"
+
+
+def _share(count: int, total: int) -> dict:
+    return {"count": count, "pct": round(100 * count / total) if total else 0}
+
+
+def _summary(rows, ctrs, needs, findings) -> dict:
+    """Percentages over the rated (non-information) customer requirements."""
+    rated = [r for r in rows if r["rating"] != "information"]
+    order = ("comply", "partial", "commercial", "not offered", "not answered")
+    ratings = {
+        k: _share(sum(r["rating"] == k for r in rated), len(rated)) for k in order
+    }
+    # verification applies to technical requirements without a scope
+    checked = [
+        r for r in rated if r["class"] in TECHNICAL and not needs[r["crs"]].get("scope")
+    ]
+    unverified = {f.split(":")[0] for f in findings if f.endswith(NOT_VERIFIED)}
+    reused = [r for r in rated if r["reuse"]]
+    kinds = ("platform", "variant", "modified", "new", "incomplete")
+    open_ctrs = [c for c in ctrs if not needs[c["ctr"]].get("scope")]
+    by_class = {
+        c: _share(
+            sum(r["rating"] == "comply" for r in rated if r["class"] == c),
+            sum(r["class"] == c for r in rated),
+        )
+        for c in TECHNICAL
+    }
+    return {
+        "total": len(rows),
+        "rated": len(rated),
+        "ratings": ratings,
+        "verified": _share(
+            sum(r["crs"] not in unverified for r in checked), len(checked)
+        ),
+        "reused": len(reused),
+        "reuse": {
+            k: _share(sum(r["reuse"] == k for r in reused), len(reused)) for k in kinds
+        },
+        "comply_by_class": by_class,
+        "ctrs_implemented": _share(
+            sum(bool(c["implemented_by"]) for c in open_ctrs), len(open_ctrs)
+        ),
     }
 
 
@@ -406,6 +471,7 @@ def view(
             "rows": rows,
             "ctrs": ctrs,
             "findings": table["findings"],
+            "summary": table["summary"],
             "reason": None if nodes else "no customer requirements",
         }
     found = _read(graph, FOCUS if focus else DEFAULTS[kind], focus=focus)

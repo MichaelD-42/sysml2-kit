@@ -215,12 +215,21 @@ export function renderCompliance(el, view, focus) {
   const links = (ks) => ks.map((k) => keyLink(k)).join(", ");
   const statements = (ss) => (ss ?? []).map(([k, v]) => `${keyLink(k)} ${esc(v)}`).join(", ");
   const row = (key) => `<tr data-row="${esc(key)}"${key === focus ? ' class="focus"' : ""}>`;
-  el.innerHTML = `<table class="compliance"><caption>Compliance of the RFQ's customer requirements</caption>
-    <thead><tr><th scope="col">CRS</th><th scope="col">Title</th><th scope="col">Class</th><th scope="col">Features</th><th scope="col">Satisfied by</th><th scope="col">Reuse</th>
+  const s = view.summary;
+  const pct = (x, label) => `<li><strong>${esc(x.pct)} %</strong> ${esc(label)} <span class="muted">(${esc(x.count)})</span></li>`;
+  const summary = s
+    ? `<section class="summary" aria-label="Compliance summary"><h3>Summary over ${esc(s.rated)} rated customer requirements (${esc(s.total - s.rated)} information)</h3>
+      <ul>${Object.entries(s.ratings).map(([k, x]) => pct(x, k)).join("")}</ul>
+      <ul>${pct(s.verified, "verified (acceptance test or implemented CTR)")}${pct(s.ctrs_implemented, "customer test requirements implemented")}</ul>
+      <ul>${Object.entries(s.reuse).filter(([, x]) => x.count).map(([k, x]) => pct(x, `reuse ${k}`)).join("")}</ul>
+      <ul>${Object.entries(s.comply_by_class).map(([k, x]) => pct(x, `of ${k} comply`)).join("")}</ul></section>`
+    : "";
+  el.innerHTML = `${summary}<table class="compliance"><caption>Compliance of the RFQ's customer requirements</caption>
+    <thead><tr><th scope="col">CRS</th><th scope="col">Title</th><th scope="col">Class</th><th scope="col">Rating</th><th scope="col">Features</th><th scope="col">Satisfied by</th><th scope="col">Reuse</th>
     <th scope="col">Partial</th><th scope="col">Statements</th><th scope="col">Domains</th></tr></thead>
     <tbody>${rows.map((r) => `${row(r.crs)}
-      <td>${keyLink(r.crs)}</td><td>${esc(r.title)}</td><td>${esc(r.class)}</td><td>${links(r.features ?? [])}</td><td>${links(r.satisfied_by ?? [])}</td><td>${esc(r.reuse)}</td>
-      <td>${r.partial ? "partial" : "full"}</td><td>${statements(r.statements)}</td>
+      <td>${keyLink(r.crs)}</td><td>${esc(r.title)}</td><td>${esc(r.class)}</td><td><span class="rating r-${esc((r.rating ?? "").replace(/ /g, "-"))}">${esc(r.rating)}</span></td><td>${links(r.features ?? [])}</td><td>${links(r.satisfied_by ?? [])}</td><td>${esc(r.reuse)}</td>
+      <td>${["comply", "partial"].includes(r.rating) ? (r.partial ? "partial" : "full") : ""}</td><td>${statements(r.statements)}</td>
       <td>${(r.domains ?? []).map((d) => `<span class="domain d-${esc(d)}">${esc(d)}</span>`).join(" ")}</td></tr>`).join("")}
     </tbody></table>
     ${ctrs.length ? `<table class="compliance"><caption>Customer test requirements and the tests that implement them</caption>

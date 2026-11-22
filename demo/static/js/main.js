@@ -273,7 +273,8 @@ function wire() {
   $("#back").onclick = () => focus.back();
   $("#zoom-in").onclick = () => ((zoomed = true), fit(scale * 1.25));
   $("#zoom-out").onclick = () => ((zoomed = true), fit(scale / 1.25));
-  new ResizeObserver(() => current.kind === "product" && !zoomed && fitView()).observe(canvas);
+  // refit on the next frame: resizing inside the callback raises "ResizeObserver loop" errors
+  new ResizeObserver(() => requestAnimationFrame(() => current.kind === "product" && !zoomed && fitView())).observe(canvas);
   $("#zoom-fit").onclick = () => ((zoomed = false), fitView());
   $("#reload").onclick = async (e) => {
     const status = $("#reload-status");

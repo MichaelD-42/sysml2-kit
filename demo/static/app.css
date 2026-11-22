@@ -270,3 +270,11 @@ caption { text-align: left; color: var(--muted); padding: 8px; }
 .slot { fill: none; stroke: var(--line); stroke-dasharray: 5 4; }
 .n.o-passed .box { stroke: var(--ok, #3fa66b); }
 .n.o-failed .box, .n.o-error .box { stroke: var(--bad, #d0564f); stroke-width: 2; }
+
+.summary { margin-bottom: 12px; }
+.summary h3 { font-size: 13px; margin: 0 0 6px; }
+.summary ul { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 0; margin: 0 0 4px; font-size: 12px; }
+.summary .muted, .muted { color: var(--muted); }
+.rating { font-size: 11px; padding: 0 5px; border: 1px solid var(--muted); border-radius: 2px; white-space: nowrap; }
+.r-partial, .r-commercial { border-color: var(--accent); color: var(--accent); }
+.r-not-offered, .r-not-answered { border-color: var(--error); color: var(--error); }

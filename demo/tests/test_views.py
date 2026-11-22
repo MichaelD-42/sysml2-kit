@@ -221,6 +221,19 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(by["CRS-507"], ["SR-115"])  # textual SR answers a constraint
         self.assertIn("SR-119", by["CRS-304"])  # the partial's gap SR
         self.assertEqual(by["CRS-201"], [])  # functional: features, not satisfiers
+        rating = {r["crs"]: r["rating"] for r in v["rows"]}
+        self.assertEqual(rating["CRS-301"], "comply")
+        self.assertEqual(rating["CRS-304"], "partial")
+        self.assertEqual(rating["CRS-207"], "not offered")
+        self.assertEqual(rating["CRS-901"], "commercial")
+        self.assertEqual(rating["CRS-101"], "information")
+        s = v["summary"]
+        self.assertEqual(s["rated"], 40)  # 45 CRS less 5 information
+        self.assertEqual(s["ratings"]["partial"]["count"], 1)
+        self.assertEqual(sum(x["count"] for x in s["ratings"].values()), 40)
+        self.assertEqual(s["verified"]["pct"], 100)
+        self.assertEqual(s["ctrs_implemented"]["pct"], 100)
+        self.assertEqual(sum(x["count"] for x in s["reuse"].values()), s["reused"])
         ctr003 = next(r for r in v["ctrs"] if r["ctr"] == "CTR-003")
         self.assertEqual(ctr003["implemented_by"], ["STC-101"])
         self.assertIn("CTR-003", {n["key"] for n in v["nodes"]})
