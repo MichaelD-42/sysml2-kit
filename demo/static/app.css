@@ -121,7 +121,7 @@ label { display: block; color: var(--muted); font-size: 12px; margin: 8px 0 4px;
 .tree-col, .side-col { background: var(--panel); }
 .tree-col { border-right: 1px solid var(--rule); }
 .side-col { border-left: 1px solid var(--rule); display: flex; flex-direction: column; }
-.view-col { display: flex; flex-direction: column; gap: 8px; }
+.view-col { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
 @media (max-width: 900px) {
   .grid { display: block; overflow: auto; }
   .col { overflow: visible; border: 0; border-bottom: 1px solid var(--rule); }
@@ -159,7 +159,7 @@ label { display: block; color: var(--muted); font-size: 12px; margin: 8px 0 4px;
 
 #canvas {
   flex: 1;
-  min-height: 320px;
+  min-height: 200px;
   overflow: auto;
   border: 1px solid var(--rule);
   background-color: var(--canvas);
@@ -168,6 +168,10 @@ label { display: block; color: var(--muted); font-size: 12px; margin: 8px 0 4px;
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
   background-size: 24px 24px;
 }
+/* always-visible scrollbars: overlay scrollbars hide that a wide diagram continues */
+#canvas::-webkit-scrollbar { width: 12px; height: 12px; }
+#canvas::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 6px; border: 3px solid var(--canvas); }
+#canvas::-webkit-scrollbar-track, #canvas::-webkit-scrollbar-corner { background: var(--canvas); }
 #canvas[aria-busy="true"] { opacity: 0.6; }
 #canvas svg { display: block; }
 .note { margin: 0; font-size: 13px; color: var(--muted); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }

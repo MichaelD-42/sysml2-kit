@@ -252,7 +252,10 @@ function wire() {
   $("#back").onclick = () => focus.back();
   $("#zoom-in").onclick = () => fit(scale * 1.25);
   $("#zoom-out").onclick = () => fit(scale / 1.25);
-  $("#zoom-fit").onclick = () => current.laid && fit($("#canvas").clientWidth / current.laid.width);
+  $("#zoom-fit").onclick = () => {
+    const c = $("#canvas");
+    if (current.laid) fit(Math.min(c.clientWidth / current.laid.width, c.clientHeight / current.laid.height));
+  };
   $("#reload").onclick = async (e) => {
     const status = $("#reload-status");
     e.target.disabled = true;
