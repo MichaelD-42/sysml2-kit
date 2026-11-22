@@ -250,6 +250,19 @@ Content: offer only the view kinds that apply to the selected element (use case:
 
 - [ ] Step 1: failing tests; Step 2: implement; Step 3: demo suite, JS tests, browser walk; Step 4: commit `feat(demo): views per element type, platform section`.
 
+### Task 16: Diagram types per level review; product overview
+
+Owner input, 2026-11-22: review whether the demo offers the right diagram types for each level, and add the missing product level that shows the whole big picture.
+
+**Files:** `docs/demo-diagram-review.md` (new, short), `demo/explorer/views.py`, `demo/static/js/*`, `demo/tests/*`, `demo/README.md`.
+
+Content:
+- Review, as a short table: for each level (product, R: use cases and requirements, F: features and functions, L: logical architecture, P: physical incl. ME/EE/SW and SW units, V: verification) the question an engineer asks there, the SysML v2 diagram kind that answers it (e.g. use case, activity, interconnection/internal structure, composition/tree, state machine, sequence, interface/pin table, V-model), what the demo offers today, and the verdict (keep, change, add, out of scope with reason). Base it on the demo as built and on the seat-switch model's content (e.g. LIN sleep/wake is a state machine candidate, diagnostic/reflash a sequence candidate) — recommend, don't implement, anything beyond the product overview unless it is a small fix.
+- Product overview (new view kind `product`, the default landing view and always offered): one picture of the whole product — the system in its context (actors, the vehicle/seat control unit, the harness), the use cases it serves, the features grouped under them, the top-level logical blocks, and the physical breakdown by domain (ME, EE, SW clusters with the main parts, SW components), with the variant dimensions (housing LH/RH, button sets) and the RFQ positions summarised; every box is a link to its own element and view. Readable at Fit on a normal screen: aggregate (counts, top level only), don't dump every element.
+- Tests on seat-switch ids; JS test if layout logic is pure; browser check.
+
+- [ ] Step 1: review doc; Step 2: failing tests for the product view; Step 3: implement; Step 4: demo suite, JS tests, browser walk; Step 5: commit `feat(demo): product overview; diagram types per level review`.
+
 ## Part 5 — ASPICE review
 
 ### Task 12: ASPICE review document
