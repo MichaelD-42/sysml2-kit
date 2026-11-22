@@ -7,12 +7,12 @@ Use cases
 ---------
 
 .. raw:: html
-   :file: _generated/usecases-seatSwitch.svg
+   :file: _generated/usecases-ACME_SeatSwitch.svg
 
 Logical architecture
 --------------------
 
-.. image:: _generated/seatSwitch.svg
+.. image:: _generated/ACME_SeatSwitch.svg
    :alt: Logical components and their interfaces
 
 Model elements

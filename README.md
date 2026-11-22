@@ -42,7 +42,7 @@ find       { "kind": "ActionUsage", "without": "allocated_to" }
 
 relations  { "element": "SR-119" }
 → SeatSwitchRfqRequirements::durabilityGap
-    incoming  satisfies  SeatSwitchRfqLogical::seatSwitches (LC-100)              architecture.sysml:134
+    incoming  satisfies  SeatSwitchRfqLogical::OEM_SeatSwitch (LC-100)              architecture.sysml:134
     incoming  verifies   SeatSwitchRfqSystemTests::keyDurabilityTest (STC-103)    system_tests.sysml:19
     outgoing  annotated_by  Trace::Satisfies                                       system_requirements.sysml:86
 ```

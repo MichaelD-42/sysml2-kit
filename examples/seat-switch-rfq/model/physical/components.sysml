@@ -77,12 +77,12 @@ package SeatSwitchRfqPhysical {
         }
     }
 
-    allocate seatSwitches.driverSwitch to driverHousing;
-    allocate seatSwitches.driverSwitch to driverButtonSet;
-    allocate seatSwitches.coDriverSwitch to coDriverHousing;
-    allocate seatSwitches.coDriverSwitch to coDriverButtonSet;
-    allocate seatSwitches.rearLeftSwitch to rearLeftHousing;
-    allocate seatSwitches.rearLeftSwitch to rearLeftButtonSet;
-    allocate seatSwitches.rearRightSwitch to rearRightHousing;
-    allocate seatSwitches.rearRightSwitch to rearRightButtonSet;
+    allocate OEM_SeatSwitch.driverSwitch to driverHousing;
+    allocate OEM_SeatSwitch.driverSwitch to driverButtonSet;
+    allocate OEM_SeatSwitch.coDriverSwitch to coDriverHousing;
+    allocate OEM_SeatSwitch.coDriverSwitch to coDriverButtonSet;
+    allocate OEM_SeatSwitch.rearLeftSwitch to rearLeftHousing;
+    allocate OEM_SeatSwitch.rearLeftSwitch to rearLeftButtonSet;
+    allocate OEM_SeatSwitch.rearRightSwitch to rearRightHousing;
+    allocate OEM_SeatSwitch.rearRightSwitch to rearRightButtonSet;
 }

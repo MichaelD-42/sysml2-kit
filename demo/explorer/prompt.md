@@ -42,7 +42,7 @@ The `cypher` tool takes no parameters: write the key in place of `$key`, as `{ke
 The composition of a part, three levels down:
 
 ```cypher
-MATCH (p:Node {qualifiedName: 'SeatSwitchRfqLogical::seatSwitches'})-[:OWNS*1..3]->(c:PartUsage)
+MATCH (p:Node {qualifiedName: 'SeatSwitchRfqLogical::OEM_SeatSwitch'})-[:OWNS*1..3]->(c:PartUsage)
 RETURN p, c
 ```
 

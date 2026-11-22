@@ -463,36 +463,36 @@ package SeatSwitchPhysical {
         connect pcb.levelLedDrive to buttonSet.levelLeds;
     }
 
-    allocate seatSwitch.enclosure to housing.housingLH;
-    allocate seatSwitch.enclosure to housing.housingRH;
-    allocate seatSwitch.enclosure to knob;
-    allocate seatSwitch.enclosure to buttonCaps;
-    allocate seatSwitch.enclosure to seal;
-    allocate seatSwitch.keypad to buttonSet.base;
-    allocate seatSwitch.keypad to buttonSet.heating;
-    allocate seatSwitch.keypad to buttonSet.heatingCooling;
-    allocate seatSwitch.keypad to buttonSet.massageHeatingCooling;
-    allocate seatSwitch.positionSensing to pcb.hallSensors;
-    allocate seatSwitch.switchController to pcb.microcontroller;
-    allocate seatSwitch.powerSupply to pcb.voltageRegulator;
-    allocate seatSwitch.powerSupply to pcb.reversePolarityProtection;
-    allocate seatSwitch.powerSupply to vehicleConnector;
-    allocate seatSwitch.linCommunication to pcb.linTransceiver;
-    allocate seatSwitch.linCommunication to pcb.linEsdProtection;
-    allocate seatSwitch.linCommunication to vehicleConnector;
-    allocate seatSwitch.illumination to pcb.ledDrivers;
-    allocate seatSwitch.illumination to pcb.leds;
+    allocate ACME_SeatSwitch.enclosure to housing.housingLH;
+    allocate ACME_SeatSwitch.enclosure to housing.housingRH;
+    allocate ACME_SeatSwitch.enclosure to knob;
+    allocate ACME_SeatSwitch.enclosure to buttonCaps;
+    allocate ACME_SeatSwitch.enclosure to seal;
+    allocate ACME_SeatSwitch.keypad to buttonSet.base;
+    allocate ACME_SeatSwitch.keypad to buttonSet.heating;
+    allocate ACME_SeatSwitch.keypad to buttonSet.heatingCooling;
+    allocate ACME_SeatSwitch.keypad to buttonSet.massageHeatingCooling;
+    allocate ACME_SeatSwitch.positionSensing to pcb.hallSensors;
+    allocate ACME_SeatSwitch.switchController to pcb.microcontroller;
+    allocate ACME_SeatSwitch.powerSupply to pcb.voltageRegulator;
+    allocate ACME_SeatSwitch.powerSupply to pcb.reversePolarityProtection;
+    allocate ACME_SeatSwitch.powerSupply to vehicleConnector;
+    allocate ACME_SeatSwitch.linCommunication to pcb.linTransceiver;
+    allocate ACME_SeatSwitch.linCommunication to pcb.linEsdProtection;
+    allocate ACME_SeatSwitch.linCommunication to vehicleConnector;
+    allocate ACME_SeatSwitch.illumination to pcb.ledDrivers;
+    allocate ACME_SeatSwitch.illumination to pcb.leds;
     // logical components go to SW components, never to SW units
-    allocate seatSwitch.switchController to switchFirmware.bootManager;
-    allocate seatSwitch.switchController to switchFirmware.inputProcessing;
-    allocate seatSwitch.illumination to switchFirmware.illuminationControl;
-    allocate seatSwitch.linCommunication to switchFirmware.linStack;
-    allocate seatSwitch.switchController to switchFirmware.diagnosticsManager;
-    allocate seatSwitch.switchController to switchFirmware.updateManager;
+    allocate ACME_SeatSwitch.switchController to switchFirmware.bootManager;
+    allocate ACME_SeatSwitch.switchController to switchFirmware.inputProcessing;
+    allocate ACME_SeatSwitch.illumination to switchFirmware.illuminationControl;
+    allocate ACME_SeatSwitch.linCommunication to switchFirmware.linStack;
+    allocate ACME_SeatSwitch.switchController to switchFirmware.diagnosticsManager;
+    allocate ACME_SeatSwitch.switchController to switchFirmware.updateManager;
 
-    allocate seatSwitch.enclosure.trimMount to housing.housingLH.clipsLH;
-    allocate seatSwitch.enclosure.trimMount to housing.housingRH.clipsRH;
-    allocate seatSwitch.linCommunication.vehicleBus to vehicleConnector.pin3Lin;
-    allocate seatSwitch.powerSupply.vehicleSupply to vehicleConnector.pin1Kl30;
-    allocate seatSwitch.linCommunication.controllerLink to switchFirmware.linStack.signals;
+    allocate ACME_SeatSwitch.enclosure.trimMount to housing.housingLH.clipsLH;
+    allocate ACME_SeatSwitch.enclosure.trimMount to housing.housingRH.clipsRH;
+    allocate ACME_SeatSwitch.linCommunication.vehicleBus to vehicleConnector.pin3Lin;
+    allocate ACME_SeatSwitch.powerSupply.vehicleSupply to vehicleConnector.pin1Kl30;
+    allocate ACME_SeatSwitch.linCommunication.controllerLink to switchFirmware.linStack.signals;
 }

@@ -3,7 +3,7 @@ package SeatSwitchRfqContext {
 
     part seatSwitchContext {
         doc /* The seat switches in use, with everything outside them that they exchange with. */
-        part seatSwitches :> SeatSwitchRfqLogical::seatSwitches { doc /* The seat switches under development, one per seat position. */ }
+        part OEM_SeatSwitch :> SeatSwitchRfqLogical::OEM_SeatSwitch { doc /* The seat switches under development, one per seat position. */ }
         part seat { doc /* Carries the switch in its side trim; the seat control unit moves it. */ }
         part seatControlUnit { doc /* Seat ECU: LIN master that reads the key states and drives the seat motors, heating, cooling and massage. */ }
         part seatHarness {
@@ -16,13 +16,13 @@ package SeatSwitchRfqContext {
         part workshopTester { doc /* Diagnostic tester on the vehicle bus: reads faults and updates firmware. */ }
         part endOfLineTester { doc /* Supplier's end-of-line station: flashes, codes and tests each switch. */ }
 
-        connect seatSwitches to seat;
-        connect seatHarness.kl30 to seatSwitches.supply;
-        connect seatHarness.kl31 to seatSwitches.ground;
-        connect seatHarness.seatLin to seatSwitches.lin;
+        connect OEM_SeatSwitch to seat;
+        connect seatHarness.kl30 to OEM_SeatSwitch.supply;
+        connect seatHarness.kl31 to OEM_SeatSwitch.ground;
+        connect seatHarness.seatLin to OEM_SeatSwitch.lin;
         connect seatControlUnit to seatHarness;
-        connect occupant to seatSwitches;
+        connect occupant to OEM_SeatSwitch;
         connect workshopTester to seatControlUnit;
-        connect endOfLineTester to seatSwitches;
+        connect endOfLineTester to OEM_SeatSwitch;
     }
 }

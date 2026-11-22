@@ -106,7 +106,7 @@ class EnrichedExampleTest(unittest.TestCase):
 
     def test_seat_positions(self):
         self.assertEqual(
-            part_names(export, "SeatSwitchRfqLogical::seatSwitches"),
+            part_names(export, "SeatSwitchRfqLogical::OEM_SeatSwitch"),
             {"driverSwitch", "coDriverSwitch", "rearLeftSwitch", "rearRightSwitch"},
         )
 
@@ -130,7 +130,7 @@ class EnrichedExampleTest(unittest.TestCase):
         self.assertEqual(
             part_names(export, "SeatSwitchRfqContext::seatSwitchContext"),
             {
-                "seatSwitches",
+                "OEM_SeatSwitch",
                 "seatHarness",
                 "seat",
                 "seatControlUnit",

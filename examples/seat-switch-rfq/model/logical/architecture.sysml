@@ -1,5 +1,5 @@
 package SeatSwitchRfqLogical {
-    doc /* L layer: the platform seat switch as this vehicle needs it. seatSwitches subsets the platform
+    doc /* L layer: the platform seat switch as this vehicle needs it. OEM_SeatSwitch subsets the platform
      * switch, so it carries the platform's rated attributes and limits; its constraints are this RFQ's
      * limits over those attributes. One switch per seat position, each allocated to its housing and
      * button set. The platform's own components satisfy the system requirements they meet. */
@@ -7,11 +7,11 @@ package SeatSwitchRfqLogical {
     private import Trace::*;
     private import SeatSwitchRfqFeatures::*;
     private import SeatSwitchRfqRequirements::*;
-    private import SeatSwitchLogical::seatSwitch;
+    private import SeatSwitchLogical::ACME_SeatSwitch;
     private import ISQ::*;
     private import SI::*;
 
-    part <'LC-100'> seatSwitches :> seatSwitch {
+    part <'LC-100'> OEM_SeatSwitch :> ACME_SeatSwitch {
         doc /* The vehicle's seat switches: the platform seat switch within this RFQ's limits, fitted at four seat positions.
          * Its limits apply to every position switch below. */
 
@@ -101,48 +101,48 @@ package SeatSwitchRfqLogical {
                 and coDriverSwitch.nad != rearRightSwitch.nad and rearLeftSwitch.nad != rearRightSwitch.nad
         }
 
-        part <'LC-101'> driverSwitch :> seatSwitch {
+        part <'LC-101'> driverSwitch :> ACME_SeatSwitch {
             doc /* Driver seat (left-hand drive): left-hand housing; massage, heating and cooling keys; NAD 0x21. */
             attribute :>> nad = 33;
         }
-        part <'LC-102'> coDriverSwitch :> seatSwitch {
+        part <'LC-102'> coDriverSwitch :> ACME_SeatSwitch {
             doc /* Co-driver seat: right-hand housing; heating and cooling keys; NAD 0x22. */
             attribute :>> nad = 34;
         }
-        part <'LC-103'> rearLeftSwitch :> seatSwitch {
+        part <'LC-103'> rearLeftSwitch :> ACME_SeatSwitch {
             doc /* Rear left seat: left-hand housing; heating key; NAD 0x23. */
             attribute :>> nad = 35;
         }
-        part <'LC-104'> rearRightSwitch :> seatSwitch {
+        part <'LC-104'> rearRightSwitch :> ACME_SeatSwitch {
             doc /* Rear right seat: right-hand housing; heating key; NAD 0x24. */
             attribute :>> nad = 36;
         }
     }
 
-    allocate comfortKeys.offerDriverComfortKeys to seatSwitches.driverSwitch;
-    allocate comfortKeys.offerCoDriverComfortKeys to seatSwitches.coDriverSwitch;
-    allocate comfortKeys.offerRearLeftComfortKeys to seatSwitches.rearLeftSwitch;
-    allocate comfortKeys.offerRearRightComfortKeys to seatSwitches.rearRightSwitch;
+    allocate comfortKeys.offerDriverComfortKeys to OEM_SeatSwitch.driverSwitch;
+    allocate comfortKeys.offerCoDriverComfortKeys to OEM_SeatSwitch.coDriverSwitch;
+    allocate comfortKeys.offerRearLeftComfortKeys to OEM_SeatSwitch.rearLeftSwitch;
+    allocate comfortKeys.offerRearRightComfortKeys to OEM_SeatSwitch.rearRightSwitch;
 
     // the platform components meet these as they are
-    satisfy adjustmentRequests by seatSwitch.positionSensing;
-    satisfy comfortLevelSteps by seatSwitch.keypad;
-    satisfy nightDesignDimming by seatSwitch.illumination;
-    satisfy keyStateReporting by seatSwitch.linCommunication;
-    satisfy messagePlausibility by seatSwitch.linCommunication;
-    satisfy diagnosticIdentification by seatSwitch.switchController;
-    satisfy faultCodes by seatSwitch.switchController;
-    satisfy authenticatedWrite by seatSwitch.switchController;
-    satisfy signedImagesOnly by seatSwitch.switchController;
-    satisfy workshopUpdate by seatSwitch.linCommunication;
-    satisfy endOfLineTest by seatSwitch.switchController;
-    satisfy endOfLineCoding by seatSwitch.switchController;
-    satisfy traceabilityContent by seatSwitch.switchController;
-    satisfy debugInterfaceClosed by seatSwitch.switchController;
-    satisfy installationSpace by seatSwitch.enclosure;
-    satisfy seatInPlaceReplacement by seatSwitch.enclosure;
+    satisfy adjustmentRequests by ACME_SeatSwitch.positionSensing;
+    satisfy comfortLevelSteps by ACME_SeatSwitch.keypad;
+    satisfy nightDesignDimming by ACME_SeatSwitch.illumination;
+    satisfy keyStateReporting by ACME_SeatSwitch.linCommunication;
+    satisfy messagePlausibility by ACME_SeatSwitch.linCommunication;
+    satisfy diagnosticIdentification by ACME_SeatSwitch.switchController;
+    satisfy faultCodes by ACME_SeatSwitch.switchController;
+    satisfy authenticatedWrite by ACME_SeatSwitch.switchController;
+    satisfy signedImagesOnly by ACME_SeatSwitch.switchController;
+    satisfy workshopUpdate by ACME_SeatSwitch.linCommunication;
+    satisfy endOfLineTest by ACME_SeatSwitch.switchController;
+    satisfy endOfLineCoding by ACME_SeatSwitch.switchController;
+    satisfy traceabilityContent by ACME_SeatSwitch.switchController;
+    satisfy debugInterfaceClosed by ACME_SeatSwitch.switchController;
+    satisfy installationSpace by ACME_SeatSwitch.enclosure;
+    satisfy seatInPlaceReplacement by ACME_SeatSwitch.enclosure;
     // what this program adds on top of the platform
-    satisfy materialDeclaration by seatSwitches;
-    satisfy sparePartNumbers by seatSwitches;
-    satisfy durabilityGap by seatSwitches;
+    satisfy materialDeclaration by OEM_SeatSwitch;
+    satisfy sparePartNumbers by OEM_SeatSwitch;
+    satisfy durabilityGap by OEM_SeatSwitch;
 }

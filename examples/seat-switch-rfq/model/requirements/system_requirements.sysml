@@ -1,6 +1,6 @@
 package SeatSwitchRfqRequirements {
     doc /* R layer: what the seat switches shall do, derived from the customer requirements. Values the
-     * model can state are constraints on seatSwitches and on the position parts (SeatSwitchRfqLogical,
+     * model can state are constraints on OEM_SeatSwitch and on the position parts (SeatSwitchRfqLogical,
      * SeatSwitchRfqPhysical); these are the rest: behaviour, and what only a document or a drawing shows. */
 
     private import Trace::*;

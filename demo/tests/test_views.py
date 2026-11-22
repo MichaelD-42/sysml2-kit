@@ -269,7 +269,7 @@ class ViewsTest(unittest.TestCase):
         self.assertIn(chain + ("PC-102",), all_paths)
         # the product is the root, its use cases below it, shown by their titles
         self.assertEqual([n["key"] for n in own], ["LC-100"])
-        self.assertEqual(own[0]["name"], "seatSwitches")
+        self.assertEqual(own[0]["name"], "OEM_SeatSwitch")
         ucs = own[0]["children"]
         self.assertEqual(
             [n["key"] for n in ucs], ["UC-101", "UC-102", "UC-103", "UC-104"]
@@ -279,7 +279,7 @@ class ViewsTest(unittest.TestCase):
         )
         platform = views.rflp_tree(self.graph, platform=True)
         self.assertEqual([n["key"] for n in platform], ["SSW-LC-001"])
-        self.assertEqual(platform[0]["name"], "seatSwitch")
+        self.assertEqual(platform[0]["name"], "ACME_SeatSwitch")
         self.assertIn(
             (
                 "SSW-LC-001",
@@ -456,7 +456,7 @@ class ViewsTest(unittest.TestCase):
         v = self.view("context", "LC-100")
         self.assertIn("seatHarness", self.names(v))
         edges = self.edges(v)
-        self.assertIn(("seatHarness", "CONNECTS", "seatSwitches"), edges)
+        self.assertIn(("seatHarness", "CONNECTS", "OEM_SeatSwitch"), edges)
         self.assertIn(("seatControlUnit", "CONNECTS", "seatHarness"), edges)
 
     def test_context_of_an_inner_component(self):

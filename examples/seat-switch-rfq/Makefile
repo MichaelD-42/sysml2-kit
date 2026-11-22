@@ -17,7 +17,7 @@ PLATFORM_MODEL := $(shell test -d platform/model && find platform/model -name '*
 RESULTS  := $(wildcard test-results/*.xml)
 GEN      := docs/_generated
 # Usages whose internal structure is drawn, by qualified name (e.g. MyLogical::system MyFunctions::operate)
-DIAGRAMS := SeatSwitchRfqLogical::seatSwitches
+DIAGRAMS := SeatSwitchRfqLogical::OEM_SeatSwitch
 
 .PHONY: all tools lint render docs clean
 # always regenerated (< 1 s): make cannot see a deleted model or result file, so staleness checks would keep removed elements

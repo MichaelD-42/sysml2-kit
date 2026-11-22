@@ -11,7 +11,7 @@ package SeatSwitchRfqUseCases {
         @Realizes { need = "CRS-401"; }
         objective { doc /* The occupant wants to adjust the seat position */ }
         doc /* The occupant pushes the knob or the lumbar pad; the seat control unit moves the seat while it is held. */
-        subject seatSwitches;
+        subject OEM_SeatSwitch;
         actor occupant;
         actor seatControlUnit;
         perform seatAdjustment;
@@ -24,7 +24,7 @@ package SeatSwitchRfqUseCases {
         @Realizes { need = "CRS-206"; }
         objective { doc /* The occupant wants to set seat heating, cooling and massage */ }
         doc /* The occupant steps seat heating, cooling or massage through its levels; at night the keys are lit. */
-        subject seatSwitches;
+        subject OEM_SeatSwitch;
         actor occupant;
         actor seatControlUnit;
         perform comfortKeys;
@@ -37,7 +37,7 @@ package SeatSwitchRfqUseCases {
         @Realizes { need = "CRS-802"; }
         objective { doc /* The technician wants to diagnose and update the switch without removing it */ }
         doc /* A technician reads identification and fault memory and updates the firmware over LIN with the workshop tester. */
-        subject seatSwitches;
+        subject OEM_SeatSwitch;
         actor technician;
         actor workshopTester;
         perform diagnosticServices;
@@ -49,7 +49,7 @@ package SeatSwitchRfqUseCases {
         @Realizes { need = "CRS-702"; }
         objective { doc /* The end-of-line tester wants to flash, code and test each switch for its seat position */ }
         doc /* The end-of-line tester flashes and codes each switch for its seat position, then tests every key and LED. */
-        subject seatSwitches;
+        subject OEM_SeatSwitch;
         actor endOfLineTester;
         perform diagnosticServices;
         perform softwareUpdate;

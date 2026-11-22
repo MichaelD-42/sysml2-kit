@@ -4,10 +4,10 @@ package SeatSwitchLogical {
 
     private import SeatSwitchFeatures::*;
     private import SeatSwitchRequirements::*;
-    // typed by the assembly definition, so an RFQ component subsetting seatSwitch inherits its attributes
+    // typed by the assembly definition, so an RFQ component subsetting ACME_SeatSwitch inherits its attributes
     private import SeatSwitchPhysical::SwitchAssembly;
 
-    part <'SSW-LC-001'> seatSwitch : SwitchAssembly {
+    part <'SSW-LC-001'> ACME_SeatSwitch : SwitchAssembly {
         doc /* The seat adjustment switch as a whole. */
         part <'SSW-LC-002'> keypad {
             doc /* Turns comfort key presses into key states. */
@@ -48,41 +48,41 @@ package SeatSwitchLogical {
         connect switchController.lightControl to illumination.lightDrive;
     }
 
-    allocate seatAdjustmentInput.senseKnobDirection to seatSwitch.positionSensing;
-    allocate seatAdjustmentInput.debounceAdjustmentInput to seatSwitch.switchController;
-    allocate seatAdjustmentInput.mapToAdjustmentSignal to seatSwitch.switchController;
-    allocate seatAdjustmentInput.provideTactileFeedback to seatSwitch.enclosure;
-    allocate comfortFunctionInput.detectKeyPress to seatSwitch.keypad;
-    allocate comfortFunctionInput.debounceKey to seatSwitch.switchController;
-    allocate comfortFunctionInput.mapToComfortSignal to seatSwitch.switchController;
-    allocate comfortFunctionInput.showComfortLevel to seatSwitch.illumination;
-    allocate nightDesignIllumination.receiveDimmingLevel to seatSwitch.linCommunication;
-    allocate nightDesignIllumination.lightKeySymbols to seatSwitch.illumination;
-    allocate vehicleCommunication.sendKeyStates to seatSwitch.linCommunication;
-    allocate vehicleCommunication.receiveVehicleCommands to seatSwitch.linCommunication;
-    allocate vehicleCommunication.checkMessagePlausibility to seatSwitch.linCommunication;
-    allocate vehicleCommunication.supplyProtectedPower to seatSwitch.powerSupply;
-    allocate diagnostics.storeFaultCodes to seatSwitch.switchController;
-    allocate diagnostics.answerDiagnosticRequests to seatSwitch.switchController;
-    allocate diagnostics.grantSecurityAccess to seatSwitch.switchController;
-    allocate diagnostics.runEndOfLineTest to seatSwitch.switchController;
-    allocate diagnostics.storeVariantCoding to seatSwitch.switchController;
-    allocate secureUpdate.receiveFirmwareImage to seatSwitch.linCommunication;
-    allocate secureUpdate.verifyImageSignature to seatSwitch.switchController;
-    allocate secureUpdate.bootVerifiedImage to seatSwitch.switchController;
+    allocate seatAdjustmentInput.senseKnobDirection to ACME_SeatSwitch.positionSensing;
+    allocate seatAdjustmentInput.debounceAdjustmentInput to ACME_SeatSwitch.switchController;
+    allocate seatAdjustmentInput.mapToAdjustmentSignal to ACME_SeatSwitch.switchController;
+    allocate seatAdjustmentInput.provideTactileFeedback to ACME_SeatSwitch.enclosure;
+    allocate comfortFunctionInput.detectKeyPress to ACME_SeatSwitch.keypad;
+    allocate comfortFunctionInput.debounceKey to ACME_SeatSwitch.switchController;
+    allocate comfortFunctionInput.mapToComfortSignal to ACME_SeatSwitch.switchController;
+    allocate comfortFunctionInput.showComfortLevel to ACME_SeatSwitch.illumination;
+    allocate nightDesignIllumination.receiveDimmingLevel to ACME_SeatSwitch.linCommunication;
+    allocate nightDesignIllumination.lightKeySymbols to ACME_SeatSwitch.illumination;
+    allocate vehicleCommunication.sendKeyStates to ACME_SeatSwitch.linCommunication;
+    allocate vehicleCommunication.receiveVehicleCommands to ACME_SeatSwitch.linCommunication;
+    allocate vehicleCommunication.checkMessagePlausibility to ACME_SeatSwitch.linCommunication;
+    allocate vehicleCommunication.supplyProtectedPower to ACME_SeatSwitch.powerSupply;
+    allocate diagnostics.storeFaultCodes to ACME_SeatSwitch.switchController;
+    allocate diagnostics.answerDiagnosticRequests to ACME_SeatSwitch.switchController;
+    allocate diagnostics.grantSecurityAccess to ACME_SeatSwitch.switchController;
+    allocate diagnostics.runEndOfLineTest to ACME_SeatSwitch.switchController;
+    allocate diagnostics.storeVariantCoding to ACME_SeatSwitch.switchController;
+    allocate secureUpdate.receiveFirmwareImage to ACME_SeatSwitch.linCommunication;
+    allocate secureUpdate.verifyImageSignature to ACME_SeatSwitch.switchController;
+    allocate secureUpdate.bootVerifiedImage to ACME_SeatSwitch.switchController;
 
-    satisfy adjustmentDirections by seatSwitch.positionSensing;
-    satisfy comfortKeySteps by seatSwitch.keypad;
-    satisfy nightDesign by seatSwitch.illumination;
-    satisfy keyStateLatency by seatSwitch.linCommunication;
-    satisfy faultMemory by seatSwitch.switchController;
-    satisfy signedFirmware by seatSwitch.switchController;
-    satisfy protectedWrite by seatSwitch.switchController;
-    satisfy endOfLineTestMode by seatSwitch.switchController;
-    satisfy variantCoding by seatSwitch.switchController;
-    satisfy mirroredMounting by seatSwitch.enclosure;
-    satisfy sideKeyedAssembly by seatSwitch.enclosure;
-    satisfy nodeAddressing by seatSwitch.linCommunication;
-    satisfy busSleepAndWake by seatSwitch.linCommunication;
-    satisfy framePlausibility by seatSwitch.linCommunication;
+    satisfy adjustmentDirections by ACME_SeatSwitch.positionSensing;
+    satisfy comfortKeySteps by ACME_SeatSwitch.keypad;
+    satisfy nightDesign by ACME_SeatSwitch.illumination;
+    satisfy keyStateLatency by ACME_SeatSwitch.linCommunication;
+    satisfy faultMemory by ACME_SeatSwitch.switchController;
+    satisfy signedFirmware by ACME_SeatSwitch.switchController;
+    satisfy protectedWrite by ACME_SeatSwitch.switchController;
+    satisfy endOfLineTestMode by ACME_SeatSwitch.switchController;
+    satisfy variantCoding by ACME_SeatSwitch.switchController;
+    satisfy mirroredMounting by ACME_SeatSwitch.enclosure;
+    satisfy sideKeyedAssembly by ACME_SeatSwitch.enclosure;
+    satisfy nodeAddressing by ACME_SeatSwitch.linCommunication;
+    satisfy busSleepAndWake by ACME_SeatSwitch.linCommunication;
+    satisfy framePlausibility by ACME_SeatSwitch.linCommunication;
 }

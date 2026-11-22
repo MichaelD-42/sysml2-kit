@@ -68,7 +68,7 @@ PLATFORM_MUTATIONS = [
         "all",
         replace(
             "model/physical/components.sysml",
-            "    allocate seatSwitch.illumination to switchFirmware.illuminationControl;\n",
+            "    allocate ACME_SeatSwitch.illumination to switchFirmware.illuminationControl;\n",
             "",
         ),
         r"Need path:\s+SSW-PC-031\b.*\n\s+Schema path:\s+swcomponent-used",
@@ -97,7 +97,7 @@ MUTATIONS = [
         "all",
         replace(
             "model/logical/architecture.sysml",
-            "satisfy durabilityGap by seatSwitches;",
+            "satisfy durabilityGap by OEM_SeatSwitch;",
             "",
         ),
         r"Need path:\s+SR-119\b.*\n\s+Schema path:\s+sysreq-satisfied",
@@ -117,7 +117,7 @@ MUTATIONS = [
         "all",
         replace(
             "model/logical/architecture.sysml",
-            "allocate comfortKeys.offerDriverComfortKeys to seatSwitches.driverSwitch;",
+            "allocate comfortKeys.offerDriverComfortKeys to OEM_SeatSwitch.driverSwitch;",
             "",
         ),
         r"Need path:\s+F-101\b.*\n\s+Schema path:\s+function-allocated",
@@ -143,10 +143,10 @@ MUTATIONS = [
         "render",
         replace(
             "Makefile",
-            "DIAGRAMS := SeatSwitchRfqLogical::seatSwitches",
-            "DIAGRAMS := SeatSwitchRfqLogical::seatSwitches Other::seatSwitches",
+            "DIAGRAMS := SeatSwitchRfqLogical::OEM_SeatSwitch",
+            "DIAGRAMS := SeatSwitchRfqLogical::OEM_SeatSwitch Other::OEM_SeatSwitch",
         ),
-        r"more than one entry ends in seatSwitches",
+        r"more than one entry ends in OEM_SeatSwitch",
     ),
     (
         "a model file name with a space fails with what to rename",
@@ -159,10 +159,10 @@ MUTATIONS = [
         "all",
         replace(
             "model/logical/architecture.sysml",
-            "part <'LC-100'> seatSwitches",
-            "part seatSwitches",
+            "part <'LC-100'> OEM_SeatSwitch",
+            "part OEM_SeatSwitch",
         ),
-        r"seatSwitches has no short name",
+        r"OEM_SeatSwitch has no short name",
     ),
     (
         "a commercial requirement without its compliance statement is not answered",
@@ -203,8 +203,8 @@ MUTATIONS = [
         "all",
         replace(
             "model/physical/components.sysml",
-            "    allocate seatSwitches.rearRightSwitch to rearRightHousing;\n"
-            "    allocate seatSwitches.rearRightSwitch to rearRightButtonSet;\n",
+            "    allocate OEM_SeatSwitch.rearRightSwitch to rearRightHousing;\n"
+            "    allocate OEM_SeatSwitch.rearRightSwitch to rearRightButtonSet;\n",
             "",
         ),
         r"Need path:\s+LC-104\b.*\n\s+Schema path:\s+logical-allocated",
@@ -346,7 +346,7 @@ def main():
             "SR-119 shows its system test": re.search(
                 r'id="SR-119".*?verified by.*?STC-103', html, re.DOTALL
             ),
-            "internal diagrams are embedded": "_images/seatSwitches.svg" in html,
+            "internal diagrams are embedded": "_images/OEM_SeatSwitch.svg" in html,
             "use cases link to their needs": 'href="#UC-101"' in html,
             **compliance_rows(work / "docs/_generated/compliance.md"),
             **links_resolve(work / "docs/_build/html"),
@@ -430,14 +430,14 @@ def incremental(work):
     use_cases = work / "model/requirements/use_cases.sysml"
     original = use_cases.read_text()
     use_cases.write_text(
-        original.replace("subject seatSwitches;", "subject switches;")
+        original.replace("subject OEM_SeatSwitch;", "subject switches;")
     )  # every use case
     result = subprocess.run(remake, check=False, capture_output=True, text=True)
     out = result.stdout + result.stderr
     failed = report(
         "a renamed subject's old diagram is gone, so the page pointing at it fails",
         result.returncode != 0
-        and "usecases-seatSwitches.svg" in out
+        and "usecases-OEM_SeatSwitch.svg" in out
         and "No such file or directory" in out,
         out,
     )
