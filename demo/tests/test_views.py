@@ -216,6 +216,11 @@ class ViewsTest(unittest.TestCase):
         row = next(r for r in v["rows"] if r["crs"] == "CRS-301")
         self.assertEqual(row["class"], "non-functional")
         self.assertEqual(row["constraints"], ["CON-101"])
+        self.assertEqual(row["satisfied_by"], ["CON-101"])
+        by = {r["crs"]: r["satisfied_by"] for r in v["rows"]}
+        self.assertEqual(by["CRS-507"], ["SR-115"])  # textual SR answers a constraint
+        self.assertIn("SR-119", by["CRS-304"])  # the partial's gap SR
+        self.assertEqual(by["CRS-201"], [])  # functional: features, not satisfiers
         ctr003 = next(r for r in v["ctrs"] if r["ctr"] == "CTR-003")
         self.assertEqual(ctr003["implemented_by"], ["STC-101"])
         self.assertIn("CTR-003", {n["key"] for n in v["nodes"]})

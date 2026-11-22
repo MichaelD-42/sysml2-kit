@@ -216,10 +216,10 @@ export function renderCompliance(el, view, focus) {
   const statements = (ss) => (ss ?? []).map(([k, v]) => `${keyLink(k)} ${esc(v)}`).join(", ");
   const row = (key) => `<tr data-row="${esc(key)}"${key === focus ? ' class="focus"' : ""}>`;
   el.innerHTML = `<table class="compliance"><caption>Compliance of the RFQ's customer requirements</caption>
-    <thead><tr><th scope="col">CRS</th><th scope="col">Title</th><th scope="col">Class</th><th scope="col">Features</th><th scope="col">Reuse</th>
+    <thead><tr><th scope="col">CRS</th><th scope="col">Title</th><th scope="col">Class</th><th scope="col">Features</th><th scope="col">Satisfied by</th><th scope="col">Reuse</th>
     <th scope="col">Partial</th><th scope="col">Statements</th><th scope="col">Domains</th></tr></thead>
     <tbody>${rows.map((r) => `${row(r.crs)}
-      <td>${keyLink(r.crs)}</td><td>${esc(r.title)}</td><td>${esc(r.class)}</td><td>${links(r.features ?? [])}</td><td>${esc(r.reuse)}</td>
+      <td>${keyLink(r.crs)}</td><td>${esc(r.title)}</td><td>${esc(r.class)}</td><td>${links(r.features ?? [])}</td><td>${links(r.satisfied_by ?? [])}</td><td>${esc(r.reuse)}</td>
       <td>${r.partial ? "partial" : "full"}</td><td>${statements(r.statements)}</td>
       <td>${(r.domains ?? []).map((d) => `<span class="domain d-${esc(d)}">${esc(d)}</span>`).join(" ")}</td></tr>`).join("")}
     </tbody></table>

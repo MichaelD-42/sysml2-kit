@@ -6,7 +6,7 @@ from pathlib import Path
 import tomllib
 
 from explorer.graph import LAYERS
-from sysml2kit.compliance import compliance, ctr_rows
+from sysml2kit.compliance import CONSTRAINED, compliance, ctr_rows
 
 KINDS = (
     "product",
@@ -357,8 +357,18 @@ def compliance_rows(needs_path: Path) -> dict:
     data = json.loads(needs_path.read_text())
     needs = data["versions"][data.get("current_version", "")]["needs"]
     rows, findings = compliance(needs)
+    srs = {}  # crs -> system requirements satisfying it
+    for k, n in needs.items():
+        if n["type"] == "sysreq":
+            for c in n.get("satisfies", []):
+                srs.setdefault(c, []).append(k)
+    out = [dict(zip(ROW, r)) for r in rows]
+    for r in out:
+        # a non-functional or constraint CRS is answered by constraints or textual SRs
+        texts = sorted(srs.get(r["crs"], [])) if r["class"] in CONSTRAINED else []
+        r["satisfied_by"] = list(r["constraints"]) + texts
     return {
-        "rows": [dict(zip(ROW, r)) for r in rows],
+        "rows": out,
         "ctrs": [dict(zip(CTR_ROW, r)) for r in ctr_rows(needs)],
         "findings": findings,
     }
