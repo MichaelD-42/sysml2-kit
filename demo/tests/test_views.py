@@ -89,6 +89,19 @@ class SmallGraphTest(unittest.TestCase):
         )
         self.assertEqual(link["rules"], ["both"])
 
+    def test_a_project_added_need_type_goes_under_an_other_layer(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            docs.mkdir()
+            toml = (RFQ / "docs" / "ubproject.toml").read_text()
+            toml += '\n[[needs.types]]\ndirective = "hazard"\ntitle = "Hazard"\nprefix = "HAZ-"\n'
+            (docs / "ubproject.toml").write_text(toml)
+            (docs / "schemas.json").write_text(json.dumps({"schemas": []}))
+            v = views.metamodel(self.graph, Path(tmp))
+        parents = {n["key"]: n["parent"] for n in v["nodes"]}
+        self.assertEqual(parents["type:hazard"], "layer:?")
+        self.assertIn("layer:?", parents)
+
 
 class ViewsTest(unittest.TestCase):
     @classmethod
@@ -428,6 +441,7 @@ class ViewsTest(unittest.TestCase):
         types = {n["kind"]: n for n in v["nodes"] if n["parent"]}
         self.assertEqual(types["crs"]["parent"], "layer:R")
         self.assertEqual(types["ctr"]["parent"], "layer:V")
+        self.assertEqual(types["swreq"]["parent"], "layer:P")
         self.assertEqual(types["crs"]["count"], len(types["crs"]["instances"]))
         self.assertGreater(types["crs"]["count"], 0)
         self.assertEqual(types["crs"]["rules"], ["crs-class"])

@@ -274,7 +274,7 @@ function wire() {
   $("#zoom-in").onclick = () => ((zoomed = true), fit(scale * 1.25));
   $("#zoom-out").onclick = () => ((zoomed = true), fit(scale / 1.25));
   new ResizeObserver(() => current.kind === "product" && !zoomed && fitView()).observe(canvas);
-  $("#zoom-fit").onclick = fitView;
+  $("#zoom-fit").onclick = () => ((zoomed = false), fitView());
   $("#reload").onclick = async (e) => {
     const status = $("#reload-status");
     e.target.disabled = true;

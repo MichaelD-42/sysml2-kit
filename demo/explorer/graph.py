@@ -5,12 +5,10 @@ from dataclasses import dataclass, field
 
 # need type -> RFLP layer
 LAYERS = {
-    **dict.fromkeys(
-        ("crs", "prq", "cst", "usecase", "sysreq", "swreq", "constraint"), "R"
-    ),
+    **dict.fromkeys(("crs", "prq", "cst", "usecase", "sysreq", "constraint"), "R"),
     **dict.fromkeys(("feature", "function"), "F"),
     **dict.fromkeys(("component", "interface"), "L"),
-    **dict.fromkeys(("physical", "physinterface"), "P"),
+    **dict.fromkeys(("physical", "physinterface", "swreq"), "P"),
     **dict.fromkeys(("ctr", "systest", "acctest", "testresult"), "V"),
 }
 NEED_FIELDS = (

@@ -8,7 +8,7 @@ Terms used in this repository, the plugin and the generated docs. Which layer ow
 
 **RFQ** (request for quotation): a customer's call for an offer. The `rfq` skill builds the architecture that answers it, reusing the supplier's platform.
 
-**Platform**: the supplier's own project of reusable features, components and variants, with the same layout as an RFQ project. An RFQ project pulls it in at `platform/` (git submodule). Its ids carry a tag (`EDU-PC-004`); its needs have `platform: true` and are checked by the platform's own build, not the RFQ's.
+**Platform**: the supplier's own project of reusable features, components and variants, with the same layout as an RFQ project. An RFQ project pulls it in at `platform/` (git submodule). Its ids carry a tag (`SSW-PC-004`); its needs have `platform: true` and are checked by the platform's own build, not the RFQ's.
 
 **V model**: the left side of the V goes down through the RFLP layers; the right side goes up through tests that verify each layer. Here: system tests verify system requirements, acceptance tests verify customer requirements and use cases.
 
@@ -58,7 +58,7 @@ SW architecture and design are physical components: SW components and SW units.
 
 **SW component** (`PC-nnn`): a `#Software part` owned by the firmware PC; the SW architecture. Its interfaces are `#Software` ports and connections. Logical components are allocated to it.
 
-**SW unit** (`PC-nnn`): a `#Software part` owned by its SW component; the SW design. Software requirements realize it, unit tests verify those.
+**SW unit** (`PC-nnn`): a `#Software part` owned by its SW component; the SW design. Software requirements are allocated to it, unit tests verify those.
 
 **PI** (physical interface, `PI-nnn`): a SysML `port` on a PC with the same domain keywords; a logical interface is allocated to it.
 

@@ -895,7 +895,9 @@ def metamodel(graph, project: Path) -> dict:
             for s in selected:
                 node_rules[s].append(rule["id"])
     used = {link for (_, link, _), e in edges.items() if e["instances"]}
-    layers = {t: LAYERS[t] for t in types}
+    # a project-added need type has no RFLP layer: it goes under "?"
+    layers = {t: LAYERS.get(t, "?") for t in types}
+    titles = LAYER_TITLES | ({"?": "Other"} if "?" in layers.values() else {})
     nodes = [
         {
             "key": f"layer:{lv}",
@@ -904,7 +906,7 @@ def metamodel(graph, project: Path) -> dict:
             "parent": None,
             "count": sum(len(instances[t]) for t in types if layers[t] == lv),
         }
-        for lv, title in LAYER_TITLES.items()
+        for lv, title in titles.items()
     ] + [
         {
             "key": f"type:{t}",

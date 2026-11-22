@@ -18,7 +18,6 @@ SW architecture and design are physical components: SW components and SW units.
 |---|---|---|---|---|
 | R | Customer requirement | `CRS-nnn` | Markdown (MyST) `crs` directive, `docs/customer/`; `:class:` functional, non-functional, constraint or information | none |
 | R | Platform requirement | `PRQ-nnn` | Markdown `prq` directive, in the platform project; `:class:` as for CRS | none |
-| R | Customer test requirement | `CTR-nnn` | Markdown `ctr` directive, `docs/customer/`; `:purpose:` verification or validation, `:method:` test, analysis, inspection or demonstration | `applies_to` → CRS/PRQ (`:applies_to:`) |
 | R | Compliance statement | `CST-nnn` | Markdown `cst` directive, in the RFQ project | answers → CRS; `compliance`: comply, partial, not-comply |
 | R | Use case | `UC-nnn` | SysML `use case`; its `objective` doc is the need title | realizes → CRS (`@Realizes`) |
 | R | System requirement | `SR-nnn` | SysML `requirement` usage, text in `doc` | satisfies → CRS (`@Satisfies`) |
@@ -32,10 +31,11 @@ SW architecture and design are physical components: SW components and SW units.
 | P | Physical interface | `PI-nnn` | SysML `port` on a PC, same domain keywords | LI allocated_to → PI (`allocate`) |
 | P | SW component | `PC-nnn` | SysML `#Software part` owned by the firmware PC | LC allocated_to → SW component (`allocate`); owned_by → firmware |
 | P | SW unit | `PC-nnn` | SysML `#Software part` owned by its SW component | owned_by → SW component |
+| P | Software requirement | `SWR-nnn` | Markdown or RST `swreq`, `docs/software/` | satisfies → SR, allocated_to → the SW component or unit implementing it (no rules) |
+| V | Customer test requirement | `CTR-nnn` | Markdown `ctr` directive, `docs/customer/`; `:purpose:` verification or validation, `:method:` test, analysis, inspection or demonstration | `applies_to` → CRS/PRQ (`:applies_to:`) |
 | V | System test case | `STC-nnn` | SysML `verification` | verifies → SR (native `verify`) or constraint (`@Verifies`); implements → CTR (`@Implements`) |
 | V | Acceptance test case | `ATC-nnn` | Markdown or RST `acctest` | verifies → CRS, UC; implements → CTR (`:implements:`) |
 | V | Test result | generated | JUnit XML, `<property name="verifies" value="STC-001"/>` | tests → STC/ATC/SWR |
-| P | Software requirement | `SWR-nnn` | Markdown or RST `swreq`, `docs/software/` | satisfies → SR, allocated_to → the SW component or unit implementing it (no rules) |
 
 Keywords `#Feature`, `#Mechanical`, `#Electrical`, `#Software` and the metadata `@Matches`, `@Satisfies`, `@Verifies`, `@Implements` are in `model/trace.sysml` (package `Trace`). A part or port without a domain keyword is logical. The id prefix must agree with the kind (`PC-` on a domain part, `FEAT-` on a `#Feature` action); the bridge errors otherwise. Exactly one domain keyword per element.
 
@@ -95,9 +95,9 @@ CTRs are the customer's own test requirements, captured as written (`ctr` direct
 
 ## Platform, variants, matching
 
-The platform is the supplier's own project with this same layout (its PRQ play the role of CRS), in `<project>/platform/` as a git submodule (`git submodule add <platform repo> platform`; the repo examples use a symlink). Its ids carry a tag before the type prefix (`EDU-FEAT-001`, `EDU-PC-004`). `make` loads its model next to `model/`; its elements become needs with `platform: true`, which RFQ builds never rule-check (the platform's own build does).
+The platform is the supplier's own project with this same layout (its PRQ play the role of CRS), in `<project>/platform/` as a git submodule (`git submodule add <platform repo> platform`; the repo examples use a symlink). Its ids carry a tag before the type prefix (`SSW-FEAT-001`, `SSW-PC-004`). `make` loads its model next to `model/`; its elements become needs with `platform: true`, which RFQ builds never rule-check (the platform's own build does).
 
-- Reuse is subsetting: `part <'PC-001'> driveMotor :> EDrivePhysical::motor::motor80kW;` or `#Feature action <'FEAT-010'> acc :> PlatformFeatures::cruise;`. The bridge turns it into a `specializes` link; the coverage chain follows it into the platform.
+- Reuse is subsetting: `#Mechanical part <'PC-101'> driverHousing :> SeatSwitchPhysical::housing::housingLH;` or `#Feature action <'FEAT-101'> seatAdjustment :> SeatSwitchFeatures::seatAdjustmentInput;`. The bridge turns it into a `specializes` link; the coverage chain follows it into the platform.
 - Variants are native `variation` / `variant` members in the platform; the RFQ part subsets one variant to select it. A chain that reaches a variation without such a selection reaches no PC there: the feature is `incomplete`.
 - `@Matches { need = "CRS-001"; }` in a feature states that it covers that CRS; `partial = true` says only in part, and then an SR that satisfies the CRS must be satisfied by a component in the feature's chain (it states the gap).
 - Reuse status per matched feature is derived from the chain feature → leaf functions → LC → PC, never written: `platform` (all PCs from the platform, no variant), `variant` (all from the platform, at least one a selected variant), `modified` (some platform, some new), `new` (no platform PC), `incomplete` (a leaf function reaches no PC). On a CRS: the worst of its features.
@@ -109,7 +109,7 @@ The platform is the supplier's own project with this same layout (its PRQ play t
 |---|---|---|
 | `crs-class` | R | every CRS and PRQ has a class |
 | `crs-satisfied` | R | every CRS of class functional, non-functional or constraint with empty scope is satisfied by at least one SR or constraint |
-| `constraint-satisfies` | R | every constraint satisfies at least one CRS |
+| `constraint-satisfies` | R | every constraint satisfies at least one CRS or PRQ |
 | `usecase-realizes` | R | every UC realizes at least one CRS |
 | `sysreq-satisfies` | R | every SR satisfies at least one CRS |
 | `cst-compliance` | R | every CST has a compliance value (comply, partial or not-comply) |
@@ -142,7 +142,7 @@ In an RFQ build the model rules (all except `crs-class`, `crs-satisfied`, `cst-c
 - **CRS** are the customer's words. Do not rewrite them; ask when one is ambiguous.
 - **UC**: name a verb phrase from the actor's view (`commute`, `transportOnTrailer`), with subject and actors; title "The <actor> wants to <goal>" in the `objective` doc.
 - **SR**: one `shall` per requirement; verifiable (a number with a unit, or an observable yes/no); solution-free (no component names, no technology); no TBD, "etc.", "as appropriate", "user-friendly", "fast".
-- **FEAT**: a noun for what the product offers (`travelRange`, `adaptiveCruiseControl`), not a verb phrase.
+- **FEAT**: a noun for what the product offers (`seatAdjustmentInput`, `nightDesignIllumination`), not a verb phrase.
 - **F**: verb + noun, solution-neutral (`storeEnergy`, not `chargeBattery` unless the battery is a given constraint); nest sub-functions under the function they refine.
 - **LC**: technology-neutral role (`energyStore`, not `liIonPack48V`); each leaf has a purpose (an allocated function).
 - **PC/PI**: one domain keyword; the `doc` names the BOM item, drawing or code module; a platform part is reused with `:>` before a new one is created. SW components and units say in their `doc` which they are (`SW component: ...`, `SW unit: ...`).

@@ -62,7 +62,7 @@ Then ask Claude to set up a SysML project. `sysml-init` scaffolds the pipeline, 
 
 ## Model explorer demo
 
-[`demo/`](demo) is a local web app over a kit project: nine views generated from the model, search and a chat in which Claude answers from an in-memory graph of the model. `make -C demo demo` starts it on the seat-switch RFQ example; [`demo/README.md`](demo/README.md) has the steps, the HTTP API and the graph schema, and the notes for integrating it into your own tools.
+[`demo/`](demo) is a local web app over a kit project: twelve views generated from the model, search and a chat in which Claude answers from an in-memory graph of the model. `make -C demo demo` starts it on the seat-switch RFQ example; [`demo/README.md`](demo/README.md) has the steps, the HTTP API and the graph schema, and the notes for integrating it into your own tools.
 
 ## Upgrading from 0.1.x
 
@@ -84,6 +84,9 @@ Requirement classes, constraints and customer test requirements change the rules
 - `model/trace.sysml`: add the `Implements` metadata (`need : String[1..*]`), and `partial` on `Satisfies`, or copy it from the template.
 - Every CRS and PRQ needs a `:class:` (`functional`, `non-functional`, `constraint` or `information`). Plain values move from bare attributes or textual SRs into `CON-` constraints; `information` carries no obligation.
 - Customer tests become `ctr` directives with `:applies_to:`, implemented by STC (`@Implements`) or ATC (`:implements:`).
+- Software architecture: new rules `swcomponent-used` (every SW component has a logical component allocated) and `software-used` (a top-level `#Software` PC without SW components has one), and `physical-used` now covers only mechanical and electrical leaf PCs. A project whose firmware owns `#Software` parts must allocate its logical components to those SW components, not to the units under them.
+- A use case's need title comes from the doc of its `objective` (`objective { doc /* The driver wants to ... */ }`), otherwise from its name.
+- A software requirement links to the SW component or unit implementing it with `:allocated_to:`.
 
 ## Pipeline
 
@@ -102,7 +105,7 @@ The platform model is loaded next to the RFQ's `model/`; its elements become nee
 
 ### What `sysml export` gives the bridge
 
-A flat JSON array of elements with `@type`, `@id` and every metamodel property; references are `{"@id": ...}`. `sysml2kit needs` reads `declaredShortName` (not `shortName`, which implicit features inherit), `name`, `qualifiedName`, `owner`, `documentation`; `SatisfyRequirementUsage.satisfyingFeature/satisfiedRequirement`; `Verification*.verifiedRequirement`; `AllocationUsage.relatedFeature` (`[source, target]`); `PerformActionUsage` → `ReferenceSubsetting.referencedFeature`; `MetadataUsage` typed by `Trace::Realizes/Satisfies/Verifies/Matches` and the string literals under it, and keyword metadata `Trace::Feature/Mechanical/Electrical/Software`, which with the metaclass decide the need type (`#Feature action` → feature, `#Electrical part` → physical component); subsetting (`:>`) becomes a `specializes` link. The export has no source positions; the bridge finds `<'ID'>` in the model text, skipping comments and string literals.
+A flat JSON array of elements with `@type`, `@id` and every metamodel property; references are `{"@id": ...}`. `sysml2kit needs` reads `declaredShortName` (not `shortName`, which implicit features inherit), `name`, `qualifiedName`, `owner`, `documentation`; `SatisfyRequirementUsage.satisfyingFeature/satisfiedRequirement`; `Verification*.verifiedRequirement`; `AllocationUsage.relatedFeature` (`[source, target]`); `PerformActionUsage` → `ReferenceSubsetting.referencedFeature`; `MetadataUsage` typed by `Trace::Realizes/Satisfies/Verifies/Matches/Implements` and the string literals under it, and keyword metadata `Trace::Feature/Mechanical/Electrical/Software`, which with the metaclass decide the need type (`#Feature action` → feature, `#Electrical part` → physical component); subsetting (`:>`) becomes a `specializes` link. The export has no source positions; the bridge finds `<'ID'>` in the model text, skipping comments and string literals.
 
 ## Tools and versions
 
