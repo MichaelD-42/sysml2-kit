@@ -231,6 +231,10 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(s["rated"], 40)  # 45 CRS less 5 information
         self.assertEqual(s["ratings"]["partial"]["count"], 1)
         self.assertEqual(sum(x["count"] for x in s["ratings"].values()), 40)
+        # one decimal, and the shares of a split always add up to 100
+        self.assertEqual(s["ratings"]["comply"]["pct"], 92.5)
+        self.assertEqual(round(sum(x["pct"] for x in s["ratings"].values()), 1), 100)
+        self.assertEqual(round(sum(x["pct"] for x in s["reuse"].values()), 1), 100)
         self.assertEqual(s["verified"]["pct"], 100)
         self.assertEqual(s["ctrs_implemented"]["pct"], 100)
         self.assertEqual(sum(x["count"] for x in s["reuse"].values()), s["reused"])

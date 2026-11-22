@@ -396,16 +396,29 @@ def _rating(row, need, findings) -> str:
 
 
 def _share(count: int, total: int) -> dict:
-    return {"count": count, "pct": round(100 * count / total) if total else 0}
+    return {"count": count, "pct": round(100 * count / total, 1) if total else 0}
+
+
+def _split(counts: dict, total: int) -> dict:
+    """Shares in tenths of a percent that add up to 100 (largest remainder), so a split never shows 98 %."""
+    if not total:
+        return {k: {"count": c, "pct": 0} for k, c in counts.items()}
+    exact = {k: 1000 * c / total for k, c in counts.items()}
+    tenths = {k: int(v) for k, v in exact.items()}
+    for k in sorted(exact, key=lambda k: exact[k] - tenths[k], reverse=True)[
+        : 1000 - sum(tenths.values())
+    ]:
+        tenths[k] += 1
+    return {k: {"count": counts[k], "pct": tenths[k] / 10} for k in counts}
 
 
 def _summary(rows, ctrs, needs, findings) -> dict:
     """Percentages over the rated (non-information) customer requirements."""
     rated = [r for r in rows if r["rating"] != "information"]
     order = ("comply", "partial", "commercial", "not offered", "not answered")
-    ratings = {
-        k: _share(sum(r["rating"] == k for r in rated), len(rated)) for k in order
-    }
+    ratings = _split(
+        {k: sum(r["rating"] == k for r in rated) for k in order}, len(rated)
+    )
     # verification applies to technical requirements without a scope
     checked = [
         r for r in rated if r["class"] in TECHNICAL and not needs[r["crs"]].get("scope")
@@ -429,9 +442,9 @@ def _summary(rows, ctrs, needs, findings) -> dict:
             sum(r["crs"] not in unverified for r in checked), len(checked)
         ),
         "reused": len(reused),
-        "reuse": {
-            k: _share(sum(r["reuse"] == k for r in reused), len(reused)) for k in kinds
-        },
+        "reuse": _split(
+            {k: sum(r["reuse"] == k for r in reused) for k in kinds}, len(reused)
+        ),
         "comply_by_class": by_class,
         "ctrs_implemented": _share(
             sum(bool(c["implemented_by"]) for c in open_ctrs), len(open_ctrs)
