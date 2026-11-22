@@ -272,7 +272,7 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(own[0]["name"], "OEM_SeatSwitch")
         ucs = own[0]["children"]
         self.assertEqual(
-            [n["key"] for n in ucs], ["UC-101", "UC-102", "UC-103", "UC-104"]
+            [n["key"] for n in ucs], ["UC-101", "UC-102", "UC-103", "UC-104", None]
         )
         self.assertEqual(
             ucs[0]["name"], "The occupant wants to adjust the seat position"
@@ -296,6 +296,7 @@ class ViewsTest(unittest.TestCase):
                 k.startswith(("LC-", "PC-", "FEAT-", "UC-"))
                 for p in self.paths(platform)
                 for k in p
+                if k
             )
         )
 
@@ -318,9 +319,20 @@ class ViewsTest(unittest.TestCase):
             any(p[-3:] == ("FEAT-104", "SSW-F-011", "SSW-LC-005") for p in all_paths)
         )
         self.assertTrue(any(p[-2:] == ("SSW-LC-005", "SSW-PC-034") for p in all_paths))
-        self.assertTrue(
-            any(p[-3:] == ("SSW-LC-005", "SSW-PC-034", "SSW-PC-035") for p in all_paths)
-        )
+        # the product's physical breakdown: assemblies down to software units, in both trees
+        firmware = ("SSW-PC-016", "SSW-PC-034", "SSW-PC-035")
+        self.assertIn(("LC-100", None) + firmware, all_paths)
+        for top in ("SSW-PC-001", "SSW-PC-007", "SSW-PC-011"):
+            self.assertIn(("LC-100", None, top), all_paths)
+        platform = set(self.paths(views.rflp_tree(self.graph, platform=True)))
+        self.assertIn(("SSW-LC-001", None) + firmware, platform)
+        # a part is expanded in the breakdown; its rows under a logical component say where
+        under_lc = [
+            n
+            for n in self.walk(nodes["SSW-LC-005"]["children"])
+            if n["key"] == "SSW-PC-034"
+        ]
+        self.assertEqual(under_lc[0]["again"], "Physical breakdown")
         # a position's part shows the variant it selects
         self.assertTrue(
             any(p[-3:] == ("LC-101", "PC-101", "SSW-PC-002") for p in all_paths)
@@ -331,7 +343,9 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(
             [bool(n["children"]) for n in rows], [True] + [False] * (len(rows) - 1)
         )
-        self.assertTrue(all(n.get("again") for n in rows[1:]))
+        self.assertEqual(
+            rows[1]["again"], "The occupant wants to adjust the seat position"
+        )
 
     def test_activity_of_a_feature_includes_inherited_actions(self):
         v = self.view("activity", "FEAT-104")
@@ -558,6 +572,9 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(parent[names["seatHarness"]], "group:context")
         # use cases with the features they perform, inherited functions counted
         self.assertLessEqual({"UC-101", "UC-102", "UC-103", "UC-104"}, set(nodes))
+        self.assertEqual(
+            nodes["UC-101"]["name"], "The occupant wants to adjust the seat position"
+        )
         self.assertIn("8 functions", tags["FEAT-102"])
         self.assertIn("4 functions", tags["FEAT-104"])
         edges = {(e["src"], e["dst"], e["type"]) for e in v["edges"]}

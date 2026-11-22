@@ -423,7 +423,7 @@ def view(
 
 PRODUCT_UCS = """
 MATCH (f:Node {key: $product}), (uc:UseCaseUsage)-[:SUBJECT]->({name: f.name})
-RETURN uc.key AS key, uc.name AS name,
+RETURN uc.key AS key,
   COLLECT { MATCH (uc)-[:OWNS]->(a:PartUsage) RETURN a.name } AS actors,
   COLLECT { MATCH (uc)-[:PERFORMS]->(x:feature) RETURN x.key } AS features
 ORDER BY key"""
@@ -537,10 +537,6 @@ def product(graph) -> dict:
             add(t["key"], f"group:{t['domain']}", _count(len(t["parts"]), what))
 
     nodes = _nodes(graph, [r for r in rows if not r["key"].startswith("group:")])
-    for n in nodes:
-        # a use case by its short name: its title is in the inspector
-        if n["kind"] == "UseCaseUsage":
-            n["name"] = next(uc["name"] for uc in ucs if uc["key"] == n["key"])
     columns = [
         {"key": group[t], "name": t, "parent": None, "partition": i}
         for i, t in enumerate(OVERVIEW_COLUMNS)
@@ -655,6 +651,7 @@ WHERE (type(r) = 'PERFORMS' AND a:usecase AND b:feature)
    OR (type(r) = 'ALLOCATED_TO' AND a:component AND b:physical)
    OR (type(r) IN ['OWNS', 'SPECIALIZES'] AND a:physical AND b:physical)
 RETURN a.key AS src, b.key AS dst, type(r) = 'SPECIALIZES' AS reuse"""
+PHYSICAL_BRANCH = "Physical breakdown"
 # the product a tree is rooted at: the first top-level logical component of the project or platform
 PRODUCT = """
 MATCH (:Package)-[:OWNS]->(n:component) WHERE coalesce(n.platform, false) = $platform
@@ -674,9 +671,11 @@ RETURN n.key AS key, coalesce(CASE WHEN n:usecase THEN n.title END, n.name, n.ti
 def rflp_tree(graph, platform: bool = False) -> list[dict]:
     """The product (project or platform) > use case > feature > function (nested) > logical >
     physical (its parts, and the variant a project part selects). A project feature also lists
-    the platform functions it inherits. A shared feature or function repeats; a logical or
-    physical component is expanded where it first shows, later rows are marked `again`. Each
-    node lists the elements on the other side it uses or is used by (`uses`)."""
+    the platform functions it inherits. Below the use cases, the product's physical breakdown:
+    its top-level parts and their assemblies. A shared feature or function repeats; a logical or
+    physical component is expanded once (a part in the breakdown), later rows carry `again`, the
+    branch it is expanded in. Each node lists the elements on the other side it uses or is used
+    by (`uses`)."""
     every = {r["key"]: r for r in _read(graph, RFLP_NODES, types=NEED_TYPES)}
     info = {k: r for k, r in every.items() if r["platform"] == platform}
     kids, uses, inherited = {}, {}, {}
@@ -692,19 +691,19 @@ def rflp_tree(graph, platform: bool = False) -> list[dict]:
         # a project feature does what the platform feature it specializes does
         if not platform and every[r["a"]]["kind"] == every[r["b"]]["kind"] == "feature":
             inherited.setdefault(r["a"], []).extend(kids.get(r["b"], []))
-    expanded = set()
+    expanded = {}  # a logical or physical component -> the branch it is expanded in
 
-    def node(key, seen):
+    def node(key, seen, branch):
         n = dict(every[key])
         n["uses"] = sorted(uses.get(key, []))
         if n["kind"] in ("component", "physical"):
             if key in expanded:
-                return n | {"children": [], "again": True}
-            expanded.add(key)
+                return n | {"children": [], "again": expanded[key]}
+            expanded[key] = branch
         # the other side's elements show only below what is reused from it
         own = [k for k in kids.get(key, []) if k in info or n["platform"] != platform]
         n["children"] = [
-            node(k, seen | {key})
+            node(k, seen | {key}, branch)
             for k in sorted(own + inherited.get(key, []))
             if k not in seen
         ]
@@ -713,14 +712,31 @@ def rflp_tree(graph, platform: bool = False) -> list[dict]:
     ucs = sorted(k for k, v in info.items() if v["kind"] == "usecase")
     found = _read(graph, PRODUCT, platform=platform)
     if not found or found[0]["key"] not in info:
-        return [node(k, frozenset()) for k in ucs]
+        return [node(k, frozenset(), every[k]["name"]) for k in ucs]
     root = found[0]["key"]
-    expanded.add(root)
+    expanded[root] = info[root]["name"]
+    # the physical breakdown is built first, so each part is expanded there, its assemblies
+    # included, and its rows under logical components refer to it
+    tops = [
+        r["key"]
+        for r in _read(graph, PRODUCT_PHYSICAL)
+        if r["key"] in every and (not platform or r["key"] in info)
+    ]
+    parts = [node(k, frozenset({root}), PHYSICAL_BRANCH) for k in tops]
+    branches = [node(k, frozenset({root}), every[k]["name"]) for k in ucs]
+    breakdown = {
+        "key": None,
+        "name": PHYSICAL_BRANCH,
+        "kind": "group",
+        "platform": False,
+        "uses": [],
+        "children": parts,
+    }
     return [
         dict(
             info[root],
             uses=sorted(uses.get(root, [])),
-            children=[node(k, frozenset({root})) for k in ucs],
+            children=branches + ([breakdown] if parts else []),
         )
     ]
 

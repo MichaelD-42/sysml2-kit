@@ -69,7 +69,7 @@ export function renderTree(el, roots) {
     const label = n.key
       ? `${n.rel ? `<span class="rel">${esc(n.rel)}</span> ` : ""}${keyLink(n.key, n.name)}${n.key !== n.name && !GENERATED.test(n.key) ? ` <span class="id">${esc(n.key)}</span>` : ""}`
       : `<span class="group">${esc(n.name)}</span>`;
-    const marks = `${n.again ? ' <span class="kind">expanded above</span>' : ""}${n.domain ? ` <span class="domain d-${esc(n.domain)}">${esc(n.domain)}</span>` : ""}${n.class ? ` <span class="req-class">${esc(n.class)}</span>` : ""}${n.platform ? ' <span class="kind">platform</span>' : ""}`;
+    const marks = `${n.again ? ` <span class="kind">expanded under ${esc(n.again)}</span>` : ""}${n.domain ? ` <span class="domain d-${esc(n.domain)}">${esc(n.domain)}</span>` : ""}${n.class ? ` <span class="req-class">${esc(n.class)}</span>` : ""}${n.platform ? ' <span class="kind">platform</span>' : ""}`;
     return `<li data-tree="${esc(n.key ?? "")}">
       ${kids.length ? `<button type="button" class="twisty" aria-expanded="${open}" aria-label="expand ${esc(n.name)}"></button>` : '<span class="twisty-gap"></span>'}
       ${label}${n.key && !n.rel ? ` <span class="kind">${esc(n.kind)}</span>` : ""}${marks}
@@ -93,19 +93,21 @@ const openUp = (li) => {
   }
 };
 
-/** Mark every row of `key` (opening its ancestors) and, more lightly, the first row of each linked key. */
-export function revealInTree(el, key, linked = new Set()) {
+/** Mark every row of `key` (opening its ancestors) and, more lightly, the first row of each linked key.
+ * `quiet` marks without opening a collapsed section or scrolling (the landing focus). */
+export function revealInTree(el, key, linked = new Set(), quiet = false) {
   el.querySelectorAll("li.current, li.linked").forEach((li) => li.classList.remove("current", "linked"));
   const rows = [...el.querySelectorAll("li[data-tree]")];
   const hits = rows.filter((x) => x.dataset.tree === key);
   hits.forEach((li) => (li.classList.add("current"), openUp(li)));
-  // a collapsed section opens for the focus itself, not for what is linked to it
-  const section = el.closest("details");
-  if (hits.length && section) section.open = true;
   for (const k of linked) {
     const li = rows.find((x) => x.dataset.tree === k && !x.parentElement.closest(`li[data-tree="${CSS.escape(key)}"]`));
     if (li) li.classList.add("linked"), openUp(li);
   }
+  if (quiet) return;
+  // a collapsed section opens for the focus itself, not for what is linked to it
+  const section = el.closest("details");
+  if (hits.length && section) section.open = true;
   hits[0]?.scrollIntoView({ block: "nearest" });
 }
 

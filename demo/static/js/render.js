@@ -78,9 +78,11 @@ function shape(n) {
       ${text(cx, n.y + n.height - 4, n.name, "t-name", "middle")}`;
   }
   if (n.shape === "usecase") {
+    const lines = n.wrapped ?? [n.name];
+    const top = n.y + n.height / 2 - (lines.length * 16) / 2 + 4;
     return `<ellipse cx="${cx}" cy="${n.y + n.height / 2}" rx="${n.width / 2}" ry="${n.height / 2}" class="box"/>
-      ${text(cx, n.y + n.height / 2 - 4, n.header, "t-kw", "middle")}
-      ${text(cx, n.y + n.height / 2 + 12, n.name, "t-name", "middle")}`;
+      ${text(cx, top, n.header, "t-kw", "middle")}
+      ${lines.map((l, i) => text(cx, top + 16 * (i + 1), l, "t-name", "middle")).join("")}`;
   }
   const rx = n.shape === "action" ? 12 : 2;
   const frame = n.shape === "frame";

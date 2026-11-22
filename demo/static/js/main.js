@@ -28,6 +28,7 @@ const knownKeys = new Set();
 const current = { kind: "product", keys: new Set(), view: null };
 let token = 0;
 let scale = 1;
+let zoomed = false; // the viewer zoomed this view: a resize no longer re-fits it
 
 const related = new Map(); // key -> keys linked to it through a requirement or a platform use (both directions)
 const reqLinks = new Map(); // requirement key -> its links [{rel, key, name}]
@@ -61,9 +62,11 @@ async function loadModel() {
   panels.renderTree($("#plat-tree"), platform);
 }
 
-// the focus in every tree, plus what it is linked to through a requirement or a platform use
+// the focus in every tree, plus what it is linked to through a requirement or a platform use;
+// the landing focus is marked quietly, so the column stays at its top and sections as the viewer left them
+let landing = false;
 function revealTrees(key) {
-  for (const id of TREES) panels.revealInTree($(id), key, related.get(key) ?? new Set());
+  for (const id of TREES) panels.revealInTree($(id), key, related.get(key) ?? new Set(), landing);
 }
 
 // unnamed elements (a requirement's constraint) are labelled by their expression
@@ -132,6 +135,8 @@ async function show(kind, key) {
     }
     if (mine !== token) return;
     note.innerHTML = why;
+    if (kind === "product")
+      note.textContent = "Which block each physical part realizes is in Traceability and the trees; those lines are left out here for readability.";
     if (view.unused_links?.length) note.textContent = `Declared links with no instance: ${view.unused_links.join(", ")}`;
     await label(view.nodes);
     if (mine !== token) return;
@@ -147,11 +152,16 @@ async function show(kind, key) {
       if (mine !== token) return;
       current.laid = laid;
       canvas.innerHTML = svg(laid, focus.get());
-      // the overview is one picture: it opens fitted to the canvas
+      // the overview is one picture: it opens fitted to the canvas (and re-fits while the canvas settles)
+      zoomed = false;
       if (kind === "product") fitView();
       else fit(laid.width < canvas.clientWidth ? 1 : Math.max(0.8, canvas.clientWidth / laid.width));
     }
-    if (!focus.get() && view.focus) setFocus(view.focus);
+    if (!focus.get() && view.focus) {
+      landing = true;
+      setFocus(view.focus);
+      landing = false;
+    }
   } catch (e) {
     if (mine === token) canvas.innerHTML = `<div class="empty"><p class="error">${esc(e.message)}</p></div>`;
   } finally {
@@ -261,8 +271,9 @@ function wire() {
     e.shiftKey ? drill(el) : setFocus(el.dataset.key);
   });
   $("#back").onclick = () => focus.back();
-  $("#zoom-in").onclick = () => fit(scale * 1.25);
-  $("#zoom-out").onclick = () => fit(scale / 1.25);
+  $("#zoom-in").onclick = () => ((zoomed = true), fit(scale * 1.25));
+  $("#zoom-out").onclick = () => ((zoomed = true), fit(scale / 1.25));
+  new ResizeObserver(() => current.kind === "product" && !zoomed && fitView()).observe(canvas);
   $("#zoom-fit").onclick = fitView;
   $("#reload").onclick = async (e) => {
     const status = $("#reload-status");

@@ -8,6 +8,17 @@ const PACKED = { "elk.hierarchyHandling": "SEPARATE_CHILDREN", "elk.algorithm": 
 
 export const textWidth = (s, px = 12) => String(s ?? "").length * px * 0.6;
 
+/** Words of `s` in lines of at most `max` characters (a longer word gets a line of its own). */
+export function wrap(s, max) {
+  const lines = [];
+  for (const word of String(s ?? "").split(/\s+/).filter(Boolean)) {
+    const last = lines.length - 1;
+    if (last >= 0 && lines[last].length + 1 + word.length <= max) lines[last] += ` ${word}`;
+    else lines.push(word);
+  }
+  return lines.length ? lines : [""];
+}
+
 /** SysML-style keyword for a node kind: ActionUsage -> action, PartDefinition -> part def. */
 export function keyword(kind) {
   if (!kind || /^[a-z]/.test(kind)) return kind ?? ""; // need types (crs, acctest) are already words
@@ -45,12 +56,17 @@ function describe(node, actors, compound) {
   const id = typeBox || node.kind === "group" ? null : node.shortName ?? (/^[0-9a-f]{8}-/.test(node.key) ? null : node.key);
   // an overview column or domain group is a titled frame, no element
   const header = node.kind === "group" ? "" : [`«${keyword(node.kind)}»`, id, node.domain].filter(Boolean).join(" ");
-  return { ...node, shape, header, lines, tags };
+  // a use case's title wraps inside its ellipse
+  const wrapped = shape === "usecase" ? wrap(node.name, 28) : undefined;
+  return { ...node, shape, header, lines, tags, wrapped };
 }
 
 function size(meta) {
   if (meta.shape === "actor") return [Math.max(48, textWidth(meta.name) + 10), 74];
-  if (meta.shape === "usecase") return [Math.max(textWidth(meta.name, 13), textWidth(meta.header, 11)) + 60, 58];
+  if (meta.shape === "usecase") {
+    const lines = meta.wrapped ?? [meta.name];
+    return [Math.max(...lines.map((l) => textWidth(l, 13)), textWidth(meta.header, 11)) + 70, 42 + lines.length * 16];
+  }
   const width = Math.max(110, textWidth(meta.header, 11) + 24, textWidth(meta.name, 13) + 24,
     ...[...meta.lines, ...meta.tags].map((l) => textWidth(l, 11) + 24));
   const body = meta.lines.length * 15 + meta.tags.length * 14;

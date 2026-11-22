@@ -256,7 +256,8 @@ caption { text-align: left; color: var(--muted); padding: 8px; }
 /* each section is as tall as its content; the column scrolls as one */
 .tree-part { flex: none; }
 .tree-part > summary { cursor: pointer; }
-.tree-part > summary h2 { display: inline; }
+.tree-part > summary [role="heading"] { font-size: 13px; font-weight: 700; color: var(--muted); }
+.tree-part > summary { margin-bottom: 8px; }
 .tree-part + .tree-part { border-top: 1px solid var(--rule); }
 .tree .group { font-weight: 700; color: var(--ink); }
 .tree .rel, #inspector .rel { font-size: 11px; color: var(--muted); }

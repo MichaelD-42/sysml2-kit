@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { toElk, fromElk } from "../../static/js/layout.js";
+import { toElk, fromElk, wrap } from "../../static/js/layout.js";
 
 const node = (key, kind, parent = null, extra = {}) => ({
   key, name: key, kind, parent, compartments: { attributes: [], ports: [] }, ...extra,
@@ -146,4 +146,18 @@ test("toElk keeps overview columns in order and packs a domain group", () => {
   assert.equal(g.children[1].layoutOptions["elk.algorithm"], undefined);
   // a group is a titled frame: no keyword, no id
   assert.equal(sw.meta.header, "");
+});
+
+test("wrap breaks a use case title into lines at word boundaries", () => {
+  assert.deepEqual(wrap("The occupant wants to adjust the seat position", 28), ["The occupant wants to adjust", "the seat position"]);
+  assert.deepEqual(wrap("short", 28), ["short"]);
+  assert.deepEqual(wrap("averyveryverylongsingleword x", 10), ["averyveryverylongsingleword", "x"]);
+  assert.deepEqual(wrap("", 28), [""]);
+});
+
+test("toElk sizes a use case by its wrapped title", () => {
+  const g = toElk({ kind: "usecases", nodes: [node("U", "UseCaseUsage", null, { name: "The occupant wants to adjust the seat position" })], edges: [] });
+  const [u] = g.children;
+  assert.deepEqual(u.meta.wrapped, ["The occupant wants to adjust", "the seat position"]);
+  assert.equal(u.height, 42 + 2 * 16);
 });
