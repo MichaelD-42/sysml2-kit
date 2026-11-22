@@ -22,6 +22,16 @@ The supplier warrants the switches for 5 years or 150 000 km from vehicle regist
 comes first, under its standard warranty conditions.
 :::
 
+:::{cst} Durability met in part
+:id: CST-004
+:answers: CRS-304
+:compliance: partial
+
+Partial. The platform key mechanism is rated for 200 000 actuations per key and control direction
+(CON-104), two thirds of the 300 000 requested. Reaching 300 000 needs a new key mechanism outside the
+platform, which can be quoted separately on request.
+:::
+
 :::{cst} Durability test pass criterion
 :id: CST-003
 :answers: CTR-002

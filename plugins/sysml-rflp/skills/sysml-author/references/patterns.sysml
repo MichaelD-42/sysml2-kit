@@ -31,25 +31,26 @@ package PumpPatterns {
         require constraint { power <= 150.0 }          // optional formal part
     }
 
-    // --- R: a constraint states a value over a part attribute; it carries an id and satisfies a CRS ---
-    // Plain values go here, never as a bare attribute. A constraint is owned by the part it limits.
-    part <'LC-104'> pumpHousing {
-        attribute mass : Real;
-        attribute speed : Real;
+    // --- R: a constraint states a value over a physical part's attribute; it carries an id and satisfies a CRS ---
+    // Plain values go here, never as a bare attribute. A constraint is owned by the physical part it limits
+    // (an #Assembly for the product as a whole), never by a logical component: values belong to the solution.
+    // The bridge evaluates it against the values the part states or inherits; one that does not hold fails.
+    #Assembly part <'PC-111'> pumpModule {
+        doc /* The pump module as delivered. */
+        attribute mass : Real = 2.1;
+        attribute maxContinuousSpeed : Real = 3500.0;
         constraint <'CON-101'> maxMass {
             @Satisfies { need = "CRS-103"; }
-            doc /* The housing mass shall not exceed 2.5 kg. */
+            doc /* The module mass shall not exceed 2.5 kg. */
             mass <= 2.5
         }
-        constraint <'CON-102'> maxSpeed {
-            @Satisfies { need = "CRS-104"; partial = true; }   // met in part: an SR must state the gap
-            doc /* The pump shall run up to 4000 rpm. */
-            speed <= 4000.0
+        // met in part (the customer asks for 4000 rpm): the constraint states what is met, a `partial`
+        // compliance statement (CST, in the docs) answering CRS-104 states the gap
+        constraint <'CON-102'> continuousSpeed {
+            @Satisfies { need = "CRS-104"; partial = true; }
+            doc /* The pump shall run continuously up to 3500 rpm. */
+            maxContinuousSpeed >= 3500.0
         }
-    }
-    requirement <'SR-103'> speedGap {
-        @Satisfies { need = "CRS-104"; }
-        doc /* The pump shall run continuously up to 3500 rpm; 4000 rpm is limited to 10 minutes. */
     }
 
     // --- F: a feature (noun name) owns solution-neutral functions (verb + noun), nested for sub-functions ---
@@ -84,7 +85,8 @@ package PumpPatterns {
     satisfy minFlow by pumpSystem.pump;               // both ends need short names
     satisfy maxPower by pumpSystem.pump;
 
-    // --- P: physical components, one domain keyword each (#Mechanical, #Electrical, #Software) ---
+    // --- P: physical components, one domain keyword each (#Mechanical, #Electrical, #Software); an
+    // assembly across domains (the product as built) is #Assembly, no domain, and owns or references them ---
     #Electrical part <'PC-101'> pumpUnit {
         doc /* Brushless coolant pump, BOM PMP-100. */
         #Electrical port <'PI-101'> hoseOutlet;
@@ -125,7 +127,8 @@ package PumpPatterns {
         variant #Electrical part <'PC-105'> controllerPwm { doc /* Speed control by PWM. */ }
     }
 
-    // --- P: reuse in an RFQ project: subset (`:>`) a platform part or a variant; never `:>>` ---
+    // --- P: reuse in an RFQ project: subset (`:>`) a platform part or a variant; the project's subsetting
+    // is what selects a variant (the platform's own allocations to its variants only offer them) ---
     #Electrical part <'PC-106'> selectedController :> controller::controllerPwm {
         doc /* Platform PWM controller, selected for this program. */
     }

@@ -59,11 +59,12 @@ def main(argv=None):
 
     try:
         if args.command == "needs":
+            warnings = []
             needs = write_needs(
-                args.export, args.output, args.model_files, args.platform
+                args.export, args.output, args.model_files, args.platform, warnings
             )
             print(f"sysml2kit: {len(needs)} needs -> {args.output}")
-            for finding in text_findings(needs):
+            for finding in warnings + text_findings(needs):
                 print(f"sysml2kit: warning: {finding}", file=sys.stderr)
         elif args.command == "usecases":
             out = Path(args.output_dir)

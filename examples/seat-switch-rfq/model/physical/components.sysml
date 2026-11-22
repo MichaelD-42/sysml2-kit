@@ -1,88 +1,200 @@
 package SeatSwitchRfqPhysical {
-    doc /* P layer: per seat position, the platform housing and button-set variants it selects. Everything
-     * else is the platform switch as it is (SeatSwitchPhysical). A constraint on each selection states the
-     * customer's position table: which side's housing and which comfort keys that seat gets. */
+    doc /* P layer: the vehicle's seat switch as built, the platform switch assembly within this RFQ's limits,
+     * and the four switches of one vehicle, each selecting the platform housing and button-set variants of
+     * its seat position. Everything else is the platform switch as it is (SeatSwitchPhysical). A constraint
+     * on each selection states the customer's position table: which side's housing and which comfort keys
+     * that seat gets. */
 
     private import Trace::*;
     private import SeatSwitchRfqLogical::*;
-    private import SeatSwitchPhysical::housing;
-    private import SeatSwitchPhysical::buttonSet;
+    private import SeatSwitchPhysical::seatSwitchAssembly;
+    private import ISQ::*;
+    private import SI::*;
 
-    // driver seat, left-hand drive
-    #Mechanical part <'PC-101'> driverHousing :> housing::housingLH {
-        doc /* Platform left-hand housing for the driver seat, BOM SSW-HSG-110. */
-        constraint <'CON-113'> driverHousingSide {
-            @Satisfies { need = "CRS-704"; }
-            doc /* The driver switch housing shall be keyed to the left-hand trim opening. */
-            codingRib == "left-hand"
+    // one switch: every limit here holds for each switch, at every seat position
+    #Assembly part <'PC-100'> oemSeatSwitch :> seatSwitchAssembly {
+        doc /* The vehicle's seat switch as delivered: the platform switch assembly within this RFQ's limits. */
+
+        constraint <'CON-101'> actuationForceLimits {
+            @Satisfies { need = "CRS-301"; }
+            doc /* The actuation force of every key and knob direction shall be 3.0 N to 6.5 N. */
+            actuationForce >= 3.0 [N] and actuationForce <= 6.5 [N]
         }
-    }
-    #Electrical part <'PC-102'> driverButtonSet :> buttonSet::massageHeatingCooling {
-        doc /* Platform massage, heating and cooling button set for the driver seat, BOM SSW-BTN-640. */
-        constraint <'CON-114'> driverComfortKeys {
-            @Satisfies { need = "CRS-203"; }
-            doc /* The driver switch shall have one massage, one heating and one cooling key. */
-            massageKeys == 1 and heatingKeys == 1 and coolingKeys == 1
+        constraint <'CON-102'> keyTravelLimits {
+            @Satisfies { need = "CRS-302"; }
+            doc /* The travel to the actuation point shall be 0.2 mm to 1.5 mm. */
+            keyTravel >= 0.2 [mm] and keyTravel <= 1.5 [mm]
+        }
+        constraint <'CON-103'> symbolLuminanceLimits {
+            @Satisfies { need = "CRS-303"; }
+            doc /* A lit key symbol shall have a luminance of 8 cd/m² to 40 cd/m² at full dimming level. */
+            symbolLuminance >= 8 [cd/m^2] and symbolLuminance <= 40 [cd/m^2]
+        }
+        // the platform is rated for 200 000 actuations (SSW-CON-004); the OEM asks for 300 000
+        constraint <'CON-104'> keyDurabilityLimit {
+            @Satisfies { need = "CRS-304"; partial = true; }
+            doc /* Every key and knob direction shall withstand at least 200 000 actuations. */
+            durabilityCycles >= 200000
+        }
+        constraint <'CON-105'> supplyVoltageRange {
+            @Satisfies { need = "CRS-501"; }
+            doc /* The switch shall operate from 9 V to 16 V. */
+            minOperatingVoltage <= 9 [V] and maxOperatingVoltage >= 16 [V]
+        }
+        constraint <'CON-106'> operatingTemperatureLimits {
+            @Satisfies { need = "CRS-502"; }
+            doc /* The switch shall operate from -40 °C to +85 °C. */
+            minOperatingTemperature <= -40 ['°C'] and maxOperatingTemperature >= 85 ['°C']
+        }
+        constraint <'CON-107'> ingressRating {
+            @Satisfies { need = "CRS-503"; }
+            doc /* The switch shall be rated IP5K4. */
+            ipRating == "IP5K4"
+        }
+        constraint <'CON-108'> esdLevels {
+            @Satisfies { need = "CRS-504"; }
+            doc /* The switch shall withstand ±8 kV contact and ±15 kV air discharge. */
+            esdContactLevel >= 8000 [V] and esdAirLevel >= 15000 [V]
+        }
+        constraint <'CON-109'> linProtocol {
+            @Satisfies { need = "CRS-402"; }
+            doc /* The switch shall implement LIN 2.2A. */
+            linVersion == "2.2A"
+        }
+        constraint <'CON-110'> dataMatrixMarking {
+            @Satisfies { need = "CRS-703"; }
+            doc /* The traceability code of every switch shall be a laser-marked Data Matrix; its content is SR-120. */
+            partMarking == "laser Data Matrix"
+        }
+        constraint <'CON-111'> workshopUpdateTime {
+            @Satisfies { need = "CRS-803"; }
+            doc /* A complete software update in the workshop shall take at most 180 s. */
+            reflashTime <= 180 [s]
+        }
+        constraint <'CON-112'> switchMass {
+            @Satisfies { need = "CRS-506"; }
+            doc /* A switch shall weigh at most 60 g. */
+            mass <= 60 [g]
+        }
+        constraint <'CON-121'> emcSeverity {
+            @Satisfies { need = "CRS-505"; }
+            doc /* The switch shall meet OEM-EMC-200 at severity class 3 or higher. */
+            emcSeverityClass >= 3
+        }
+        constraint <'CON-122'> lightColours {
+            @Satisfies { need = "CRS-305"; }
+            doc /* Key symbols shall be lit white and level indicators amber. */
+            symbolColour == "white" and levelIndicatorColour == "amber"
+        }
+        constraint <'CON-123'> quiescentCurrentLimit {
+            @Satisfies { need = "CRS-509"; }
+            doc /* With the LIN bus asleep, the switch shall draw at most 100 µA. */
+            quiescentCurrent <= 0.0001 [A]
         }
     }
 
-    #Mechanical part <'PC-103'> coDriverHousing :> housing::housingRH {
-        doc /* Platform right-hand housing for the co-driver seat, BOM SSW-HSG-120. */
-        constraint <'CON-115'> coDriverHousingSide {
-            @Satisfies { need = "CRS-704"; }
-            doc /* The co-driver switch housing shall be keyed to the right-hand trim opening. */
-            codingRib == "right-hand"
+    // the four switches of one vehicle; what holds between them is stated here
+    #Assembly part <'PC-109'> vehicleSeatSwitches {
+        doc /* The seat switches fitted to one vehicle, one per seat position. */
+
+        // the four switches share the seat LIN, so each gets its own node address, coded at end of line (CRS-702)
+        constraint <'CON-124'> distinctNodeAddresses {
+            @Satisfies { need = "CRS-702"; }
+            doc /* The four position switches shall be coded to four different LIN node addresses. */
+            driverSwitch.nad != coDriverSwitch.nad and driverSwitch.nad != rearLeftSwitch.nad
+                and driverSwitch.nad != rearRightSwitch.nad and coDriverSwitch.nad != rearLeftSwitch.nad
+                and coDriverSwitch.nad != rearRightSwitch.nad and rearLeftSwitch.nad != rearRightSwitch.nad
         }
-    }
-    #Electrical part <'PC-104'> coDriverButtonSet :> buttonSet::heatingCooling {
-        doc /* Platform heating and cooling button set for the co-driver seat, BOM SSW-BTN-630. */
-        constraint <'CON-116'> coDriverComfortKeys {
-            @Satisfies { need = "CRS-203"; }
-            doc /* The co-driver switch shall have one heating and one cooling key and no massage key. */
-            massageKeys == 0 and heatingKeys == 1 and coolingKeys == 1
+
+        #Assembly part <'PC-110'> driverSwitch :> oemSeatSwitch {
+            doc /* Driver seat (left-hand drive): the switch with its housing side and button set; LIN node address 0x21. */
+            attribute :>> nad = 33;
+            #Mechanical part <'PC-101'> driverHousing :>> housing :> SeatSwitchPhysical::housing::housingLH {
+                doc /* Platform left-hand housing for the driver seat, BOM SSW-HSG-110. */
+                constraint <'CON-113'> driverHousingSide {
+                    @Satisfies { need = "CRS-704"; }
+                    doc /* The driver switch housing shall be keyed to the left-hand trim opening. */
+                    codingRib == "left-hand"
+                }
+            }
+            #Electrical part <'PC-102'> driverButtonSet :>> buttonSet :> SeatSwitchPhysical::buttonSet::massageHeatingCooling {
+                doc /* Platform massage, heating and cooling button set for the driver seat, BOM SSW-BTN-640. */
+                constraint <'CON-114'> driverComfortKeys {
+                    @Satisfies { need = "CRS-203"; }
+                    doc /* The driver switch shall have one massage, one heating and one cooling key. */
+                    massageKeys == 1 and heatingKeys == 1 and coolingKeys == 1
+                }
+            }
+        }
+        #Assembly part <'PC-111'> coDriverSwitch :> oemSeatSwitch {
+            doc /* Co-driver seat: the switch with its housing side and button set; LIN node address 0x22. */
+            attribute :>> nad = 34;
+            #Mechanical part <'PC-103'> coDriverHousing :>> housing :> SeatSwitchPhysical::housing::housingRH {
+                doc /* Platform right-hand housing for the co-driver seat, BOM SSW-HSG-120. */
+                constraint <'CON-115'> coDriverHousingSide {
+                    @Satisfies { need = "CRS-704"; }
+                    doc /* The co-driver switch housing shall be keyed to the right-hand trim opening. */
+                    codingRib == "right-hand"
+                }
+            }
+            #Electrical part <'PC-104'> coDriverButtonSet :>> buttonSet :> SeatSwitchPhysical::buttonSet::heatingCooling {
+                doc /* Platform heating and cooling button set for the co-driver seat, BOM SSW-BTN-630. */
+                constraint <'CON-116'> coDriverComfortKeys {
+                    @Satisfies { need = "CRS-203"; }
+                    doc /* The co-driver switch shall have one heating and one cooling key and no massage key. */
+                    massageKeys == 0 and heatingKeys == 1 and coolingKeys == 1
+                }
+            }
+        }
+        #Assembly part <'PC-112'> rearLeftSwitch :> oemSeatSwitch {
+            doc /* Rear left seat: the switch with its housing side and button set; LIN node address 0x23. */
+            attribute :>> nad = 35;
+            #Mechanical part <'PC-105'> rearLeftHousing :>> housing :> SeatSwitchPhysical::housing::housingLH {
+                doc /* Platform left-hand housing for the rear left seat, BOM SSW-HSG-110. */
+                constraint <'CON-117'> rearLeftHousingSide {
+                    @Satisfies { need = "CRS-704"; }
+                    doc /* The rear left switch housing shall be keyed to the left-hand trim opening. */
+                    codingRib == "left-hand"
+                }
+            }
+            #Electrical part <'PC-106'> rearLeftButtonSet :>> buttonSet :> SeatSwitchPhysical::buttonSet::heating {
+                doc /* Platform heating button set for the rear left seat, BOM SSW-BTN-620. */
+                constraint <'CON-118'> rearLeftComfortKeys {
+                    @Satisfies { need = "CRS-203"; }
+                    doc /* The rear left switch shall have one heating key and no cooling or massage key. */
+                    massageKeys == 0 and heatingKeys == 1 and coolingKeys == 0
+                }
+            }
+        }
+        #Assembly part <'PC-113'> rearRightSwitch :> oemSeatSwitch {
+            doc /* Rear right seat: the switch with its housing side and button set; LIN node address 0x24. */
+            attribute :>> nad = 36;
+            #Mechanical part <'PC-107'> rearRightHousing :>> housing :> SeatSwitchPhysical::housing::housingRH {
+                doc /* Platform right-hand housing for the rear right seat, BOM SSW-HSG-120. */
+                constraint <'CON-119'> rearRightHousingSide {
+                    @Satisfies { need = "CRS-704"; }
+                    doc /* The rear right switch housing shall be keyed to the right-hand trim opening. */
+                    codingRib == "right-hand"
+                }
+            }
+            #Electrical part <'PC-108'> rearRightButtonSet :>> buttonSet :> SeatSwitchPhysical::buttonSet::heating {
+                doc /* Platform heating button set for the rear right seat, BOM SSW-BTN-620. */
+                constraint <'CON-120'> rearRightComfortKeys {
+                    @Satisfies { need = "CRS-203"; }
+                    doc /* The rear right switch shall have one heating key and no cooling or massage key. */
+                    massageKeys == 0 and heatingKeys == 1 and coolingKeys == 0
+                }
+            }
         }
     }
 
-    #Mechanical part <'PC-105'> rearLeftHousing :> housing::housingLH {
-        doc /* Platform left-hand housing for the rear left seat, BOM SSW-HSG-110. */
-        constraint <'CON-117'> rearLeftHousingSide {
-            @Satisfies { need = "CRS-704"; }
-            doc /* The rear left switch housing shall be keyed to the left-hand trim opening. */
-            codingRib == "left-hand"
-        }
-    }
-    #Electrical part <'PC-106'> rearLeftButtonSet :> buttonSet::heating {
-        doc /* Platform heating button set for the rear left seat, BOM SSW-BTN-620. */
-        constraint <'CON-118'> rearLeftComfortKeys {
-            @Satisfies { need = "CRS-203"; }
-            doc /* The rear left switch shall have one heating key and no cooling or massage key. */
-            massageKeys == 0 and heatingKeys == 1 and coolingKeys == 0
-        }
-    }
-
-    #Mechanical part <'PC-107'> rearRightHousing :> housing::housingRH {
-        doc /* Platform right-hand housing for the rear right seat, BOM SSW-HSG-120. */
-        constraint <'CON-119'> rearRightHousingSide {
-            @Satisfies { need = "CRS-704"; }
-            doc /* The rear right switch housing shall be keyed to the right-hand trim opening. */
-            codingRib == "right-hand"
-        }
-    }
-    #Electrical part <'PC-108'> rearRightButtonSet :> buttonSet::heating {
-        doc /* Platform heating button set for the rear right seat, BOM SSW-BTN-620. */
-        constraint <'CON-120'> rearRightComfortKeys {
-            @Satisfies { need = "CRS-203"; }
-            doc /* The rear right switch shall have one heating key and no cooling or massage key. */
-            massageKeys == 0 and heatingKeys == 1 and coolingKeys == 0
-        }
-    }
-
-    allocate OEM_SeatSwitch.driverSwitch to driverHousing;
-    allocate OEM_SeatSwitch.driverSwitch to driverButtonSet;
-    allocate OEM_SeatSwitch.coDriverSwitch to coDriverHousing;
-    allocate OEM_SeatSwitch.coDriverSwitch to coDriverButtonSet;
-    allocate OEM_SeatSwitch.rearLeftSwitch to rearLeftHousing;
-    allocate OEM_SeatSwitch.rearLeftSwitch to rearLeftButtonSet;
-    allocate OEM_SeatSwitch.rearRightSwitch to rearRightHousing;
-    allocate OEM_SeatSwitch.rearRightSwitch to rearRightButtonSet;
+    allocate OEM_SeatSwitch to oemSeatSwitch;
+    allocate OEM_SeatSwitch.enclosure to vehicleSeatSwitches.driverSwitch.driverHousing;
+    allocate OEM_SeatSwitch.keypad to vehicleSeatSwitches.driverSwitch.driverButtonSet;
+    allocate OEM_SeatSwitch.enclosure to vehicleSeatSwitches.coDriverSwitch.coDriverHousing;
+    allocate OEM_SeatSwitch.keypad to vehicleSeatSwitches.coDriverSwitch.coDriverButtonSet;
+    allocate OEM_SeatSwitch.enclosure to vehicleSeatSwitches.rearLeftSwitch.rearLeftHousing;
+    allocate OEM_SeatSwitch.keypad to vehicleSeatSwitches.rearLeftSwitch.rearLeftButtonSet;
+    allocate OEM_SeatSwitch.enclosure to vehicleSeatSwitches.rearRightSwitch.rearRightHousing;
+    allocate OEM_SeatSwitch.keypad to vehicleSeatSwitches.rearRightSwitch.rearRightButtonSet;
 }

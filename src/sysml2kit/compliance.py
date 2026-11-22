@@ -9,7 +9,8 @@ from .reuse import (
 )
 
 WORST_FIRST = ["incomplete", "new", "modified", "variant", "platform"]
-GAP = "partial match without a system requirement stating the gap"
+MET = "partial match without a system requirement stating what is met"
+NO_PARTIAL_CST = "partial, but no partial compliance statement answers it"
 # classes a constraint can answer, and classes that must be verified
 CONSTRAINED = ("non-functional", "constraint")
 TECHNICAL = ("functional", *CONSTRAINED)
@@ -85,15 +86,16 @@ def compliance(needs):
             set().union(*(unselected_variations(needs, f) for f in features))
         ):
             findings.append(f"{crs}: variation {v} reached without a selected variant")
-        if any(not _gap_stated(needs, crs, f) for f in part):
-            findings.append(f"{crs}: {GAP}")
-        if partial_cons and not any(
-            n["type"] == "sysreq" and crs in n.get("satisfies", [])
-            for n in needs.values()
-        ):
-            findings.append(
-                f"{crs}: partial satisfaction without a system requirement stating the gap"
-            )
+        if any(not _met_stated(needs, crs, f) for f in part):
+            findings.append(f"{crs}: {MET}")
+        elif features:
+            findings += [
+                f"{crs}: system requirement {sr} is satisfied outside the chain of its matching features"
+                for sr in _satisfied_outside(needs, crs, features)
+            ]
+        # what is met is in the model (a constraint, or an SR in the chain); the gap goes to the customer
+        if (part or partial_cons) and ("partial" not in dict(statements).values()):
+            findings.append(f"{crs}: {NO_PARTIAL_CST}")
     implemented = {c for c, *_, tests, _ in ctrs if tests}
     for req, need in sorted(needs.items()):
         if (
@@ -156,7 +158,7 @@ def _answer_findings(need_id, need, answered, statements):
     return []
 
 
-def _gap_stated(needs, crs, feature):
+def _met_stated(needs, crs, feature):
     """An SR satisfying the CRS is itself satisfied by a component in the feature's chain."""
     chain = chain_components(needs, feature)
     return any(
@@ -164,6 +166,23 @@ def _gap_stated(needs, crs, feature):
         and crs in n.get("satisfies", [])
         and any(sr in needs[c].get("satisfies", []) for c in chain)
         for sr, n in needs.items()
+    )
+
+
+def _satisfied_outside(needs, crs, features):
+    """SRs satisfying the CRS whose satisfying components all lie outside every matching feature's chain."""
+    chain = set().union(*(chain_components(needs, f) for f in features))
+    satisfiers = {}
+    for c, n in needs.items():
+        for sr in n.get("satisfies", []):
+            satisfiers.setdefault(sr, set()).add(c)
+    return sorted(
+        sr
+        for sr, n in needs.items()
+        if n["type"] == "sysreq"
+        and crs in n.get("satisfies", [])
+        and satisfiers.get(sr)
+        and not satisfiers[sr] & chain
     )
 
 

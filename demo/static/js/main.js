@@ -2,7 +2,7 @@
 import * as api from "./api.js";
 import { focus, setFocus, breadcrumb, history } from "./state.js";
 import { toElk, fromElk, layoutV, keyword } from "./layout.js";
-import { svg, esc, drillKind, offered, viewsFor } from "./render.js";
+import { svg, esc, drillKind, viewsFor, MENU } from "./render.js";
 import * as panels from "./panels.js";
 
 const KINDS = {
@@ -10,8 +10,8 @@ const KINDS = {
   context: "System context",
   boundary: "System boundary",
   interfaces: "Interfaces",
-  activity: "Activity",
   composition: "Composition",
+  allocation: "Allocation",
   variants: "Variants",
   usecases: "Use cases",
   trace: "Traceability",
@@ -20,12 +20,14 @@ const KINDS = {
   metamodel: "Meta-model",
 };
 const $ = (s) => document.querySelector(s);
-const WHOLE = new Set(["product", "compliance", "metamodel"]); // views of the whole model, no focus
+const NO_FOCUS = new Set(["product", "metamodel"]); // drawn for the whole model only
+const DOMAIN_VIEWS = new Set(["product", "boundary", "interfaces", "composition", "variants", "allocation", "context"]);
 const elk = new globalThis.ELK();
 const names = new Map(); // key -> display name
 const parents = new Map(); // key -> owner key
 const knownKeys = new Set();
-const current = { kind: "product", keys: new Set(), view: null };
+// `whole`: a model-wide view from the menu, not scoped to the focus
+const current = { kind: "product", whole: true, keys: new Set(), view: null };
 let token = 0;
 let scale = 1;
 let zoomed = false; // the viewer zoomed this view: a resize no longer re-fits it
@@ -80,17 +82,16 @@ async function label(nodes) {
   );
 }
 
-// the tabs for `kinds` (all views until there is a focus)
-function renderTabs(kinds = Object.keys(KINDS)) {
-  $("#kinds").innerHTML = kinds
-    .map((k) => `<button type="button" role="tab" id="tab-${k}" aria-controls="canvas" data-kind="${k}">${esc(KINDS[k])}</button>`)
-    .join("");
+// the focus's own views and its scoped big-picture ones, in two labelled groups
+function renderTabs(own = [], context = []) {
+  const tab = (k) => `<button type="button" role="tab" id="tab-${k}" aria-controls="canvas" data-kind="${k}">${esc(KINDS[k])}</button>`;
+  const group = (label, kinds) => (kinds.length ? `<span class="group" aria-hidden="true">${label}</span>${kinds.map(tab).join("")}` : "");
+  $("#kinds").innerHTML = group("This element", own) + group("In context", context);
   markTab(current.kind);
 }
 
 function tabs() {
   const nav = $("#kinds");
-  renderTabs();
   nav.onclick = (e) => {
     const b = e.target.closest("[data-kind]");
     if (b) show(b.dataset.kind, focus.get());
@@ -98,7 +99,7 @@ function tabs() {
   nav.onkeydown = (e) => {
     const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
     if (!step) return;
-    const all = [...nav.children];
+    const all = [...nav.querySelectorAll("[role=tab]")];
     const next = all[(all.indexOf(document.activeElement) + step + all.length) % all.length];
     next.focus();
     next.click();
@@ -106,35 +107,30 @@ function tabs() {
 }
 
 function markTab(kind) {
-  for (const b of $("#kinds").children) {
-    const on = b.dataset.kind === kind;
+  const all = [...$("#kinds").querySelectorAll("[role=tab]")];
+  for (const b of all) {
+    const on = !current.whole && b.dataset.kind === kind;
     b.setAttribute("aria-selected", on);
     b.tabIndex = on ? 0 : -1;
   }
+  if (all.length && !all.some((b) => b.tabIndex === 0)) all[0].tabIndex = 0;
 }
 
-async function show(kind, key) {
+async function show(kind, key, whole = false) {
   const mine = ++token;
   current.kind = kind;
+  current.whole = whole || NO_FOCUS.has(kind);
   markTab(kind);
+  $(".legend").hidden = !DOMAIN_VIEWS.has(kind);
   const canvas = $("#canvas");
   canvas.setAttribute("aria-busy", "true");
   const note = $("#note");
   try {
-    let view = await api.view(kind, WHOLE.has(kind) ? null : key);
-    let why = "";
-    if (view.reason && key) {
-      // the focus has no such view: show the default one and say why
-      const { node } = await api.element(key).catch(() => ({ node: {} }));
-      const fitting = viewsFor(node).find((k) => k !== kind) ?? kind;
-      const name = await panels.nameOf(key, names);
-      const reason = view.reason.startsWith(key) ? name + view.reason.slice(key.length) : view.reason;
-      why = `${esc(reason)}; showing the default ${esc(KINDS[kind].toLowerCase())}.
-        ${fitting !== kind ? `<button type="button" data-open="${fitting}" data-with="focus">${esc(KINDS[fitting])} of ${esc(name)}</button>` : ""}`;
-      view = await api.view(kind, null);
-    }
+    const view = await api.view(kind, current.whole ? null : key);
+    // the focus has none of this view: say so by name, no stand-in diagram
+    if (view.reason && key && view.reason.startsWith(key)) view.reason = (await panels.nameOf(key, names)) + view.reason.slice(key.length);
     if (mine !== token) return;
-    note.innerHTML = why;
+    note.innerHTML = "";
     if (kind === "product")
       note.textContent = "Which block each physical part realizes is in Traceability and the trees; those lines are left out here for readability.";
     if (view.unused_links?.length) note.textContent = `Declared links with no instance: ${view.unused_links.join(", ")}`;
@@ -192,6 +188,7 @@ function highlight(key) {
 function inspect(key, found) {
   const crumbs = $("#breadcrumb");
   const info = $("#inspector");
+  const body = $("#details-body");
   try {
     if (found.error) throw found.error;
     const { node, edges } = found;
@@ -208,10 +205,12 @@ function inspect(key, found) {
     info.innerHTML = `<strong>${esc(name)}</strong> ${node.kind ? `<span class="kind">«${esc(keyword(node.kind))}»</span>` : ""}
       ${node.shortName || !/^[0-9a-f]{8}-/.test(key) ? `<span class="id">${esc(node.shortName ?? key)}</span>` : ""}
       ${node.domain ? `<span class="domain d-${esc(node.domain)}">${esc(node.domain)}</span>` : ""}
-      ${value ? `<span>= ${esc(value)}</span>` : ""}${node.expression ? `<span>${esc(node.expression)}</span>` : ""}
-      ${node.doc || node.content ? `<p>${esc(node.doc ?? node.content)}</p>` : ""}${panels.linkList(links)}`;
+      ${value ? `<span>= ${esc(value)}</span>` : ""}${node.expression ? `<span>${esc(node.expression)}</span>` : ""}`;
+    body.innerHTML = `${node.doc || node.content ? `<p>${esc(node.doc ?? node.content)}</p>` : ""}${panels.linkList(links)}`;
+    $("#details").hidden = !body.textContent.trim();
   } catch (e) {
     info.innerHTML = `<p class="error">${esc(e.message)}</p>`;
+    body.innerHTML = "";
   }
 }
 
@@ -221,17 +220,21 @@ async function onFocus(key) {
   const found = await api.element(key).catch((error) => ({ error }));
   if (focus.get() !== key) return;
   inspect(key, found);
-  // only the views that apply to the element; a view it was picked in stays offered
   const node = found.node ?? {};
   const inView = current.keys.has(key);
-  const kinds = offered(node, Object.keys(KINDS));
-  renderTabs(Object.keys(KINDS).filter((k) => kinds.includes(k) || (inView && k === current.kind)));
-  // in the V a customer requirement (level 1, left leg) narrows the view to its chain
-  const crs = current.kind === "vmodel" && current.view?.nodes.some((n) => n.key === key && n.level === 1 && n.side === "left");
-  if (crs && key !== current.view.focus) show(current.kind, key);
-  else if (current.kind === "compliance" || current.kind === "metamodel" || inView) highlight(key);
-  // an element not on the overview opens in its own view
-  else show(kinds.includes(current.kind) && current.kind !== "product" ? current.kind : drillKind(node, current.kind), key);
+  let { own, context } = viewsFor(node);
+  // a view the element has nothing for is no tab (a leaf has no composition, a platform part no V);
+  // an element keeps at least its first own view
+  const probe = (kinds) => Promise.all(kinds.map((k) => api.view(k, key).then((v) => !v.reason, () => true)));
+  const [hasOwn, hasContext] = await Promise.all([own.length > 1 ? probe(own) : own.map(() => true), probe(context)]);
+  if (focus.get() !== key) return;
+  own = own.filter((_, i) => hasOwn[i]).concat(hasOwn.some(Boolean) ? [] : own.slice(0, 1));
+  context = context.filter((_, i) => hasContext[i]);
+  // an element picked in a diagram keeps that diagram, and its tab, on screen
+  const keep = inView && !current.whole && !own.includes(current.kind) && !context.includes(current.kind);
+  renderTabs(own, keep ? [...context, current.kind] : context);
+  if (inView || (current.whole && (current.kind === "compliance" || current.kind === "metamodel"))) highlight(key);
+  else show(drillKind({ ...node, views: { own, context } }, current.kind), key);
 }
 
 // a meta-model type or link lists its instances in the inspector; its boxes are not elements
@@ -239,7 +242,7 @@ function pick(el) {
   const item = el.dataset.edge
     ? current.laid.edges.find((x) => x.key === el.dataset.edge)
     : current.view.nodes.find((x) => x.key === el.dataset.key);
-  if (item) $("#inspector").innerHTML = panels.instanceList(item);
+  if (item) ($("#details-body").innerHTML = panels.instanceList(item)), ($("#details").hidden = false), ($("#details").open = true);
 }
 
 function wire() {
@@ -249,8 +252,6 @@ function wire() {
     if (meta) return e.preventDefault(), pick(meta);
     const el = e.target.closest("[data-key]");
     if (el) e.preventDefault(), setFocus(el.dataset.key);
-    const open = e.target.closest("[data-open]");
-    if (open) show(open.dataset.open, open.dataset.with ? focus.get() : null);
   });
   const canvas = $("#canvas");
   const drill = (el) => {
@@ -301,11 +302,33 @@ function wire() {
       localStorage.setItem("theme", document.documentElement.dataset.theme);
     } catch {}
   };
+  const menu = $("#menu");
+  menu.querySelector(".menu-items").innerHTML = MENU.map(
+    (k) => `<button type="button" role="menuitem" data-whole="${k}">${esc(KINDS[k])}</button>`,
+  ).join("");
+  menu.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-whole]");
+    if (!b) return;
+    menu.open = false;
+    show(b.dataset.whole, null, true);
+  });
+  document.addEventListener("click", (e) => menu.open && !menu.contains(e.target) && (menu.open = false));
+  const panel = $("#side");
+  const sideOpen = (open) => {
+    panel.hidden = !open;
+    $("#side-toggle").setAttribute("aria-expanded", open);
+  };
+  $("#side-toggle").onclick = () => sideOpen(panel.hidden);
+  $("#side-close").onclick = () => sideOpen(false);
+  $("#tree-toggle").onclick = (e) => {
+    const hidden = $(".grid").classList.toggle("no-tree");
+    e.target.setAttribute("aria-expanded", !hidden);
+  };
   const side = $("#side-tabs");
   side.onclick = (e) => {
     const b = e.target.closest("[data-panel]");
     if (!b) return;
-    for (const t of side.children) t.setAttribute("aria-selected", t === b);
+    for (const t of side.querySelectorAll("[data-panel]")) t.setAttribute("aria-selected", t === b);
     for (const p of document.querySelectorAll(".side-panel")) p.hidden = p.id !== b.dataset.panel;
   };
 }
@@ -317,4 +340,5 @@ await loadModel();
 panels.rememberSections(document.querySelectorAll(".tree-part"));
 panels.mountSearch($("#search"), names);
 panels.mountAsk($("#ask"), knownKeys, names);
-await show("product", null);
+renderTabs();
+await show("product", null, true);

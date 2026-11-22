@@ -76,17 +76,51 @@ class ComplianceTest(unittest.TestCase):
         self.assertTrue(rows[0][5])
         self.assertEqual(
             findings,
-            ["CRS-1: partial match without a system requirement stating the gap"],
+            [
+                "CRS-1: partial match without a system requirement stating what is met",
+                "CRS-1: partial, but no partial compliance statement answers it",
+            ],
         )
         needs["SR-1"] = need("sysreq", satisfies=["CRS-1"])
         needs["LC2"] = need("component", satisfies=["SR-1"], owned_by=["LC"])
+        needs["CST-1"] = need("cst", answers=["CRS-1"], compliance="partial")
         self.assertEqual(compliance(needs)[1], [])
 
-    def test_gap_sr_outside_the_chain_does_not_count(self):
+    def test_met_sr_outside_the_chain_does_not_count(self):
         needs = model(partial_matches=["CRS-1"])
         needs["SR-1"] = need("sysreq", satisfies=["CRS-1"])
         needs["OTHER"] = need("component", satisfies=["SR-1"])
-        self.assertEqual(len(compliance(needs)[1]), 1)
+        needs["CST-1"] = need("cst", answers=["CRS-1"], compliance="partial")
+        self.assertEqual(
+            compliance(needs)[1],
+            ["CRS-1: partial match without a system requirement stating what is met"],
+        )
+
+    def test_matched_sr_satisfied_outside_the_chain_is_a_finding(self):
+        needs = model(matches=["CRS-1"])
+        needs["SR-1"] = need("sysreq", satisfies=["CRS-1"])
+        needs["OTHER"] = need("component", satisfies=["SR-1"])
+        self.assertEqual(
+            compliance(needs)[1],
+            [
+                "CRS-1: system requirement SR-1 is satisfied outside the chain of its matching features"
+            ],
+        )
+        needs["LC"]["satisfies"] = ["SR-1"]
+        self.assertEqual(compliance(needs)[1], [])
+
+    def test_any_matching_features_chain_counts(self):
+        needs = model(matches=["CRS-1"])
+        needs["F2"] = need("feature", matches=["CRS-1"])
+        needs["FN2"] = need("function", owned_by=["F2"], allocated_to=["LC2"])
+        needs["LC2"] = need("component", allocated_to=["PC"], satisfies=["SR-1"])
+        needs["SR-1"] = need("sysreq", satisfies=["CRS-1"])
+        self.assertEqual(compliance(needs)[1], [])
+
+    def test_unsatisfied_sr_is_left_to_the_schema_rule(self):
+        needs = model(matches=["CRS-1"])
+        needs["SR-1"] = need("sysreq", satisfies=["CRS-1"])
+        self.assertEqual(compliance(needs)[1], [])
 
     def test_incomplete_match_is_a_finding(self):
         needs = model(matches=["CRS-1"])
@@ -230,17 +264,17 @@ class ComplianceTest(unittest.TestCase):
         needs["CRS-1"]["class"] = "functional"
         self.assertEqual(compliance(needs)[1], ["CRS-1: not answered"])
 
-    def test_partial_constraint_needs_a_gap_requirement(self):
+    def test_partial_constraint_needs_a_partial_statement(self):
+        """The constraint states what is met; a partial compliance statement states the gap."""
         needs = self.constrained(partial_satisfies=["CRS-1"])
         rows, findings = compliance(needs)
         self.assertTrue(rows[0][5])
         self.assertEqual(
-            findings,
-            [
-                "CRS-1: partial satisfaction without a system requirement stating the gap"
-            ],
+            findings, ["CRS-1: partial, but no partial compliance statement answers it"]
         )
-        needs["SR-1"] = need("sysreq", satisfies=["CRS-1"])
+        needs["CST-1"] = need("cst", answers=["CRS-1"], compliance="comply")
+        self.assertEqual(len(compliance(needs)[1]), 1)
+        needs["CST-1"]["compliance"] = "partial"
         self.assertEqual(compliance(needs)[1], [])
 
     def test_unverified_requirement_is_a_finding(self):

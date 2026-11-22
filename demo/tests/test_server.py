@@ -37,7 +37,7 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(
             r.json()["node"]["qualifiedName"],
-            "SeatSwitchRfqPhysical::driverHousing",
+            "SeatSwitchRfqPhysical::vehicleSeatSwitches::driverSwitch::driverHousing",
         )
         self.assertEqual(self.client.get("/api/element/NOPE-1").status_code, 404)
 

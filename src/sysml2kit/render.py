@@ -3,7 +3,7 @@
 from urllib.parse import quote
 from xml.sax.saxutils import escape, quoteattr
 
-from .needs import refs
+from .needs import normalize, refs
 
 FONT = 'font-family="Arial, Helvetica, sans-serif" font-size="12"'
 CHAR_W = 7  # approximate width of one 12px Arial character
@@ -51,6 +51,7 @@ def use_cases(elements):
     Use cases are grouped by subject name and type: untyped `subject vehicle;` in several use
     cases is one subject, while `vehicle : Car` and `vehicle : Truck` are two, titled with their type.
     """
+    elements = normalize(elements)
     by_id = {e["@id"]: e for e in elements}
 
     def member(membership):

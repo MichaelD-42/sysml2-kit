@@ -9,7 +9,8 @@ import json
 import re
 from pathlib import Path
 
-from sysml2kit.reuse import reuse
+from sysml2kit.constraints import Model, Unevaluable
+from sysml2kit.reuse import closure, reuse
 
 # SysML metaclass -> need type. A short-named element of any other kind is an error.
 NEED_TYPES = {
@@ -43,6 +44,9 @@ KEYWORD_TYPES = {
             ("PortDefinition", "physinterface"),
         )
     },
+    # an assembly is physical across domains: the product as built, with no domain of its own
+    ("PartUsage", "Trace::Assembly"): "physical",
+    ("PartDefinition", "Trace::Assembly"): "physical",
 }
 DOMAINS = {
     "Trace::Mechanical": "ME",
@@ -144,7 +148,34 @@ def source_locations(model_files):
     return locations
 
 
-def convert(elements, locations, platform_files=()):
+def platform_dir(project):
+    """The platform project's directory, as the project's Makefile names it (`PLATFORM := ...`)."""
+    makefile = Path(project) / "Makefile"
+    text = makefile.read_text() if makefile.is_file() else ""
+    m = re.search(r"^PLATFORM\s*:?=\s*(\S+)", text, re.MULTILINE)
+    return Path(project) / (m[1] if m else "platform")
+
+
+def normalize(elements):
+    """Read a sysml 0.2 export as the kit reads a 0.1.4 one; changes the elements in place and returns them.
+
+    0.2 writes `owner` and `ownedElement` as the specification derives them: a relationship has
+    neither (it has `owningRelatedElement` and `ownedRelatedElement`), and an element's
+    `ownedElement` leaves out the relationships it owns. The kit follows both."""
+    for e in elements:
+        if not e.get("owner") and e.get("owningRelatedElement"):
+            e["owner"] = e["owningRelatedElement"]
+        owned = list(e.get("ownedElement") or []) + list(
+            e.get("ownedRelatedElement") or []
+        )
+        owned += e.get("ownedRelationship") or []
+        e["ownedElement"] = list({o["@id"]: o for o in owned}.values())
+    return elements
+
+
+def convert(elements, locations, platform_files=(), warnings=None):
+    """needs.json content; a constraint that does not hold is an error, one that cannot be evaluated a warning."""
+    elements = normalize(elements)
     by_id = {e["@id"]: e for e in elements}
     errors = []
     needs = {}
@@ -182,6 +213,9 @@ def convert(elements, locations, platform_files=()):
             errors.append(
                 f"{short}: one domain keyword allowed, found {' and '.join(domains)}"
             )
+            continue
+        if domains and "Trace::Assembly" in tags:
+            errors.append(f"{short}: an assembly takes no domain keyword")
             continue
         if kind is None:
             errors.append(
@@ -340,8 +374,29 @@ def convert(elements, locations, platform_files=()):
     for need in needs.values():
         for key in LINK_TYPES:
             need[key] = sorted(set(need[key]))
-        # leaf functions/components carry allocation rules (see schemas.json)
-        need["leaf"] = need["id"] not in children
+    for need in needs.values():
+        # leaf functions/components carry allocation rules (see schemas.json); subsetting a composite inherits its children
+        need["leaf"] = not children & {
+            i
+            for i in closure(needs, need["id"], "specializes")
+            if needs[i]["type"] == need["type"]
+        }
+
+    model = Model(elements)
+    for element_id, short in need_of.items():
+        if needs[short]["type"] != "constraint" or (
+            platform_files and needs[short]["platform"]
+        ):
+            continue  # the platform's own build evaluates its constraints
+        try:
+            holds, text, values = model.check(element_id)
+        except Unevaluable as err:
+            if warnings is not None:
+                warnings.append(f"{short}: not evaluated: {err}")
+            continue
+        if not holds:
+            stated = ", ".join(f"{k} = {v}" for k, v in values.items())
+            errors.append(f"{short}: does not hold: {text} ({stated})")
 
     status = reuse(needs)
     for need in needs.values():
@@ -367,7 +422,7 @@ def text_findings(needs):
     return findings
 
 
-def write_needs(export_path, out_path, model_files, platform_files=()):
+def write_needs(export_path, out_path, model_files, platform_files=(), warnings=None):
     elements = json.loads(Path(export_path).read_text())
     if not isinstance(elements, list) or not all(
         "@id" in e and "@type" in e for e in elements
@@ -375,7 +430,7 @@ def write_needs(export_path, out_path, model_files, platform_files=()):
         raise BridgeError(
             f"{export_path}: not SysML v2 interchange JSON (expected a list of elements with @id/@type)"
         )
-    result = convert(elements, source_locations(model_files), platform_files)
+    result = convert(elements, source_locations(model_files), platform_files, warnings)
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     Path(out_path).write_text(json.dumps(result, indent=2, sort_keys=True))
     return result["versions"][""]["needs"]

@@ -14,6 +14,8 @@ import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 
+from sysml2kit.needs import platform_dir
+
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "seat-switch-rfq"
 PLATFORM = EXAMPLE.parent / "seat-switch-platform"
 TOOLS = {
@@ -26,13 +28,18 @@ TOOLS = {
 @contextmanager
 def build(target, edit=None, example=EXAMPLE):
     """Copy the example, apply edit(project_dir), run make target; yield (exit code, output, project dir), then remove the copy."""
+    ignore = shutil.ignore_patterns("build", "_build", "_generated")
     with tempfile.TemporaryDirectory(prefix="sysml2kit-acc-") as tmp:
         work = Path(tmp) / example.name
-        shutil.copytree(
-            example,
-            work,
-            ignore=shutil.ignore_patterns("build", "_build", "_generated"),
-        )
+        shutil.copytree(example, work, ignore=ignore)
+        # a platform the Makefile names beside the project is copied to the same place beside the copy
+        platform = platform_dir(example).resolve()
+        if platform.is_dir() and not platform.is_relative_to(example.resolve()):
+            shutil.copytree(
+                platform,
+                (work / os.path.relpath(platform, example)).resolve(),
+                ignore=ignore,
+            )
         if edit:
             edit(work)
         args = ["make", "-C", str(work), target]
@@ -73,6 +80,16 @@ PLATFORM_MUTATIONS = [
         ),
         r"Need path:\s+SSW-PC-031\b.*\n\s+Schema path:\s+swcomponent-used",
     ),
+    (
+        "platform: a rated value outside the platform's own limit fails the bridge",
+        "all",
+        replace(
+            "model/physical/components.sysml",
+            "reflashTime : DurationValue = 95 [s]",
+            "reflashTime : DurationValue = 130 [s]",
+        ),
+        r"SSW-CON-012: does not hold",
+    ),
 ]
 
 MUTATIONS = [
@@ -80,11 +97,11 @@ MUTATIONS = [
         "broken model reference fails lint",
         "lint",
         replace(
-            "model/logical/architecture.sysml",
-            "allocate comfortKeys.offerDriverComfortKeys",
-            "allocate comfortKeys.offerDriverComfortKey",
+            "model/physical/components.sysml",
+            "driverSwitch.driverButtonSet;",
+            "driverSwitch.driverButtonSe;",
         ),
-        r"offerDriverComfortKey` resolves to nothing",
+        r"driverButtonSe` resolves to nothing",
     ),
     (
         "trace metadata to a missing customer requirement fails the build",
@@ -97,10 +114,10 @@ MUTATIONS = [
         "all",
         replace(
             "model/logical/architecture.sysml",
-            "satisfy durabilityGap by OEM_SeatSwitch;",
+            "satisfy materialDeclaration by OEM_SeatSwitch;",
             "",
         ),
-        r"Need path:\s+SR-119\b.*\n\s+Schema path:\s+sysreq-satisfied",
+        r"Need path:\s+SR-116\b.*\n\s+Schema path:\s+sysreq-satisfied",
     ),
     (
         "use case performing no function violates usecase-realized",
@@ -116,11 +133,12 @@ MUTATIONS = [
         "unallocated leaf function violates function-allocated",
         "all",
         replace(
-            "model/logical/architecture.sysml",
-            "allocate comfortKeys.offerDriverComfortKeys to OEM_SeatSwitch.driverSwitch;",
-            "",
+            "model/functional/features.sysml",
+            "        doc /* Heating, cooling and massage keys with level indicators, by seat position. */\n",
+            "        doc /* Heating, cooling and massage keys with level indicators, by seat position. */\n"
+            "        action <'F-199'> offerExtraKey;\n",
         ),
-        r"Need path:\s+F-101\b.*\n\s+Schema path:\s+function-allocated",
+        r"Need path:\s+F-199\b.*\n\s+Schema path:\s+function-allocated",
     ),
     (
         "system requirement without a test violates sysreq-verified",
@@ -143,10 +161,10 @@ MUTATIONS = [
         "render",
         replace(
             "Makefile",
-            "DIAGRAMS := SeatSwitchRfqLogical::OEM_SeatSwitch",
-            "DIAGRAMS := SeatSwitchRfqLogical::OEM_SeatSwitch Other::OEM_SeatSwitch",
+            "DIAGRAMS := SeatSwitchRfqPhysical::vehicleSeatSwitches",
+            "DIAGRAMS := SeatSwitchRfqPhysical::vehicleSeatSwitches Other::vehicleSeatSwitches",
         ),
-        r"more than one entry ends in OEM_SeatSwitch",
+        r"more than one entry ends in vehicleSeatSwitches",
     ),
     (
         "a model file name with a space fails with what to rename",
@@ -202,32 +220,75 @@ MUTATIONS = [
         "leaf logical component without a physical component violates logical-allocated",
         "all",
         replace(
-            "model/physical/components.sysml",
-            "    allocate OEM_SeatSwitch.rearRightSwitch to rearRightHousing;\n"
-            "    allocate OEM_SeatSwitch.rearRightSwitch to rearRightButtonSet;\n",
-            "",
+            "model/logical/architecture.sysml",
+            "as this RFQ needs it. */\n",
+            "as this RFQ needs it. */\n        part <'LC-199'> extraUnit;\n",
         ),
-        r"Need path:\s+LC-104\b.*\n\s+Schema path:\s+logical-allocated",
+        r"Need path:\s+LC-199\b.*\n\s+Schema path:\s+logical-allocated",
     ),
     (
-        "partial match without its gap system requirement fails the compliance table",
+        "a platform variation the project selects no variant of fails the compliance table",
+        "all",
+        lambda work: (work / "model/physical/components.sysml").write_text(
+            re.sub(
+                r":> SeatSwitchPhysical::buttonSet::\w+",
+                ":> SeatSwitchPhysical::buttonSet",
+                (work / "model/physical/components.sysml").read_text(),
+            )
+        ),
+        r"CRS-203: variation SSW-PC-011 reached without a selected variant",
+    ),
+    (
+        "partial match without a system requirement stating what is met fails the compliance table",
         "all",
         replace(
             "model/functional/features.sysml",
             '@Matches { need = "CRS-203"; }',
             '@Matches { need = "CRS-203"; partial = true; }',
         ),
-        r"CRS-203: partial match without a system requirement stating the gap",
+        r"CRS-203: partial match without a system requirement stating what is met",
     ),
     (
-        "partial constraint satisfaction without its gap system requirement fails the compliance table",
+        "a matched requirement's system requirement satisfied outside the feature's chain fails the compliance table",
         "all",
         replace(
-            "model/requirements/system_requirements.sysml",
-            '@Satisfies { need = "CRS-304"; }',
-            "",
+            "model/logical/architecture.sysml",
+            "satisfy adjustmentRequests by OEM_SeatSwitch.positionSensing;",
+            "satisfy adjustmentRequests by OEM_SeatSwitch.illumination;",
         ),
-        r"CRS-304: partial satisfaction without a system requirement stating the gap",
+        r"CRS-201: system requirement SR-101 is satisfied outside the chain of its matching features",
+    ),
+    (
+        "a constraint its part's values break fails the bridge",
+        "all",
+        replace("model/physical/components.sysml", "mass <= 60 [g]", "mass <= 40 [g]"),
+        r"CON-112: does not hold: mass <= 40 \[g\] \(mass = 48 \[g\]\)",
+    ),
+    (
+        "two seat positions coded to one node address break the vehicle's constraint",
+        "all",
+        replace("model/physical/components.sysml", "nad = 34;", "nad = 33;"),
+        r"CON-124: does not hold",
+    ),
+    (
+        "a platform rating that no longer meets this RFQ's limit fails the bridge",
+        "all",
+        replace(
+            "../seat-switch-platform/model/physical/components.sysml",
+            "reflashTime : DurationValue = 95 [s]",
+            "reflashTime : DurationValue = 200 [s]",
+        ),
+        r"CON-111: does not hold: reflashTime <= 180 \[s\] \(reflashTime = 200 \[s\]\)",
+    ),
+    (
+        "partial constraint satisfaction without a partial compliance statement fails the compliance table",
+        "all",
+        replace(
+            "docs/customer/statements.md",
+            ":answers: CRS-304\n:compliance: partial",
+            ":answers: CRS-304\n:compliance: comply",
+        ),
+        r"CRS-304: partial, but no partial compliance statement answers it",
     ),
     (
         "a customer requirement without an acceptance test is not verified",
@@ -263,7 +324,7 @@ MUTATIONS = [
         "a non-functional requirement whose constraint is a bare attribute is not answered (crs-satisfied)",
         "all",
         replace(
-            "model/logical/architecture.sysml",
+            "model/physical/components.sysml",
             "constraint <'CON-111'> workshopUpdateTime {\n"
             '            @Satisfies { need = "CRS-803"; }\n'
             "            doc /* A complete software update in the workshop shall take at most 180 s. */\n"
@@ -340,14 +401,16 @@ def main():
             return 1
         html = (work / "docs/_build/html/model.html").read_text()
         checks = {
-            "SR-119 shows its satisfying component": re.search(
-                r'id="SR-119".*?satisfied by.*?LC-100', html, re.DOTALL
+            "SR-116 shows its satisfying component": re.search(
+                r'id="SR-116".*?satisfied by.*?LC-100', html, re.DOTALL
             ),
-            "SR-119 shows its system test": re.search(
-                r'id="SR-119".*?verified by.*?STC-103', html, re.DOTALL
+            "SR-116 shows its system test": re.search(
+                r'id="SR-116".*?verified by.*?STC-119', html, re.DOTALL
             ),
-            "internal diagrams are embedded": "_images/OEM_SeatSwitch.svg" in html,
+            "internal diagrams are embedded": "_images/vehicleSeatSwitches.svg" in html,
             "use cases link to their needs": 'href="#UC-101"' in html,
+            "a use case is titled by its objective": "The occupant wants to adjust the seat position"
+            in html,
             **compliance_rows(work / "docs/_generated/compliance.md"),
             **links_resolve(work / "docs/_build/html"),
         }
@@ -360,7 +423,7 @@ def main():
 
 
 def information():
-    """An information CRS is no coverage obligation: no SR, a partial satisfaction without a gap SR, still green."""
+    """An information CRS is no coverage obligation: a partial satisfaction without a partial statement, still green."""
 
     def edit(work):
         replace(
@@ -369,14 +432,14 @@ def information():
             ":id: CRS-304\n:class: information\n",
         )(work)
         replace(
-            "model/requirements/system_requirements.sysml",
-            '@Satisfies { need = "CRS-304"; }',
-            '@Satisfies { need = "CRS-301"; }',
+            "docs/customer/statements.md",
+            ":answers: CRS-304\n:compliance: partial",
+            ":answers: CRS-304\n:compliance: comply",
         )(work)
 
     with build("all", edit) as (code, out, _):
         return report(
-            "an information requirement without a system requirement builds clean",
+            "an information requirement met in part without a partial statement builds clean",
             code == 0,
             out,
         )
@@ -430,7 +493,7 @@ def incremental(work):
     use_cases = work / "model/requirements/use_cases.sysml"
     original = use_cases.read_text()
     use_cases.write_text(
-        original.replace("subject OEM_SeatSwitch;", "subject switches;")
+        original.replace("subject OEM_SeatSwitch :>", "subject switches :>")
     )  # every use case
     result = subprocess.run(remake, check=False, capture_output=True, text=True)
     out = result.stdout + result.stderr
@@ -463,11 +526,11 @@ def incremental(work):
 def hook(work):
     """The plugin's PostToolUse hook reports `sysml check` errors with exit code 2, and ignores other files."""
     script = EXAMPLE.parent.parent / "plugins/sysml-rflp/scripts/lint_on_edit.py"
-    target = work / "model/logical/architecture.sysml"
+    target = work / "model/physical/components.sysml"
     replace(
-        "model/logical/architecture.sysml",
-        "allocate comfortKeys.offerDriverComfortKeys",
-        "allocate comfortKeys.offerDriverComfortKey",
+        "model/physical/components.sysml",
+        "driverSwitch.driverButtonSet;",
+        "driverSwitch.driverButtonSe;",
     )(work)
 
     def run(path):
@@ -486,37 +549,38 @@ def hook(work):
     failed = report(
         "lint hook reports a broken model with exit 2",
         broken.returncode == 2
-        and "offerDriverComfortKey` resolves to nothing" in broken.stderr,
+        and "driverButtonSe` resolves to nothing" in broken.stderr,
         f"exit {broken.returncode}: {broken.stderr}",
     ) + report("lint hook ignores non-SysML files", other.returncode == 0, other.stderr)
-    original = target.read_text().replace(
-        "offerDriverComfortKey ", "offerDriverComfortKeys "
-    )
+    original = target.read_text().replace("driverButtonSe;", "driverButtonSet;")
     target.write_text(original)
     clean = run(target)
     failed += report(
         "lint hook passes a clean model", clean.returncode == 0, clean.stderr
     )
+    # in another position's namespace, so `sysml check` accepts it and only the bridge sees the clash
     target.write_text(
-        original.replace("<'LC-104'> rearRightSwitch", "<'LC-103'> rearRightSwitch")
+        original.replace(
+            "<'PC-108'> rearRightButtonSet", "<'PC-102'> rearRightButtonSet"
+        )
     )
     duplicate = run(target)
     failed += report(
         "lint hook reports a bridge error (duplicate id) that `sysml check` accepts",
-        duplicate.returncode == 2 and "duplicate id LC-103" in duplicate.stderr,
+        duplicate.returncode == 2 and "duplicate id PC-102" in duplicate.stderr,
         f"exit {duplicate.returncode}: {duplicate.stderr}",
     )
     target.write_text(original)
     requirements = work / "model/requirements/system_requirements.sysml"
     replace(
         "model/requirements/system_requirements.sysml",
-        "shall withstand 200 000 actuations",
+        "shall be declared in the OEM material data system",
         "shall be TBD",
     )(work)
     vague = run(requirements)
     return failed + report(
         "lint hook reports a vague requirement text",
-        vague.returncode == 2 and "SR-119" in vague.stderr and "'TBD'" in vague.stderr,
+        vague.returncode == 2 and "SR-116" in vague.stderr and "'TBD'" in vague.stderr,
         f"exit {vague.returncode}: {vague.stderr}",
     )
 

@@ -23,31 +23,31 @@ It is not a modeling GUI and it does not simulate. Software components keep link
 ## What you get
 
 - **Plugin `sysml-rflp`** ([`plugins/sysml-rflp/`](plugins/sysml-rflp)): skills to scaffold (`sysml-init`), author (`sysml-author`), lint (`sysml-lint`) and document (`sysml-docs`) a model, to run the RFLP workflow (`rflp`, `rflp-method`), and to answer an RFQ with an interview per layer (`rfq`, which also captures a platform bottom-up). There is an agent per layer (requirements, functional, logical, physical, test) plus a reviewer, a hook that runs `sysml check` and the bridge after every edit (language errors, duplicate ids, unlinked ends, vague requirement texts), a session-start check for missing tools, the `sysml` MCP server, and a project template.
-- **Python package `sysml2kit`** ([`src/`](src/sysml2kit)): turns `sysml export` JSON into sphinx-needs needs, warns on system requirement texts without exactly one `shall` or with a vague term, lists RFLP rule violations by layer (`sysml2kit gaps`), derives reuse status and writes the compliance table (`sysml2kit compliance`), and renders use case diagrams and the RFLP trace graph as SVG, where a click on an element opens its need in the docs. Standard library only.
+- **Python package `sysml2kit`** ([`src/`](src/sysml2kit)): turns `sysml export` JSON into sphinx-needs needs, evaluates every constraint against the attribute values its part states or inherits (failing when one does not hold), warns on system requirement texts without exactly one `shall` or with a vague term, lists RFLP rule violations by layer (`sysml2kit gaps`), derives reuse status and writes the compliance table (`sysml2kit compliance`), and renders use case diagrams and the RFLP trace graph as SVG, where a click on an element opens its need in the docs. Standard library only.
 - **Example [`examples/seat-switch-platform/`](examples/seat-switch-platform)**: a platform captured bottom-up, a seat adjustment switch product line (mechanics, electronics, firmware, with cybersecurity, production and workshop needs) with mirrored housings and four button sets as variations, platform limits as constraints, from PRQ to test results.
-- **Example [`examples/seat-switch-rfq/`](examples/seat-switch-rfq)**: an RFQ project on the seat-switch platform (imported through `platform/`, a symlink here, a git submodule in a real project): an OEM's classified customer requirements and customer test requirements for the switches of four seat positions. Functional requirements are matched by platform features, non-functional ones and constraints are satisfied by constraints over the platform's rated attributes, each seat position selects a housing side and a button set, and tests implement the customer's test requirements. It has a partial satisfaction with the gap stated, a not-offered requirement, a commercial statement, a test deviation, and the compliance table. It is the acceptance fixture for the toolkit.
+- **Example [`examples/seat-switch-rfq/`](examples/seat-switch-rfq)**: an RFQ project on the seat-switch platform (its Makefile points `PLATFORM` at the sibling `seat-switch-platform/`; a real project has the platform as a git submodule at `platform/`): an OEM's classified customer requirements and customer test requirements for the switches of four seat positions. Functional requirements are matched by platform features, non-functional ones and constraints are satisfied by constraints over the platform's rated attributes, each seat position selects a housing side and a button set, and tests implement the customer's test requirements. It has a partial satisfaction with the gap stated, a not-offered requirement, a commercial statement, a test deviation, and the compliance table. It is the acceptance fixture for the toolkit.
 
 The docs build is the traceability report. Need tables, the trace graph and internal diagrams come out of the model, and `sphinx-build -W` fails on any RFLP rule the model breaks: a customer requirement nothing satisfies, a function allocated to no component, a logical component allocated to no physical one, a requirement no test verifies.
 
 ## For agents
 
-The `sysml` MCP server answers from the language's own standard library, not from what a model remembers. To write a model there are `check`, `notation`, `visible_names` and `library_search`. To read one there are `outline`, `find` and `relations`, so an agent queries the model instead of opening files:
+The `sysml` MCP server answers from the language's own standard library, not from what a model remembers. To write a model there are `check`, `notation`, `visible_names`, `library_search` and `rename` (which answers the edits and writes nothing). To read one there are `outline`, `find`, `relations`, `definition`, `references` and `impact` (what a change reaches, breadth first), so an agent queries the model instead of opening files. Every tool only reads, and answers as structured JSON with snake_case keys:
 
 ```text
 find       { "kind": "ActionUsage", "without": "allocated_to" }
-→ SeatSwitchRfqFeatures::seatAdjustment   FEAT-101   features.sysml:11
-  SeatSwitchRfqFeatures::comfortKeys      FEAT-102   features.sysml:17
-  SeatSwitchRfqFeatures::nightDesign      FEAT-103   features.sysml:28
+→ SeatSwitchRfqFeatures::seatAdjustment   FEAT-101   features.sysml:8
+  SeatSwitchRfqFeatures::comfortKeys      FEAT-102   features.sysml:14
+  SeatSwitchRfqFeatures::nightDesign      FEAT-103   features.sysml:21
   ... (6 found)
 
-relations  { "element": "SR-119" }
-→ SeatSwitchRfqRequirements::durabilityGap
-    incoming  satisfies  SeatSwitchRfqLogical::OEM_SeatSwitch (LC-100)              architecture.sysml:134
-    incoming  verifies   SeatSwitchRfqSystemTests::keyDurabilityTest (STC-103)    system_tests.sysml:19
-    outgoing  annotated_by  Trace::Satisfies                                       system_requirements.sysml:86
+relations  { "element": "SR-116" }
+→ SeatSwitchRfqRequirements::materialDeclaration
+    incoming  satisfies  SeatSwitchRfqLogical::OEM_SeatSwitch (LC-100)               architecture.sysml:32
+    incoming  verifies   SeatSwitchRfqSystemTests::materialDataReview (STC-119)    system_tests.sysml:105
+    outgoing  annotated_by  Trace::Satisfies                                        system_requirements.sysml:69
 ```
 
-`find` filters by metaclass, containing element, name or short name, and by a relation the element lacks. `relations` lists every link of one element in both directions: satisfy, verify, allocate, perform, connect, succession, typing, specialization, redefinition, imports, metadata. Both take a qualified name or a short name. The plugin starts the server on the project's `model/` directory.
+`find` filters by metaclass, containing element, name or short name, and by a relation the element lacks. `relations` lists every link of one element in both directions: satisfy, verify, allocate, perform, connect, succession, typing, specialization, redefinition, imports, metadata. Both take a qualified name or a short name. The plugin starts the server with `make -s mcp`, which hands it the project and the platform the Makefile names (`PLATFORM`), so it reads the same model `make` builds, a submodule or a checkout beside the project.
 
 ## Quick start
 
@@ -87,6 +87,12 @@ Requirement classes, constraints and customer test requirements change the rules
 - Software architecture: new rules `swcomponent-used` (every SW component has a logical component allocated) and `software-used` (a top-level `#Software` PC without SW components has one), and `physical-used` now covers only mechanical and electrical leaf PCs. A project whose firmware owns `#Software` parts must allocate its logical components to those SW components, not to the units under them.
 - A use case's need title comes from the doc of its `objective` (`objective { doc /* The driver wants to ... */ }`), otherwise from its name.
 - A software requirement links to the SW component or unit implementing it with `:allocated_to:`.
+- `Makefile`: copy from the template and keep your `DIAGRAMS` line. It names the platform with `PLATFORM := platform` (the submodule); a project whose platform is checked out elsewhere sets the path there. Replace a `platform` symlink with that: Git for Windows checks a symlink out as a text file unless symlinks are enabled. The Makefile's `mcp` target starts the MCP server, and the plugin runs it (`make -s mcp`), so without it the server does not start.
+- `model/trace.sysml`: add `metadata def Assembly;`, or copy it from the template. The product as built is an `#Assembly part <'PC-nnn'>` (no domain); a platform's switch assembly becomes one, and an RFQ's subsets it.
+- No logical component is typed by a physical definition. Move rated values and the constraints over them from logical components to the physical part they describe (the assembly for the product as a whole). The bridge now evaluates every constraint and fails on one that does not hold.
+- Per-configuration differences (one switch per seat position) are assemblies that subset the program's assembly and select variants, not extra logical components or functions. In an RFQ build the platform's own allocations to its variants no longer select them: subset the variant from a project part (or allocate a project component to it), or the finding `variation <V> reached without a selected variant` appears.
+- A partially met CRS (partial match or `partial = true` constraint) needs a CST with `:compliance: partial` (finding `partial, but no partial compliance statement answers it`). A partial match still needs an SR in the feature's chain, now stating what is met (`partial match without a system requirement stating what is met`); a partial constraint no longer needs an SR. Delete SRs that only restated a partial constraint's gap.
+- New finding `<CRS>: system requirement <SR> is satisfied outside the chain of its matching features`: every SR satisfying a matched CRS must be satisfied by a component that a matching feature's functions reach.
 
 ## Pipeline
 
@@ -105,18 +111,20 @@ The platform model is loaded next to the RFQ's `model/`; its elements become nee
 
 ### What `sysml export` gives the bridge
 
-A flat JSON array of elements with `@type`, `@id` and every metamodel property; references are `{"@id": ...}`. `sysml2kit needs` reads `declaredShortName` (not `shortName`, which implicit features inherit), `name`, `qualifiedName`, `owner`, `documentation`; `SatisfyRequirementUsage.satisfyingFeature/satisfiedRequirement`; `Verification*.verifiedRequirement`; `AllocationUsage.relatedFeature` (`[source, target]`); `PerformActionUsage` → `ReferenceSubsetting.referencedFeature`; `MetadataUsage` typed by `Trace::Realizes/Satisfies/Verifies/Matches/Implements` and the string literals under it, and keyword metadata `Trace::Feature/Mechanical/Electrical/Software`, which with the metaclass decide the need type (`#Feature action` → feature, `#Electrical part` → physical component); subsetting (`:>`) becomes a `specializes` link. The export has no source positions; the bridge finds `<'ID'>` in the model text, skipping comments and string literals.
+A flat JSON array of elements with `@type`, `@id` and every metamodel property; references are `{"@id": ...}`. Since sysml 0.2 a relationship carries `owningRelatedElement` and `ownedRelatedElement` instead of `owner` and `ownedElement`, and an element's `ownedElement` leaves out its relationships, as the specification derives them; `sysml2kit` reads both shapes (`normalize` in `needs.py`). `sysml2kit needs` reads `declaredShortName` (not `shortName`, which implicit features inherit), `name`, `qualifiedName`, `owner`, `documentation`; `SatisfyRequirementUsage.satisfyingFeature/satisfiedRequirement`; `Verification*.verifiedRequirement`; `AllocationUsage.relatedFeature` (`[source, target]`); `PerformActionUsage` → `ReferenceSubsetting.referencedFeature`; `MetadataUsage` typed by `Trace::Realizes/Satisfies/Verifies/Matches/Implements` and the string literals under it, and keyword metadata `Trace::Feature/Mechanical/Electrical/Software/Assembly`, which with the metaclass decide the need type (`#Feature action` → feature, `#Electrical part` → physical component, `#Assembly part` → physical component without a domain); a constraint's body, which the export carries only as text, is parsed and evaluated against the values reached through `owner`, subsetting, typing and redefinition; subsetting (`:>`) becomes a `specializes` link. The export has no source positions; the bridge finds `<'ID'>` in the model text, skipping comments and string literals.
 
 ## Tools and versions
 
 | Tool | Version | Role |
 |---|---|---|
-| `sysml` (sysmlv2-cli) | fork [MichaelD-42/sysml-v2-rs](https://github.com/MichaelD-42/sysml-v2-rs) tag `v0.1.4-kit.2` (0.1.4 + fixes, accepts ids on variant members, `find`/`relations` MCP tools) | parse, resolve, validate, export, internal diagrams, MCP server |
+| `sysml` (sysmlv2-cli) | fork [MichaelD-42/sysml-v2-rs](https://github.com/MichaelD-42/sysml-v2-rs) tag `v0.2.0-kit.3` (upstream 0.2.0 + ids on variant members; `relations` and `trace` credit nothing for a `satisfy` whose `by` end does not resolve; several `--project` roots for the MCP server) | parse, resolve, validate, export, internal diagrams, MCP server |
 | sphinx-needs | 9.2.0 | needs, links, schema rules |
 | ub-test-reports | 2.0.0 | JUnit → needs |
 | sysml2kit | this repo | export → needs, use case and trace diagrams |
 
-The fork fixes two bugs in upstream sysmlv2-cli 0.1.4. A parenthesised sequence `("a", "b")` kept only its first element, so `@Satisfies { need = ("CRS-001", "CRS-002"); }` silently lost links. And a variant member with a short name (`variant part <'PC-002'> radar;`) failed to parse, so platform variants could not be needs. With the fixes, the OMG corpus still checks clean. The fork also adds the `find` and `relations` MCP tools.
+The fork carries one fix upstream does not have: a variant member with a short name (`variant part <'PC-002'> radar;`) fails to parse upstream, so platform variants could not be needs. Two earlier fork changes are upstream since 0.2.0: a parenthesised sequence `("a", "b")` keeping all its elements (before, `@Satisfies { need = ("CRS-001", "CRS-002"); }` silently lost links), and the `find` and `relations` MCP tools. With the fix, the OMG corpus still checks clean.
+
+0.2.0 checks more than 0.1.4 did. A name declared twice in one namespace is an error, inherited members included: a constraint named like one the part inherits (`keyDurability` on a part subsetting the platform assembly, which already has one) fails `make lint`. `sysml diagram` refuses a model with unresolved names, so the Makefile passes the platform model to it as it does to `check` and `export`. And `variant w;` without a kind keyword now refers to an existing usage instead of declaring one; write `variant part w;`.
 
 The pipeline was chosen by an evaluation on 2026-11-07, Python or Rust only, against the OMG SysML-v2-Release 2026-09.1 corpus (252 files):
 
@@ -134,8 +142,9 @@ There is no OMG Pilot Implementation gate (Java/Eclipse is out); the corpus run 
 - `sysml` accepts `satisfy`/`allocate` ends that are definitions; the spec types them as features. Model traced elements as usages (the authoring skill says so); the tool will not stop you.
 - Its built-in standard library is 2026-05, not the 2026-09.1 release.
 - No derive/refine mapping: SysML v2 has no `refine` keyword.
+- The constraint evaluator covers `and`, `or`, `not`, comparisons, numbers with a unit in brackets, strings, booleans and feature chains, and compares quantities only in the same unit (no `[kg]` against `[g]`). Anything else, or a value nobody states, is a `not evaluated` warning. A constraint is evaluated in its owner's context only, not again in every part that inherits it.
 - ubCode support for `network_back` schema rules is untested here.
-- The platform is pulled in as a git submodule (or symlink) only; sysand packages are not supported. Reuse status follows the chain feature → functions → LC → PC through `specializes` links, so reuse written any other way (copying a platform part) counts as new.
+- The platform is pulled in as a git submodule, or as a checkout the Makefile's `PLATFORM` names, only; sysand packages are not supported. Reuse status follows the chain feature → functions → LC → PC through `specializes` links, so reuse written any other way (copying a platform part) counts as new.
 - Reuse is about platform components, not whether a requirement's value is met (that is `partial`).
 - Document inputs other than the Markdown CRS (PDF, Word, drawings) are read by Claude as context; there is no ReqIF or Excel import.
 - `make tools` and CI build the fork tag in `SYSML_TAG`. To take a newer fork commit, tag it, change `SYSML_TAG` in the template and example Makefiles and release; CI reads the tag from the template Makefile.

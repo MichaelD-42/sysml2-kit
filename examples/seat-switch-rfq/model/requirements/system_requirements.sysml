@@ -81,9 +81,4 @@ package SeatSwitchRfqRequirements {
         @Satisfies { need = "CRS-703"; }
         doc /* The traceability code of every switch shall encode the OEM part number, the serial number and the production date. */
     }
-    // states the gap of the partial satisfaction: the platform key is rated for 200 000 actuations, the OEM asks for 300 000
-    requirement <'SR-119'> durabilityGap {
-        @Satisfies { need = "CRS-304"; }
-        doc /* Every key and knob direction shall withstand 200 000 actuations, two thirds of the 300 000 requested; the rest needs a new key mechanism outside the platform. */
-    }
 }

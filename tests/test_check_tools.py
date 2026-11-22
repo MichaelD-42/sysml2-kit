@@ -36,6 +36,17 @@ class CheckToolsTest(unittest.TestCase):
             (Path(root) / "model/trace.sysml").write_text("package Trace;\n")
             self.assertNotIn("start Claude in", run(root))
 
+    def test_a_makefile_without_the_mcp_target_says_to_copy_the_template(self):
+        with tempfile.TemporaryDirectory() as root:
+            (Path(root) / "model").mkdir()
+            (Path(root) / "model/trace.sysml").write_text("package Trace;\n")
+            (Path(root) / "Makefile").write_text("lint:\n\tsysml check model\n")
+            self.assertIn("no `mcp` target", run(root))
+            (Path(root) / "Makefile").write_text(
+                "mcp:\n\t@exec sysml mcp --project .\n"
+            )
+            self.assertNotIn("no `mcp` target", run(root))
+
     def test_a_model_directory_without_sysml_is_not_an_rflp_project(self):
         with tempfile.TemporaryDirectory() as root:
             (Path(root) / "model").mkdir()

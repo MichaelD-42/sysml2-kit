@@ -4,35 +4,37 @@
 export const esc = (s) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-// the views that apply to an element type, in tab order; ALWAYS are offered for every element
+// an element type's own views and the big-picture views scoped to it, in tab order
 const VIEWS = {
-  usecase: ["usecases", "trace"],
-  behaviour: ["activity", "trace"],
-  logical: ["context", "boundary", "interfaces", "composition", "trace"],
-  physical: ["boundary", "interfaces", "composition", "variants", "trace"],
-  port: ["boundary", "interfaces", "trace"],
-  requirement: ["trace", "vmodel"],
+  usecase: { own: ["usecases"], context: ["vmodel"] },
+  behaviour: { own: ["trace"], context: ["interfaces"] },
+  logical: { own: ["context", "composition", "allocation"], context: ["interfaces", "vmodel"] },
+  physical: { own: ["composition", "variants"], context: ["interfaces", "vmodel"] },
+  port: { own: ["interfaces"], context: [] },
+  crs: { own: ["trace"], context: ["vmodel", "compliance"] },
+  requirement: { own: ["trace"], context: ["vmodel"] },
+  other: { own: ["trace"], context: [] },
 };
-const ALWAYS = ["product", "compliance", "vmodel", "metamodel"];
+/** The model-wide views, shown whole from the header menu. */
+export const MENU = ["product", "compliance", "vmodel", "metamodel"];
 
-/** The views that apply to an element (its `kind` metaclass and need `layer`); trace for anything else. */
+/** The views of an element (its `kind` metaclass and need `layer`): `{own, context}`. */
 export function viewsFor(node) {
   const kind = node.kind ?? "";
   if (kind === "UseCaseUsage") return VIEWS.usecase;
   if (kind === "ActionUsage") return VIEWS.behaviour;
   if (kind === "PortUsage") return VIEWS.port;
   if (/^Part/.test(kind)) return node.layer === "L" ? VIEWS.logical : VIEWS.physical;
+  // a customer or platform requirement from a document: a need with a class and no metaclass
+  if (!kind && node.class) return VIEWS.crs;
   if (node.layer || /^(Requirement|Constraint|VerificationCase)/.test(kind)) return VIEWS.requirement;
-  return ["trace"];
+  return VIEWS.other;
 }
 
-/** The tabs offered for an element: its views and ALWAYS, in `order`. */
-export const offered = (node, order) => order.filter((k) => viewsFor(node).includes(k) || ALWAYS.includes(k));
-
-/** The view a double-click on `node` drills into from view `current`. */
+/** The view a double-click on `node` drills into from view `current` (`node.views` overrides its type's views). */
 export function drillKind(node, current) {
-  const views = viewsFor(node);
-  return views.includes(current) ? current : views[0];
+  const { own, context } = node.views ?? viewsFor(node);
+  return own.includes(current) || context.includes(current) ? current : own[0];
 }
 
 const MARKERS = `<defs>

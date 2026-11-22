@@ -1,5 +1,6 @@
 import asyncio
 import json
+import os
 import re
 import tempfile
 import unittest
@@ -81,29 +82,37 @@ class OptionsTest(unittest.TestCase):
     def test_servers(self):
         self.assertEqual(set(self.options.mcp_servers), {"kit", "sysml"})
         sysml = self.options.mcp_servers["sysml"]
-        project = Path(sysml["args"][sysml["args"].index("--project") + 1])
-        # the RFQ's own model and the platform's, through the platform symlink
-        self.assertTrue((project / "seat-switch-rfq" / "model").is_dir())
-        self.assertTrue((project / "seat-switch-platform" / "model").is_dir())
+        args = sysml["args"]
+        roots = [Path(args[i + 1]).name for i, a in enumerate(args) if a == "--project"]
+        # the RFQ's own model and the platform's, which sits beside it
+        self.assertEqual(roots, ["seat-switch-rfq", "seat-switch-platform"])
         self.assertIn("read-only", self.options.system_prompt)
 
 
 class ModelRootTest(unittest.TestCase):
     def tree(self, platform_at):
+        """A project in tmp/a/rfq whose Makefile names the platform at tmp/<platform_at>."""
         tmp = Path(self.enterContext(tempfile.TemporaryDirectory())).resolve()
         project, platform = tmp / "a" / "rfq", tmp / platform_at
         (project / "model").mkdir(parents=True)
         (platform / "model").mkdir(parents=True)
-        (project / "platform").symlink_to(platform)
+        relative = os.path.relpath(platform, project)
+        (project / "Makefile").write_text(f"PLATFORM := {relative}\n")
         return project
 
-    def test_sibling_platform_uses_parent(self):
-        project = self.tree("a/platform")
-        self.assertEqual(agent.model_root(project), project.parent)
+    def test_a_platform_anywhere_is_a_second_root(self):
+        for at in ("a/platform", "a/rfq/platform", "b/c/platform"):
+            with self.subTest(at=at):
+                project = self.tree(at)
+                self.assertEqual(
+                    agent.model_roots(project),
+                    [project, (project / ".." / ".." / at).resolve()],
+                )
 
-    def test_distant_platform_falls_back_to_model(self):
-        project = self.tree("b/c/platform")
-        self.assertEqual(agent.model_root(project), project / "model")
+    def test_without_a_platform_only_the_project(self):
+        project = self.tree("a/platform")
+        (project / "Makefile").write_text("PLATFORM := nowhere\n")
+        self.assertEqual(agent.model_roots(project), [project])
 
 
 class FailingClient:

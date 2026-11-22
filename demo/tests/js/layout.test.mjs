@@ -21,7 +21,7 @@ test("toElk nests a port under its part", () => {
 test("toElk turns compartment ports into ELK ports, once per key", () => {
   const ports = [{ key: "q", name: "hvIn" }];
   const g = toElk({
-    kind: "composition",
+    kind: "interfaces",
     nodes: [
       node("P", "PartUsage", null, { compartments: { attributes: [], ports } }),
       node("R", "PartUsage", null, { compartments: { attributes: [], ports } }),
@@ -34,7 +34,7 @@ test("toElk turns compartment ports into ELK ports, once per key", () => {
 
 test("toElk nests an action under its frame and drops edges with unknown ends", () => {
   const g = toElk({
-    kind: "activity",
+    kind: "interfaces",
     nodes: [node("F", "ActionUsage"), node("a", "ActionUsage", "F"), node("b", "ActionUsage", "F")],
     edges: [
       { src: "a", dst: "b", type: "SUCCESSION", label: null },
@@ -160,4 +160,22 @@ test("toElk sizes a use case by its wrapped title", () => {
   const [u] = g.children;
   assert.deepEqual(u.meta.wrapped, ["The occupant wants to adjust", "the seat position"]);
   assert.equal(u.height, 42 + 2 * 16);
+});
+
+test("toElk packs a composition's nested parts and draws no ports", () => {
+  const ports = [{ key: "q", name: "hvIn" }];
+  const g = toElk({
+    kind: "composition",
+    nodes: [
+      node("P", "PartUsage", null, { compartments: { attributes: [], ports } }),
+      node("a", "PartUsage", "P", { compartments: { attributes: [], ports } }),
+      node("b", "PartUsage", "P", { also: ["coDriverSwitch"] }),
+    ],
+    edges: [],
+  });
+  const p = g.children[0];
+  assert.deepEqual(p.children.map((c) => c.id), ["a", "b"]);
+  assert.equal(p.layoutOptions["elk.algorithm"], "rectpacking");
+  assert.deepEqual([p.ports, p.children[0].ports], [[], []]);
+  assert.ok(p.children[1].meta.tags.includes("also in coDriverSwitch"));
 });

@@ -7,19 +7,21 @@ SPHINXBUILD  ?= sphinx-build
 STRICT       ?= -W --keep-going
 # sysmlv2-cli fork (sequence-expression fix, variant-id fix, find/relations MCP tools), pinned to a tag so every install gets the same checker
 SYSML_GIT     = https://github.com/MichaelD-42/sysml-v2-rs
-SYSML_TAG     = v0.1.4-kit.2
+SYSML_TAG     = v0.2.0-kit.3
 
 MODEL    := $(shell find model -name '*.sysml' | sort)
 # make splits file names on spaces, so `my part.sysml` would become two missing files
 $(if $(shell find model -name '*.sysml' -name '* *'),$(error model file names must not contain spaces; rename: $(shell find model -name '*.sysml' -name '* *')))
-# the platform's model (git submodule platform/), without its trace.sysml: a second package Trace
-PLATFORM_MODEL := $(shell test -d platform/model && find platform/model -name '*.sysml' ! -path platform/model/trace.sysml | sort)
+# the platform project: a git submodule at platform/, or the path to its checkout (no symlink: Windows checks one out as a file)
+PLATFORM := platform
+# the platform's model, without its trace.sysml: a second package Trace
+PLATFORM_MODEL := $(shell test -d $(PLATFORM)/model && find $(PLATFORM)/model -name '*.sysml' ! -path $(PLATFORM)/model/trace.sysml | sort)
 RESULTS  := $(wildcard test-results/*.xml)
 GEN      := docs/_generated
 # Usages whose internal structure is drawn, by qualified name (e.g. MyLogical::system MyFunctions::operate)
 DIAGRAMS :=
 
-.PHONY: all tools lint render docs clean
+.PHONY: all tools lint render docs clean mcp
 # always regenerated (< 1 s): make cannot see a deleted model or result file, so staleness checks would keep removed elements
 .PHONY: build/model.json $(GEN)/results-needs.json
 .DELETE_ON_ERROR:
@@ -32,6 +34,11 @@ tools:
 
 lint:
 	$(SYSML) check model $(PLATFORM_MODEL)
+
+# the sysml MCP server on the project and its platform, as make sees them; the plugin's .mcp.json runs `make -s mcp`
+# (a platform inside the project, the submodule, is read once)
+mcp:
+	@exec $(SYSML) mcp --project . $(if $(PLATFORM_MODEL),--project $(PLATFORM))
 
 build/model.json: $(MODEL) $(PLATFORM_MODEL)
 	@mkdir -p $(@D)
@@ -53,7 +60,7 @@ render: build/model.json
 	@# each diagram is saved under its last name segment, so two entries ending alike would overwrite each other
 	@dups=$$(for d in $(DIAGRAMS); do echo $${d##*::}; done | sort | uniq -d); \
 	if [ -n "$$dups" ]; then echo "DIAGRAMS: more than one entry ends in $$dups" >&2; exit 1; fi
-	for d in $(DIAGRAMS); do $(SYSML) diagram --internal $$d model > $(GEN)/$$(echo $$d | sed 's/.*:://').svg || exit 1; done
+	for d in $(DIAGRAMS); do $(SYSML) diagram --internal $$d model $(PLATFORM_MODEL) > $(GEN)/$$(echo $$d | sed 's/.*:://').svg || exit 1; done
 
 # two passes: the trace graph and the compliance table need the complete need set, Markdown and RST needs included
 docs: $(GEN)/model-needs.json $(GEN)/results-needs.json render

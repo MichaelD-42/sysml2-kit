@@ -2,7 +2,6 @@
 
 import asyncio
 import json
-import os
 import shutil
 import warnings
 from pathlib import Path
@@ -22,6 +21,7 @@ from claude_agent_sdk import (
 )
 
 from explorer import search
+from sysml2kit.needs import platform_dir
 
 PROMPT = Path(__file__).with_name("prompt.md")
 ALLOWED = (
@@ -62,19 +62,12 @@ def element(graph, key) -> str:
         return dumps({"error": str(e)})
 
 
-def model_root(project: Path) -> Path:
-    """Where `sysml mcp` sees the project's model and, through `platform`, the platform's."""
-    # the platform's model sits behind the `platform` symlink, which `sysml mcp --project` does
-    # not follow; their common directory holds both (its two `Trace` packages merge, no collision)
-    # shortcut: the common directory can hold other models too, so it is used only when it is the
-    # project or its parent (the examples layout); otherwise the platform stays unresolved
+def model_roots(project: Path) -> list[Path]:
+    """The roots `sysml mcp` reads, as `make mcp` passes them: the project, and its platform
+    (the Makefile's `PLATFORM`) when that has a model; a root inside another is read once."""
     project = project.resolve()
-    model = project / "model"
-    platform = (project / "platform" / "model").resolve()
-    if not platform.is_dir():
-        return model
-    common = Path(os.path.commonpath([model, platform]))
-    return common if common in (project, project.parent) else model
+    platform = platform_dir(project).resolve()
+    return [project] + ([platform] if (platform / "model").is_dir() else [])
 
 
 async def can_use_tool(name, input, context):
@@ -121,7 +114,12 @@ def options(project: Path, graph, embedder) -> ClaudeAgentOptions:
     sysml = {
         "type": "stdio",
         "command": shutil.which("sysml") or "sysml",
-        "args": ["mcp", "--project", str(model_root(project)), "--color", "never"],
+        "args": [
+            "mcp",
+            *(a for root in model_roots(project) for a in ("--project", str(root))),
+            "--color",
+            "never",
+        ],
     }
     return ClaudeAgentOptions(
         system_prompt=PROMPT.read_text(),

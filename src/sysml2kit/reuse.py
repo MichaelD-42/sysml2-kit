@@ -76,13 +76,26 @@ def _function_reach(needs, feature_id):
     # variants are reached only by allocation to one, or to a part specializing one
     assembly = descendants(needs, lambda n: not n.get("variant"))
     variations = {p for n in needs.values() if n.get("variant") for p in n["owned_by"]}
+    # the project selects a platform variant by allocating to it or subsetting it; the platform's own allocations offer them all
+    selected = {
+        v
+        for n, need in needs.items()
+        if not need["platform"]
+        for v in [*need.get("allocated_to", []), *closure(needs, n, "specializes")]
+    }
     out = {}
     for fn, components in function_components(needs, feature_id).items():
-        pcs = set()
+        pcs, offered = set(), set()
         for lc in components:
             for part in below(lc):
                 for pc in needs[part].get("allocated_to", []):
-                    if needs[pc]["type"] == "physical":
+                    if (
+                        needs[pc]["platform"]
+                        and needs[pc]["variant"]
+                        and pc not in selected
+                    ):
+                        offered |= set(needs[pc]["owned_by"]) & variations
+                    elif needs[pc]["type"] == "physical":
                         # an assembly reaches its parts
                         pcs |= {
                             i for i in assembly(pc) if needs[i]["type"] == "physical"
@@ -93,7 +106,14 @@ def _function_reach(needs, feature_id):
             chain = closure(needs, pc, "specializes")
             if not any(needs[i]["variant"] for i in chain):
                 unselected |= chain & variations
-        out[fn] = (pcs, unselected)
+        covered = {
+            o
+            for pc in pcs
+            for i in closure(needs, pc, "specializes")
+            if needs[i]["variant"]
+            for o in needs[i]["owned_by"]
+        }
+        out[fn] = (pcs, unselected | offered - covered)
     return out
 
 
@@ -149,7 +169,31 @@ def constraint_reuse(needs, con_id):
     ]
     if not owners:
         return "incomplete"
-    chain = [needs[i] for o in owners for i in closure(needs, o, "specializes")]
-    if not any(n["platform"] for n in chain):
+    return _combine({part_reuse(needs, o) for o in owners})
+
+
+def part_reuse(needs, part):
+    """Platform, variant or new by the part's specializations; an assembly (no domain) adds its parts'."""
+    chain = [needs[i] for i in closure(needs, part, "specializes")]
+    own = set()
+    if any(n["platform"] for n in chain):
+        own.add("variant" if any(n["variant"] for n in chain) else "platform")
+    parts = (
+        [
+            i
+            for i, n in needs.items()
+            if part in n["owned_by"] and n["type"] == "physical"
+        ]
+        if needs[part]["type"] == "physical" and not needs[part].get("domain")
+        else []
+    )
+    # an assembly that subsets nothing is only an arrangement: its parts decide
+    return _combine(own | {part_reuse(needs, p) for p in parts} or {"new"})
+
+
+def _combine(statuses):
+    if statuses == {"new"}:
         return "new"
-    return "variant" if any(n["variant"] for n in chain) else "platform"
+    if statuses & {"new", "modified"}:
+        return "modified"
+    return "variant" if "variant" in statuses else "platform"

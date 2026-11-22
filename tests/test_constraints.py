@@ -1,0 +1,63 @@
+import unittest
+
+from sysml2kit.constraints import Unevaluable, evaluate
+
+VALUES = {
+    ("mass",): "48 [g]",
+    ("force",): "4.5 [N]",
+    ("minTemp",): "-40 ['°C']",
+    ("ip",): '"IP5K4"',
+    ("cycles",): "200000",
+    ("lum",): "20 [cd / m^2]",
+    ("a", "nad"): "33",
+    ("b", "nad"): "34",
+    ("ok",): "true",
+}
+
+
+def lookup(chain):
+    if chain not in VALUES:
+        raise Unevaluable(f"{'.'.join(chain)} has no value")
+    return VALUES[chain]
+
+
+class EvaluateTest(unittest.TestCase):
+    def test_holds(self):
+        for text in (
+            "mass <= 60 [g]",
+            "force >= 3.0 [N] and force <= 6.5 [N]",
+            "minTemp <= -40 ['°C']",
+            'ip == "IP5K4"',
+            "cycles >= 200000",
+            "lum >= 8 [cd/m^2] and lum <= 40 [cd/m^2]",
+            "a.nad != b.nad",
+            "not (mass > 60 [g]) or cycles < 1",
+            "ok",
+        ):
+            with self.subTest(text=text):
+                self.assertTrue(evaluate(text, lookup))
+
+    def test_violated(self):
+        for text in ("mass <= 40 [g]", "cycles >= 300000", 'ip == "IP6K9K"'):
+            with self.subTest(text=text):
+                self.assertFalse(evaluate(text, lookup))
+
+    def test_different_units_are_not_compared(self):
+        with self.assertRaisesRegex(Unevaluable, r"units differ: g and kg"):
+            evaluate("mass <= 0.06 [kg]", lookup)
+
+    def test_missing_value(self):
+        with self.assertRaisesRegex(Unevaluable, "c.nad has no value"):
+            evaluate("a.nad != c.nad", lookup)
+
+    def test_unsupported_syntax(self):
+        with self.assertRaises(Unevaluable):
+            evaluate("mass->size() == 1", lookup)
+
+    def test_a_comparison_must_give_a_boolean(self):
+        with self.assertRaisesRegex(Unevaluable, "not a boolean"):
+            evaluate("mass", lookup)
+
+
+if __name__ == "__main__":
+    unittest.main()

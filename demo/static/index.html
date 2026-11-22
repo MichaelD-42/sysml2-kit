@@ -32,9 +32,14 @@
   <button type="button" onclick="this.parentElement.hidden = true; this.previousElementSibling.replaceChildren()">Dismiss</button>
 </div>
 <header class="top">
+  <button type="button" id="tree-toggle" aria-controls="tree-col" aria-expanded="true">Tree</button>
   <h1>Model explorer</h1>
-  <p class="sub">SysML v2 model and needs, from the graph</p>
+  <details id="menu" class="menu">
+    <summary>System Model</summary>
+    <div class="menu-items" role="menu"></div>
+  </details>
   <div class="actions">
+    <button type="button" id="side-toggle" aria-controls="side" aria-expanded="false">Ask / Search</button>
     <button type="button" id="back" disabled>Back</button>
     <button type="button" id="reload">Rebuild and reload</button>
     <span id="reload-status" class="status" aria-live="polite"></span>
@@ -42,28 +47,34 @@
   </div>
 </header>
 <main class="grid">
-  <nav class="col tree-col" aria-label="Requirements, system architecture and platform">
+  <nav class="col tree-col" id="tree-col" aria-label="Requirements, system architecture and platform">
     <details class="tree-part" data-section="req" open><summary><span role="heading" aria-level="2" id="req-h">Requirements</span></summary><div id="req-tree" aria-labelledby="req-h"></div></details>
     <details class="tree-part" data-section="rflp" open><summary><span role="heading" aria-level="2" id="rflp-h">System Architecture</span></summary><div id="rflp-tree" aria-labelledby="rflp-h"></div></details>
     <details class="tree-part" data-section="plat" open><summary><span role="heading" aria-level="2" id="plat-h">Platform</span></summary><div id="plat-tree" aria-labelledby="plat-h"></div></details>
   </nav>
   <section class="col view-col" aria-label="Diagram">
-    <div id="kinds" role="tablist" aria-label="Views"></div>
-    <nav id="breadcrumb" aria-label="Owner path"></nav>
-    <div id="inspector"></div>
-    <div class="zoom" role="group" aria-label="Zoom">
-      <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
-      <button type="button" id="zoom-fit">Fit</button>
-      <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
-      <span class="legend"><span class="domain d-ME">ME</span><span class="domain d-EE">EE</span><span class="domain d-SW">SW</span></span>
+    <div class="title">
+      <div id="inspector"></div>
+      <nav id="breadcrumb" aria-label="Owner path"></nav>
     </div>
+    <div id="kinds" role="tablist" aria-label="Views"></div>
     <p id="note" class="note" aria-live="polite"></p>
-    <div id="canvas" role="tabpanel" tabindex="-1"></div>
+    <div class="stage">
+      <div id="canvas" role="tabpanel" tabindex="-1"></div>
+      <div class="zoom" role="group" aria-label="Zoom">
+        <span class="legend"><span class="domain d-ME">ME</span><span class="domain d-EE">EE</span><span class="domain d-SW">SW</span></span>
+        <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+        <button type="button" id="zoom-fit">Fit</button>
+        <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+      </div>
+    </div>
+    <details id="details" class="details"><summary>Details</summary><div id="details-body"></div></details>
   </section>
-  <aside class="col side-col" aria-label="Ask and search">
+  <aside class="side-col" id="side" aria-label="Ask and search" hidden>
     <div id="side-tabs" role="tablist">
       <button type="button" role="tab" data-panel="ask" aria-selected="true">Ask</button>
       <button type="button" role="tab" data-panel="search" aria-selected="false">Search</button>
+      <button type="button" id="side-close" class="close" aria-label="Close Ask and Search">×</button>
     </div>
     <section id="ask" class="side-panel" role="tabpanel"></section>
     <section id="search" class="side-panel" role="tabpanel" hidden></section>

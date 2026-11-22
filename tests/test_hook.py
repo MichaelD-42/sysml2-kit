@@ -61,6 +61,21 @@ class LintHookTest(unittest.TestCase):
             # the platform's own trace.sysml would be a second package Trace
             self.assertNotIn("platform/model/trace.sysml", check + export + bridge)
 
+    def test_hook_reads_the_platform_the_makefile_names(self):
+        with tempfile.TemporaryDirectory() as root:
+            makefile = Path(root) / "project/Makefile"
+            makefile.parent.mkdir(parents=True)
+            makefile.write_text("PLATFORM := ../plat\n")
+            check, export, bridge = run_hook(
+                Path(root),
+                ["model/a.sysml", "../plat/model/p.sysml", "../plat/model/trace.sysml"],
+            )
+            self.assertTrue(
+                export.endswith("model/a.sysml ../plat/model/p.sysml"), export
+            )
+            self.assertTrue(bridge.endswith("--platform ../plat/model/p.sysml"), bridge)
+            self.assertNotIn("trace.sysml", check + export + bridge)
+
     def test_hook_without_platform_passes_no_platform_flag(self):
         # a 0.1.x sysml2kit rejects --platform
         with tempfile.TemporaryDirectory() as root:

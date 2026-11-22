@@ -3,6 +3,8 @@
 import re
 from dataclasses import dataclass, field
 
+from sysml2kit.needs import normalize
+
 # need type -> RFLP layer
 LAYERS = {
     **dict.fromkeys(("crs", "prq", "cst", "usecase", "sysreq", "constraint"), "R"),
@@ -90,6 +92,9 @@ def number(text):
 
 
 def build(export, needs):
+    export = normalize(
+        export
+    )  # sysml 0.2 derives owner and ownedElement as the spec does
     by_id = {e["@id"]: e for e in export}
     by_name = {e["qualifiedName"]: e for e in export if e.get("qualifiedName")}
     need_of = {  # element @id -> its need

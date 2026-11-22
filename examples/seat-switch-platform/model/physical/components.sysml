@@ -441,7 +441,7 @@ package SeatSwitchPhysical {
         connect updateManager.imageStatus to bootManager.imageStatus;
     }
 
-    part seatSwitchAssembly : SwitchAssembly {
+    #Assembly part <'SSW-PC-049'> seatSwitchAssembly : SwitchAssembly {
         doc /* The switch as delivered: housing, button set and PCB assembly behind the vehicle connector, and the firmware. */
         ref part housing :> SeatSwitchPhysical::housing;
         ref part knob :> SeatSwitchPhysical::knob;
@@ -463,6 +463,8 @@ package SeatSwitchPhysical {
         connect pcb.levelLedDrive to buttonSet.levelLeds;
     }
 
+    allocate ACME_SeatSwitch to seatSwitchAssembly;
+    // allocation to each variant offers it; an RFQ selects one by subsetting it
     allocate ACME_SeatSwitch.enclosure to housing.housingLH;
     allocate ACME_SeatSwitch.enclosure to housing.housingRH;
     allocate ACME_SeatSwitch.enclosure to knob;

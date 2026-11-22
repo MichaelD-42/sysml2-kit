@@ -1,7 +1,15 @@
 import tempfile
 import unittest
+from pathlib import Path
 
-from sysml2kit.needs import BridgeError, convert, source_locations, text_findings
+from sysml2kit.needs import (
+    BridgeError,
+    convert,
+    normalize,
+    platform_dir,
+    source_locations,
+    text_findings,
+)
 
 
 def el(id_, type_, short=None, name=None, owner=None, **fields):
@@ -153,6 +161,65 @@ class ConvertTest(unittest.TestCase):
         self.assertEqual(n["UC-1"]["qualified_name"], "P::commute")
         self.assertEqual(n["F-1"]["title"], "operate")  # no objective: the name
 
+    def test_use_case_title_in_the_sysml_0_2_export_shape(self):
+        """0.2 writes owner and ownedElement as the spec derives them: a relationship has neither."""
+        n = needs_of(
+            model(
+                uc=el(
+                    "uc",
+                    "UseCaseUsage",
+                    "UC-1",
+                    "commute",
+                    owner="pkg",
+                    ownedRelationship=ids("om"),
+                ),
+                om=el(
+                    "om",
+                    "ObjectiveMembership",
+                    owningRelatedElement={"@id": "uc"},
+                    ownedRelatedElement=ids("obj"),
+                    ownedElement=[],
+                ),
+                obj=el("obj", "RequirementUsage", owner="uc", documentation=ids("od")),
+                od={
+                    "@id": "od",
+                    "@type": "Documentation",
+                    "body": "The driver wants to get to work",
+                },
+            )
+        )
+        self.assertEqual(n["UC-1"]["title"], "The driver wants to get to work")
+
+    def test_platform_dir_from_the_makefile(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(platform_dir(tmp), Path(tmp) / "platform")
+            (Path(tmp) / "Makefile").write_text("X := 1\nPLATFORM := ../plat\n")
+            self.assertEqual(platform_dir(tmp), Path(tmp) / "../plat")
+
+    def test_normalize_restores_owner_and_owned_elements(self):
+        elements = [
+            {
+                "@id": "a",
+                "@type": "AttributeUsage",
+                "ownedRelationship": ids("fv"),
+                "ownedElement": ids("x"),
+            },
+            {
+                "@id": "fv",
+                "@type": "FeatureValue",
+                "owner": None,
+                "ownedElement": [],
+                "owningRelatedElement": {"@id": "a"},
+                "ownedRelatedElement": ids("x"),
+            },
+            {"@id": "x", "@type": "LiteralInteger", "owner": {"@id": "a"}},
+        ]
+        by_id = {e["@id"]: e for e in normalize(elements)}
+        self.assertEqual(by_id["fv"]["owner"], {"@id": "a"})
+        self.assertEqual(by_id["fv"]["ownedElement"], ids("x"))
+        self.assertEqual(by_id["a"]["ownedElement"], ids("x", "fv"))
+        self.assertEqual(normalize(elements), elements, "idempotent")
+
     def test_a_verification_objective_is_not_the_title(self):
         n = needs_of(
             model(
@@ -182,6 +249,20 @@ class ConvertTest(unittest.TestCase):
         self.assertTrue(
             n["LC-2"]["leaf"], "owning a port does not make a component a non-leaf"
         )
+
+    def test_subsetting_a_composite_is_not_a_leaf(self):
+        n = needs_of(
+            model(
+                a=el("a", "PartUsage", "LC-3", "a", owner="pkg"),
+                b=el("b", "PartUsage", "LC-4", "b", owner="pkg"),
+                r1=rel("r1", "Subsetting", "a", "lc1"),
+                r2=rel("r2", "Subsetting", "b", "lc2"),
+                # a cycle must not hang the closure
+                r3=rel("r3", "Subclassification", "lc1", "a"),
+            )
+        )
+        self.assertFalse(n["LC-3"]["leaf"], "inherits LC-1's child components")
+        self.assertTrue(n["LC-4"]["leaf"], "LC-2 is a leaf, so is what subsets it")
 
     def assertBridgeError(self, elements, fragment):
         with self.assertRaises(BridgeError) as caught:
@@ -272,6 +353,36 @@ class KeywordTest(unittest.TestCase):
         self.assertEqual(
             (n["PI-1"]["type"], n["PI-1"]["domain"]), ("physinterface", "ME")
         )
+
+    def test_assembly_keyword_makes_a_physical_component_without_domain(self):
+        n = needs_of(
+            model(
+                pc=el("pc", "PartUsage", "PC-1", "switch", owner="pkg"),
+                **keyword("k1", "Assembly", "pc"),
+            )
+        )
+        self.assertEqual((n["PC-1"]["type"], n["PC-1"]["domain"]), ("physical", ""))
+
+    def test_assembly_keyword_does_not_make_a_port_physical(self):
+        n = needs_of(
+            model(
+                pi=el("pi", "PortUsage", "LI-9", "bus", owner="pkg"),
+                **keyword("k1", "Assembly", "pi"),
+            )
+        )
+        self.assertEqual(n["LI-9"]["type"], "interface")
+
+    def test_assembly_with_a_domain_is_an_error(self):
+        with self.assertRaisesRegex(
+            BridgeError, "PC-1: an assembly takes no domain keyword"
+        ):
+            needs_of(
+                model(
+                    pc=el("pc", "PartUsage", "PC-1", "switch", owner="pkg"),
+                    **keyword("k1", "Assembly", "pc"),
+                    **keyword("k2", "Mechanical", "pc"),
+                )
+            )
 
     def test_two_domains_is_an_error(self):
         with self.assertRaises(BridgeError) as cm:

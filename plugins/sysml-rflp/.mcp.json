@@ -1,5 +1,5 @@
 {
   "mcpServers": {
-    "sysml": { "command": "sysml", "args": ["mcp", "--project", "model"] }
+    "sysml": { "command": "make", "args": ["-s", "mcp"] }
   }
 }

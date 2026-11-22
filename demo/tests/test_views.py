@@ -135,22 +135,10 @@ class ViewsTest(unittest.TestCase):
         )
 
     def test_boundary_of_the_driver_switch(self):
-        v = self.view("boundary", "LC-101")
-        ports = {n["name"] for n in v["nodes"] if n["parent"] == "LC-101"}
+        # the position's assembly inherits the switch's ports
+        v = self.view("boundary", "PC-110")
+        ports = {n["name"] for n in v["nodes"] if n["parent"] == "PC-110"}
         self.assertLessEqual({"lin", "supply"}, ports)
-
-    def test_activity(self):
-        v = self.view("activity", "SSW-FEAT-001")
-        edges = {(e["src"], e["dst"], e["type"]) for e in v["edges"]}
-        self.assertIn(("SSW-F-001", "SSW-F-002", "SUCCESSION"), edges)
-        self.assertIn(
-            ("FLOW", "KeyState"), {(e["type"], e["label"]) for e in v["edges"]}
-        )
-
-    def test_activity_without_actions(self):
-        v = self.view("activity", "PC-101")
-        self.assertEqual(v["nodes"], [])
-        self.assertTrue(v["reason"])
 
     def test_variants_mark_the_rfq_selection(self):
         v = self.view("variants", "SeatSwitchPhysical::housing")
@@ -199,8 +187,6 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(len(names), len(set(names)))
 
     def test_defaults_prefer_the_project_over_the_platform(self):
-        # the project feature with the most actions, so the default is not a single box
-        self.assertEqual(self.view("activity")["focus"], "FEAT-102")
         self.assertEqual(self.view("usecases")["focus"], "UC-101")
         self.assertEqual(self.view("variants")["focus"], "SSW-PC-001")
 
@@ -219,7 +205,9 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(row["satisfied_by"], ["CON-101"])
         by = {r["crs"]: r["satisfied_by"] for r in v["rows"]}
         self.assertEqual(by["CRS-507"], ["SR-115"])  # textual SR answers a constraint
-        self.assertIn("SR-119", by["CRS-304"])  # the partial's gap SR
+        self.assertEqual(
+            by["CRS-304"], ["CON-104"]
+        )  # met in part; CST-004 states the gap
         self.assertEqual(by["CRS-201"], [])  # functional: features, not satisfiers
         rating = {r["crs"]: r["rating"] for r in v["rows"]}
         self.assertEqual(rating["CRS-301"], "comply")
@@ -274,7 +262,7 @@ class ViewsTest(unittest.TestCase):
         links = {(c["rel"], c["key"]) for c in crs["links"]}
         self.assertIn(("satisfied by (partial)", "CON-104"), links)
         self.assertNotIn(("satisfied by", "CON-104"), links)
-        self.assertIn(("satisfied by", "SR-119"), links)
+        self.assertIn(("answered by", "CST-004"), links)
         self.assertIn(("test requirement", "CTR-002"), links)
 
     def test_requirements_tree_lists_what_implements_a_ctr(self):
@@ -299,9 +287,10 @@ class ViewsTest(unittest.TestCase):
     def test_rflp_tree_follows_the_chain(self):
         own = views.rflp_tree(self.graph)
         all_paths = set(self.paths(own))
-        chain = ("LC-100", "UC-102", "FEAT-102", "F-101", "LC-101")
-        self.assertIn(chain + ("PC-101",), all_paths)
+        # through the platform function and component to the parts this RFQ selects
+        chain = ("LC-100", "UC-102", "FEAT-102", "SSW-F-005", "SSW-LC-002")
         self.assertIn(chain + ("PC-102",), all_paths)
+        self.assertIn(chain + ("PC-104",), all_paths)
         # the product is the root, its use cases below it, shown by their titles
         self.assertEqual([n["key"] for n in own], ["LC-100"])
         self.assertEqual(own[0]["name"], "OEM_SeatSwitch")
@@ -346,8 +335,7 @@ class ViewsTest(unittest.TestCase):
         self.assertIn("SSW-F-011", below)
         self.assertTrue(nodes["SSW-F-011"]["platform"])
         comfort = {n["key"] for n in nodes["FEAT-102"]["children"]}
-        self.assertIn("F-101", comfort)
-        self.assertTrue(any(k.startswith("SSW-F-") for k in comfort))
+        self.assertLessEqual({"SSW-F-005", "SSW-F-008"}, comfort)
         # an inherited function reaches its logical component, the component its physical parts,
         # a software component its units
         self.assertTrue(
@@ -370,7 +358,7 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(under_lc[0]["again"], "Physical breakdown")
         # a position's part shows the variant it selects
         self.assertTrue(
-            any(p[-3:] == ("LC-101", "PC-101", "SSW-PC-002") for p in all_paths)
+            any(p[-3:] == ("PC-110", "PC-101", "SSW-PC-002") for p in all_paths)
         )
         # a shared component is expanded once; later rows are marked and have no subtree
         rows = [n for n in self.walk(own) if n["key"] == "SSW-LC-004"]
@@ -381,18 +369,6 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(
             rows[1]["again"], "The occupant wants to adjust the seat position"
         )
-
-    def test_activity_of_a_feature_includes_inherited_actions(self):
-        v = self.view("activity", "FEAT-104")
-        keys = {n["key"] for n in v["nodes"]}
-        self.assertLessEqual({"SSW-F-011", "SSW-F-012", "SSW-F-013"}, keys)
-        self.assertIn(
-            ("SSW-F-012", "SSW-F-013", "SUCCESSION"),
-            {(e["src"], e["dst"], e["type"]) for e in v["edges"]},
-        )
-        keys = {n["key"] for n in self.view("activity", "FEAT-102")["nodes"]}
-        self.assertIn("F-101", keys)
-        self.assertTrue(any(k.startswith("SSW-F-") for k in keys))
 
     def walk(self, nodes):
         for n in nodes:
@@ -409,7 +385,8 @@ class ViewsTest(unittest.TestCase):
             n["key"]: n for n in self.walk(views.rflp_tree(self.graph, platform=True))
         }
         self.assertIn("SSW-PC-001", own["PC-101"]["uses"])
-        self.assertIn("SSW-LC-001", own["LC-101"]["uses"])
+        self.assertIn("SSW-LC-001", own["LC-100"]["uses"])
+        self.assertIn("SSW-PC-049", own["PC-110"]["uses"])
         # the housing variation is no RFLP node; its variants are
         self.assertIn("PC-101", platform["SSW-PC-002"]["uses"])
 
@@ -434,7 +411,7 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(at["CON-101"], (2, "left"))
         self.assertEqual(at["STC-101"], (2, "right"))
         self.assertEqual(at["FEAT-102"], (3, "left"))
-        self.assertEqual(at["LC-101"], (4, "left"))
+        self.assertEqual(at["LC-100"], (4, "left"))
         self.assertEqual(at["PC-101"], (5, "bottom"))
         self.assertNotIn("SSW-FEAT-001", at)
         edges = {(e["src"], e["dst"], e["type"]) for e in v["edges"]}
@@ -445,10 +422,11 @@ class ViewsTest(unittest.TestCase):
         self.assertIn(("CTR-003", "CRS-301", "APPLIES_TO"), edges)
         self.assertEqual(v["empty"], [3, 4])
 
-    def test_vmodel_of_another_focus_is_the_whole_v(self):
-        v = views.view(self.graph, "vmodel", "LC-101")
-        self.assertEqual(v["focus"], "LC-101")
-        self.assertIn("CRS-201", {n["key"] for n in v["nodes"]})
+    def test_vmodel_of_another_focus_is_its_reach(self):
+        # the seat position's assembly is linked to no requirement: an element alone is no V
+        v = views.view(self.graph, "vmodel", "PC-110")
+        self.assertEqual(v["focus"], "PC-110")
+        self.assertEqual(v["reason"], "PC-110 reaches no requirement")
 
     def test_vmodel_of_one_requirement(self):
         keys = {n["key"] for n in views.view(self.graph, "vmodel", "CRS-301")["nodes"]}
@@ -514,8 +492,8 @@ class ViewsTest(unittest.TestCase):
         self.assertIn("switchController", self.names(v))
 
     def test_context_of_a_part_connected_to_nothing(self):
-        v = views.view(self.graph, "context", "LC-101")
-        self.assertEqual(v["reason"], "LC-101 is connected to nothing in its owner")
+        v = views.view(self.graph, "context", "PC-101")
+        self.assertEqual(v["reason"], "PC-101 is connected to nothing in its owner")
 
     def test_boundary_shows_the_pin_mapping(self):
         v = self.view("boundary", "SSW-PC-022")
@@ -543,33 +521,64 @@ class ViewsTest(unittest.TestCase):
                     {"SSW-PC-022", "SSW-PI-007"}, {n["key"] for n in v["nodes"]}
                 )
 
-    def test_firmware_composition_has_components_and_units(self):
+    def test_firmware_composition_nests_components_and_units(self):
         v = self.view("composition", "SSW-PC-016")
-        edges = {(e["src"], e["dst"]) for e in v["edges"]}
-        self.assertIn(("SSW-PC-016", "SSW-PC-034"), edges)
-        self.assertIn(("SSW-PC-034", "SSW-PC-035"), edges)
+        parent = {n["key"]: n["parent"] for n in v["nodes"]}
+        self.assertIsNone(parent["SSW-PC-016"])
+        self.assertEqual(parent["SSW-PC-034"], "SSW-PC-016")
+        self.assertEqual(parent["SSW-PC-035"], "SSW-PC-034")
+        # nesting shows ownership: no lines, and ports belong to the interfaces view
+        self.assertEqual(v["edges"], [])
+        self.assertTrue(all(n["compartments"]["ports"] == [] for n in v["nodes"]))
 
-    def test_composition_shows_shared_platform_parts_under_every_user(self):
-        v = self.view("composition", "LC-100")
-        edges = {(e["src"], e["dst"]) for e in v["edges"]}
-        for switch in ("LC-101", "LC-102", "LC-103", "LC-104"):
-            with self.subTest(switch=switch):
-                self.assertIn((switch, "SSW-LC-003"), edges)
-        self.assertNotIn(("LC-100", "SSW-LC-003"), edges)
-        keys = [n["key"] for n in v["nodes"]]
-        self.assertEqual(len(keys), len(set(keys)))
-        # a tree stays a tree: one owner edge per part
-        firmware = self.view("composition", "SSW-PC-016")
-        self.assertEqual(len(firmware["edges"]), len(firmware["nodes"]) - 1)
+    def test_composition_draws_a_shared_part_once_and_names_its_other_owners(self):
+        v = self.view("composition", "PC-109")
+        nodes = {n["key"]: n for n in v["nodes"]}
+        self.assertEqual(len(nodes), len(v["nodes"]))
+        positions = {"PC-110", "PC-111", "PC-112", "PC-113"}
+        for switch in positions:
+            self.assertEqual(nodes[switch]["parent"], "PC-109")
+        # the platform PCB every position inherits sits in one position and names the others
+        shared = [n for n in v["nodes"] if n.get("also")]
+        self.assertTrue(shared)
+        self.assertTrue(all(n["parent"] == "PC-110" and len(n["also"]) == 3 for n in shared))
+        self.assertIn(nodes["SSW-PC-017"]["parent"], nodes)
 
     def test_composition_of_a_leaf(self):
         v = views.view(self.graph, "composition", "SSW-PC-035")
         self.assertEqual(v["reason"], "SSW-PC-035 has no parts")
 
-    def test_activity_of_a_function_is_its_feature(self):
-        v = self.view("activity", "SSW-F-001")
+    def test_allocation_of_a_logical_component(self):
+        v = self.view("allocation", "SSW-LC-007")
+        keys = {n["key"] for n in v["nodes"]}
+        self.assertLessEqual({"SSW-LC-007", "SSW-F-004", "PC-101"}, keys)
+        edges = {(e["src"], e["dst"], e["type"]) for e in v["edges"]}
+        self.assertIn(("SSW-F-004", "SSW-LC-007", "ALLOCATED_TO"), edges)
+        self.assertIn(("SSW-LC-007", "PC-101", "ALLOCATED_TO"), edges)
+
+    def test_allocation_of_a_physical_part_has_none(self):
+        self.assertTrue(self.view("allocation", "PC-101")["reason"])
+
+    def test_interfaces_of_a_function_are_its_components(self):
+        v = self.view("interfaces", "SSW-F-001")
         self.assertEqual(v["focus"], "SSW-F-001")
-        self.assertLessEqual({"SSW-F-001", "SSW-F-002"}, {n["key"] for n in v["nodes"]})
+        keys = {n["key"] for n in v["nodes"]}
+        self.assertLessEqual({"SSW-LC-003", "SSW-LI-002"}, keys)  # positionSensing
+        self.assertNotIn("SSW-F-001", keys)
+
+    def test_vmodel_scoped_to_a_physical_part(self):
+        whole = self.view("vmodel")
+        v = self.view("vmodel", "PC-101")
+        keys = {n["key"] for n in v["nodes"]}
+        self.assertIn("PC-101", keys)
+        self.assertTrue(any(k.startswith("CRS-") for k in keys))
+        self.assertLess(len(keys), len(whole["nodes"]))
+
+    def test_compliance_of_one_requirement(self):
+        v = self.view("compliance", "CRS-301")
+        self.assertEqual([r["crs"] for r in v["rows"]], ["CRS-301"])
+        self.assertEqual([r["ctr"] for r in v["ctrs"]], ["CTR-003"])
+        self.assertEqual(v["focus"], "CRS-301")
 
     def test_variants_of_a_selection_is_its_variation(self):
         v = self.view("variants", "PC-101")
@@ -611,18 +620,21 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(
             nodes["UC-101"]["name"], "The occupant wants to adjust the seat position"
         )
-        self.assertIn("8 functions", tags["FEAT-102"])
+        self.assertIn("4 functions", tags["FEAT-102"])
         self.assertIn("4 functions", tags["FEAT-104"])
         edges = {(e["src"], e["dst"], e["type"]) for e in v["edges"]}
         self.assertIn(("UC-101", "FEAT-104", "PERFORMS"), edges)
         self.assertIn((names["occupant"], "UC-101", "ACTOR"), edges)
-        # logical: the positions under the product, with the variants they select; the blocks
-        self.assertEqual(parent["LC-101"], "LC-100")
+        # logical: the product and the blocks it inherits
+        self.assertEqual(parent["LC-100"], "group:logical")
+        self.assertIn("SSW-LC-008", nodes)
+        # physical: the assemblies, the seat positions with the variants they select
+        self.assertEqual(parent["PC-109"], "group:AS")
+        self.assertEqual(parent["PC-110"], "PC-109")
         self.assertLessEqual(
             {"housing: housingLH", "buttonSet: massageHeatingCooling"},
-            set(tags["LC-101"]),
+            set(tags["PC-110"]),
         )
-        self.assertIn("SSW-LC-008", nodes)
         self.assertIn(("FEAT-104", "SSW-LC-005", "ALLOCATED_TO"), edges)
         # physical by domain, top level only; software components with their unit counts
         self.assertEqual(parent["SSW-PC-016"], "group:SW")

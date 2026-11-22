@@ -1,7 +1,7 @@
 // View JSON <-> ELK graph. Both directions are pure; main.js runs ELK in between.
 
 const DOWN = new Set(["composition", "variants"]);
-const PORT_VIEWS = new Set(["boundary", "interfaces", "composition"]);
+const PORT_VIEWS = new Set(["boundary", "interfaces"]);
 const NEED_LINKS = new Set(["SATISFIES", "ALLOCATED_TO", "VERIFIES", "REALIZES", "MATCHES", "PARTIAL_MATCHES", "ANSWERS", "TESTS", "REQUIRES", "IMPLEMENTS", "APPLIES_TO"]);
 const PORT = 10;
 const PACKED = { "elk.hierarchyHandling": "SEPARATE_CHILDREN", "elk.algorithm": "rectpacking", "elk.spacing.nodeNode": "16" };
@@ -49,7 +49,8 @@ function describe(node, actors, compound) {
   if (node.reuse) tags.push(`reuse: ${node.reuse}`);
   if (node.selected === true && node.variant) tags.push("selected");
   if (node.selected === false) tags.push("not selected");
-  if (node.lane) tags.push(`allocated to ${node.lane.name}`);
+  // a shared part is drawn once, in its first owner
+  if (node.also?.length) tags.push(`also in ${node.also.join(", ")}`);
   // the platform share, since most rules check only the project's own needs (platform: false)
   const share = node.platform ? ` (${node.platform} platform)` : "";
   if (typeBox) tags.push(`${node.count} instance${node.count === 1 ? "" : "s"}${share}`, ...(node.rules ?? []).map((r) => `rule ${r}`));
@@ -113,7 +114,8 @@ export function toElk(view) {
     if (compound) {
       item.layoutOptions["elk.padding"] = "[top=48,left=18,bottom=18,right=18]";
       // an overview domain group has no edges inside: its parts are packed, not stacked
-      if (view.kind === "product" && n.domain) Object.assign(item.layoutOptions, PACKED);
+      // and a composition's parts nest without lines: packed too
+      if ((view.kind === "product" && n.domain) || view.kind === "composition") Object.assign(item.layoutOptions, PACKED);
       item.layoutOptions["elk.portLabels.placement"] = "INSIDE";
       item.layoutOptions["elk.nodeSize.constraints"] = "PORTS PORT_LABELS MINIMUM_SIZE";
       item.layoutOptions["elk.nodeSize.minimum"] = `(${size(meta)[0]}, 60)`;

@@ -8,6 +8,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from sysml2kit.needs import normalize, platform_dir
+
 RFQ = Path(__file__).resolve().parents[2] / "examples" / "seat-switch-rfq"
 export = []
 
@@ -16,15 +18,14 @@ def setUpModule():
     if not shutil.which("sysml"):
         raise unittest.SkipTest("`sysml` is not on PATH")
     # the RFQ Makefile's selection: model/ and the platform's model without its trace.sysml
+    platform = platform_dir(RFQ) / "model"
     files = sorted(RFQ.glob("model/**/*.sysml")) + sorted(
-        p
-        for p in RFQ.glob("platform/model/**/*.sysml")
-        if p != RFQ / "platform/model/trace.sysml"
+        p for p in platform.glob("**/*.sysml") if p != platform / "trace.sysml"
     )
     with tempfile.TemporaryFile("w+") as out:
         subprocess.run(["sysml", "export", *map(str, files)], stdout=out, check=True)
         out.seek(0)
-        export.extend(json.load(out))
+        export.extend(normalize(json.load(out)))
 
 
 def index(elements):
@@ -106,18 +107,24 @@ class EnrichedExampleTest(unittest.TestCase):
 
     def test_seat_positions(self):
         self.assertEqual(
-            part_names(export, "SeatSwitchRfqLogical::OEM_SeatSwitch"),
+            part_names(export, "SeatSwitchRfqPhysical::vehicleSeatSwitches"),
             {"driverSwitch", "coDriverSwitch", "rearLeftSwitch", "rearRightSwitch"},
         )
 
     def test_variant_selection(self):
         self.assertIn(
             "SeatSwitchPhysical::housing::housingLH",
-            specialized(export, "SeatSwitchRfqPhysical::driverHousing"),
+            specialized(
+                export,
+                "SeatSwitchRfqPhysical::vehicleSeatSwitches::driverSwitch::driverHousing",
+            ),
         )
         self.assertIn(
             "SeatSwitchPhysical::housing::housingRH",
-            specialized(export, "SeatSwitchRfqPhysical::coDriverHousing"),
+            specialized(
+                export,
+                "SeatSwitchRfqPhysical::vehicleSeatSwitches::coDriverSwitch::coDriverHousing",
+            ),
         )
 
     def test_assembly_boundary(self):
@@ -135,6 +142,7 @@ class EnrichedExampleTest(unittest.TestCase):
                 "seat",
                 "seatControlUnit",
                 "occupant",
+                "technician",
                 "workshopTester",
                 "endOfLineTester",
             },

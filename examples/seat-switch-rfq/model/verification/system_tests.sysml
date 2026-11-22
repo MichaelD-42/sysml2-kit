@@ -20,7 +20,6 @@ package SeatSwitchRfqSystemTests {
         @Implements { need = "CTR-002"; }
         @Verifies { need = "CON-104"; }
         doc /* Actuate every key and knob direction per CTR-002's profile at -40 °C, 23 °C and +85 °C, to 300 000 cycles; pass at 200 000 cycles if force stays in limits and no key fails, and record the cycle count at which the first key fails. */
-        objective { verify durabilityGap; }
     }
     verification <'STC-104'> environmentalTest {
         @Implements { need = "CTR-001"; }

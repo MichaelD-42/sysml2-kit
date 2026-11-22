@@ -4,10 +4,9 @@ package SeatSwitchLogical {
 
     private import SeatSwitchFeatures::*;
     private import SeatSwitchRequirements::*;
-    // typed by the assembly definition, so an RFQ component subsetting ACME_SeatSwitch inherits its attributes
-    private import SeatSwitchPhysical::SwitchAssembly;
 
-    part <'SSW-LC-001'> ACME_SeatSwitch : SwitchAssembly {
+    // solution-free: its rated values and limits belong to the switch as built (SeatSwitchPhysical::seatSwitchAssembly)
+    part <'SSW-LC-001'> ACME_SeatSwitch {
         doc /* The seat adjustment switch as a whole. */
         part <'SSW-LC-002'> keypad {
             doc /* Turns comfort key presses into key states. */

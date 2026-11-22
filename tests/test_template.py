@@ -31,9 +31,11 @@ class TemplateSyncTest(unittest.TestCase):
                     f"{example.name}/{name}",
                 )
 
-    def test_makefile_differs_only_in_diagrams(self):
+    def test_makefile_differs_only_in_diagrams_and_platform(self):
         def strip(path):
-            return re.sub(r"^DIAGRAMS :=.*$", "", path.read_text(), flags=re.MULTILINE)
+            return re.sub(
+                r"^(DIAGRAMS|PLATFORM) :=.*$", "", path.read_text(), flags=re.MULTILINE
+            )
 
         for example in EXAMPLES:
             self.assertEqual(

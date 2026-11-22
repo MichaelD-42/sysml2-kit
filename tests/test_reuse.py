@@ -149,6 +149,24 @@ class ReuseTest(unittest.TestCase):
         self.assertEqual(reused_pcs(needs, "F"), {"PV1", "PV1P"})
         self.assertEqual(reuse(needs), {"F": "variant"})
 
+    def test_platform_allocation_to_variants_selects_none_of_them(self):
+        """The platform's own allocations offer every variant; only the project selects one."""
+        needs = self.variation(["PV1", "PV2"])
+        needs["LC"]["platform"] = True
+        self.assertEqual(reuse(needs), {"F": "incomplete"})
+        self.assertEqual(unselected_variations(needs, "F"), {"PV"})
+        needs["PC"] = need("physical", specializes=["PV1"])
+        self.assertEqual(reuse(needs), {"F": "variant"})
+        self.assertEqual(reused_pcs(needs, "F"), {"PV1"})
+        self.assertEqual(unselected_variations(needs, "F"), set())
+
+    def test_own_variants_are_all_offered(self):
+        """In the platform's own build its variants are project needs: allocation reaches each."""
+        needs = self.variation(["PV1", "PV2"])
+        for v in ("PV", "PV1", "PV2"):
+            needs[v]["platform"] = False
+        self.assertEqual(reused_pcs(needs, "F"), {"PV1", "PV2"})
+
     def test_cycle_terminates(self):
         needs = {
             "A": need("feature", specializes=["B", "A"], owned_by=["B"]),
@@ -169,6 +187,30 @@ class ReuseTest(unittest.TestCase):
         self.assertEqual(constraint_reuse(needs, "CON-1"), "new")
         needs["CON-1"]["owned_by"] = []
         self.assertEqual(constraint_reuse(needs, "CON-1"), "incomplete")
+
+    def test_an_assembly_is_as_reused_as_its_parts(self):
+        needs = {
+            "CON-1": need("constraint", owned_by=["SET"]),
+            "SET": need("physical", domain=""),
+            "POS": need("physical", domain="", owned_by=["SET"], specializes=["PA"]),
+            "PA": need("physical", platform=True, domain=""),
+            "PC": need("physical", domain="EE", owned_by=["POS"], specializes=["PV"]),
+            "PV": need("physical", platform=True, variant=True, domain="EE"),
+        }
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "variant")
+        needs["NEW"] = need("physical", domain="ME", owned_by=["POS"])
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "modified")
+        del needs["POS"], needs["PC"], needs["NEW"]
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "new")
+
+    def test_a_domain_part_is_judged_by_itself_not_its_parts(self):
+        needs = {
+            "CON-1": need("constraint", owned_by=["BOARD"]),
+            "BOARD": need("physical", domain="EE"),
+            "PC": need("physical", domain="EE", owned_by=["BOARD"], specializes=["PV"]),
+            "PV": need("physical", platform=True, domain="EE"),
+        }
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "new")
 
 
 if __name__ == "__main__":

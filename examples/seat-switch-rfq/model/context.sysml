@@ -3,7 +3,7 @@ package SeatSwitchRfqContext {
 
     part seatSwitchContext {
         doc /* The seat switches in use, with everything outside them that they exchange with. */
-        part OEM_SeatSwitch :> SeatSwitchRfqLogical::OEM_SeatSwitch { doc /* The seat switches under development, one per seat position. */ }
+        part OEM_SeatSwitch :> SeatSwitchRfqLogical::OEM_SeatSwitch, SeatSwitchRfqPhysical::oemSeatSwitch { doc /* The seat switches under development, one per seat position. */ }
         part seat { doc /* Carries the switch in its side trim; the seat control unit moves it. */ }
         part seatControlUnit { doc /* Seat ECU: LIN master that reads the key states and drives the seat motors, heating, cooling and massage. */ }
         part seatHarness {
@@ -13,6 +13,7 @@ package SeatSwitchRfqContext {
             port seatLin : SeatSwitchItems::LinPort;
         }
         part occupant { doc /* Adjusts the seat and the comfort functions. */ }
+        part technician { doc /* Workshop technician: diagnoses and updates the switch with the workshop tester. */ }
         part workshopTester { doc /* Diagnostic tester on the vehicle bus: reads faults and updates firmware. */ }
         part endOfLineTester { doc /* Supplier's end-of-line station: flashes, codes and tests each switch. */ }
 

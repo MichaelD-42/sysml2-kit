@@ -16,7 +16,7 @@ Terms used in this repository, the plugin and the generated docs. Which layer ow
 
 **Traceability**: being able to follow every customer requirement through use cases, system requirements, functions and components to the tests and results that verify it, and back.
 
-**Leaf**: a function or component with no child of the same type. Allocation rules apply to leaves only. A component that owns only ports is still a leaf. SW units are leaves but take no allocation; SW components do (see SW component).
+**Leaf**: a function or component with no child of the same type. Allocation rules apply to leaves only. A component that owns only ports is still a leaf; one that subsets a composite component inherits its children and is not. SW units are leaves but take no allocation; SW components do (see SW component).
 
 ## Definitions
 
@@ -34,13 +34,13 @@ SW architecture and design are physical components: SW components and SW units.
 
 **Requirement class**: `:class:` on every CRS and PRQ: `functional`, `non-functional`, `constraint` or `information`. Functional needs a matching feature and an SR or constraint; non-functional and constraint need a `CON-` constraint; information needs a class but nothing to satisfy, match, answer or verify it.
 
-**CON** (constraint, `CON-nnn`): a SysML `constraint` usage over a part attribute that satisfies a CRS with a plain value. Verified by a system test (`@Verifies`).
+**CON** (constraint, `CON-nnn`): a SysML `constraint` usage over a physical part's attribute that satisfies a CRS with a plain value, owned by the part it limits (an assembly for the whole product). The bridge evaluates it against the values the part states or inherits and fails when it does not hold. Verified by a system test (`@Verifies`).
 
 **CTR** (customer test requirement, `CTR-nnn`): the customer's own test, written in Markdown and captured as written; `applies_to` the CRS it tests. The supplier's STC or ATC implements it (`@Implements` / `:implements:`). It counts toward verifying the CRSs it applies to, whatever its scope.
 
 **PRQ** (platform requirement, `PRQ-nnn`): what the platform offers every program, written in Markdown in the platform project, where it plays the role CRS plays in an RFQ project.
 
-**CST** (compliance statement, `CST-nnn`): the supplier's answer to a CRS that no architecture element can meet, in Markdown, with `answers` and `compliance` (comply, partial, not-comply).
+**CST** (compliance statement, `CST-nnn`): the supplier's answer to a CRS that no architecture element can meet, or meets only in part (then it states the gap), in Markdown, with `answers` and `compliance` (comply, partial, not-comply).
 
 **UC** (use case, `UC-nnn`): what an actor does with the system, as a SysML `use case` with a subject and actors. Its title is "The <actor> wants to <goal>" (e.g. "The driver wants to adjust the seat position"), written as the doc of its `objective`; the model name (`adjustSeat`) stays the identifier.
 
@@ -56,13 +56,15 @@ SW architecture and design are physical components: SW components and SW units.
 
 **PC** (physical component, `PC-nnn`): a part that is built or bought, as a SysML `part` with one domain keyword.
 
+**Assembly** (`PC-nnn`): the product as built, across domains, as a SysML `#Assembly part` with no domain keyword. It owns or references its PCs and carries the product's rated values and constraints. A configuration of the product (one per seat position) is an assembly that subsets the program's assembly and selects its variants.
+
 **SW component** (`PC-nnn`): a `#Software part` owned by the firmware PC; the SW architecture. Its interfaces are `#Software` ports and connections. Logical components are allocated to it.
 
 **SW unit** (`PC-nnn`): a `#Software part` owned by its SW component; the SW design. Software requirements are allocated to it, unit tests verify those.
 
 **PI** (physical interface, `PI-nnn`): a SysML `port` on a PC with the same domain keywords; a logical interface is allocated to it.
 
-**Domain**: the engineering discipline of a PC or PI: `#Mechanical` (ME), `#Electrical` (EE) or `#Software` (SW). A part or port without one is logical.
+**Domain**: the engineering discipline of a PC or PI: `#Mechanical` (ME), `#Electrical` (EE) or `#Software` (SW). A part or port without one (and without `#Assembly`) is logical.
 
 **STC** (system test case, `STC-nnn`): a SysML `verification` that verifies system requirements.
 
@@ -106,9 +108,9 @@ SW architecture and design are physical components: SW components and SW units.
 
 **Trace metadata**: `@Realizes`, `@Satisfies`, `@Verifies`, `@Matches` from `model/trace.sysml`. Links from a model element to a need written outside the model, such as a CRS: `@Realizes { need = "CRS-001"; }`.
 
-**Keyword metadata**: `#Feature`, `#Mechanical`, `#Electrical`, `#Software`, also from `model/trace.sysml`; they set what kind of need an `action`, `part` or `port` becomes.
+**Keyword metadata**: `#Feature`, `#Mechanical`, `#Electrical`, `#Software`, `#Assembly`, also from `model/trace.sysml`; they set what kind of need an `action`, `part` or `port` becomes.
 
-**Variation / variant**: SysML v2 way to declare alternatives: a `variation part` with `variant part` members. An RFQ part selects one by subsetting it; a chain that reaches the variation without a selection makes the feature `incomplete`.
+**Variation / variant**: SysML v2 way to declare alternatives: a `variation part` with `variant part` members. An RFQ part selects one by subsetting it; the platform's own allocations to its variants only offer them. A chain that reaches the variation without a selection makes the feature `incomplete`.
 
 **Interchange JSON**: the output of `sysml export`, a flat array of elements with `@id`, `@type` and every metamodel property.
 
@@ -132,7 +134,7 @@ SW architecture and design are physical components: SW components and SW units.
 
 **Reuse status**: derived per matched feature from its chain feature → functions → LC → PC, never written: `platform`, `variant`, `modified`, `new`, or `incomplete` (a leaf function reaches no PC). A CRS shows the worst of its features.
 
-**Compliance table**: per CRS the matched features, reuse status, partial flag, compliance statements and domains; generated by `sysml2kit compliance`, which also reports unanswered CRS and unstated gaps.
+**Compliance table**: per CRS the matched features, reuse status, partial flag, compliance statements and domains; generated by `sysml2kit compliance`, which also reports unanswered CRS, partial ones without a partial statement, and system requirements satisfied outside their matching features' chains.
 
 **Gap**: one broken schema rule on one need. `sysml2kit gaps build/needs --layer L` lists the gaps of layer L and earlier, with the file and line to fix.
 

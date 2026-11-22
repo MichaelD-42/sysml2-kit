@@ -1,10 +1,7 @@
 package SeatSwitchRfqFeatures {
     doc /* F layer: the platform features this vehicle's seat switches offer, each matching the customer
      * requirements it covers. A feature subsets the platform feature it reuses and inherits its functions;
-     * only the comfort keys add functions, one per seat position.
-     * Known compromise: F-101..104 exist because CRS-203 differs per seat position and each function is
-     * allocated to exactly one logical component (rule function-allocated), so each position switch gets
-     * its own function; the behaviour itself is the platform's. */
+     * which comfort keys each seat position gets is its button-set selection (SeatSwitchRfqPhysical). */
 
     private import Trace::*;
 
@@ -19,10 +16,6 @@ package SeatSwitchRfqFeatures {
         @Matches { need = "CRS-204"; }
         @Matches { need = "CRS-205"; }
         doc /* Heating, cooling and massage keys with level indicators, by seat position. */
-        action <'F-101'> offerDriverComfortKeys { doc /* Offer massage, heating and cooling keys at the driver seat. */ }
-        action <'F-102'> offerCoDriverComfortKeys { doc /* Offer heating and cooling keys at the co-driver seat. */ }
-        action <'F-103'> offerRearLeftComfortKeys { doc /* Offer a heating key at the rear left seat. */ }
-        action <'F-104'> offerRearRightComfortKeys { doc /* Offer a heating key at the rear right seat. */ }
     }
 
     #Feature action <'FEAT-103'> nightDesign :> SeatSwitchFeatures::nightDesignIllumination {

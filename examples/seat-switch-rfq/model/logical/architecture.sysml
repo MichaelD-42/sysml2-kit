@@ -1,148 +1,34 @@
 package SeatSwitchRfqLogical {
     doc /* L layer: the platform seat switch as this vehicle needs it. OEM_SeatSwitch subsets the platform
-     * switch, so it carries the platform's rated attributes and limits; its constraints are this RFQ's
-     * limits over those attributes. One switch per seat position, each allocated to its housing and
-     * button set. The platform's own components satisfy the system requirements they meet. */
+     * switch and inherits its logical components, which satisfy the system requirements they meet; the
+     * switch as a whole satisfies what this program adds. This RFQ's limits are constraints on the switch
+     * as built (SeatSwitchRfqPhysical), and the seat positions are physical too. */
 
-    private import Trace::*;
-    private import SeatSwitchRfqFeatures::*;
     private import SeatSwitchRfqRequirements::*;
     private import SeatSwitchLogical::ACME_SeatSwitch;
-    private import ISQ::*;
-    private import SI::*;
 
     part <'LC-100'> OEM_SeatSwitch :> ACME_SeatSwitch {
-        doc /* The vehicle's seat switches: the platform seat switch within this RFQ's limits, fitted at four seat positions.
-         * Its limits apply to every position switch below. */
-
-        constraint <'CON-101'> actuationForceLimits {
-            @Satisfies { need = "CRS-301"; }
-            doc /* The actuation force of every key and knob direction shall be 3.0 N to 6.5 N. */
-            actuationForce >= 3.0 [N] and actuationForce <= 6.5 [N]
-        }
-        constraint <'CON-102'> keyTravelLimits {
-            @Satisfies { need = "CRS-302"; }
-            doc /* The travel to the actuation point shall be 0.2 mm to 1.5 mm. */
-            keyTravel >= 0.2 [mm] and keyTravel <= 1.5 [mm]
-        }
-        constraint <'CON-103'> symbolLuminanceLimits {
-            @Satisfies { need = "CRS-303"; }
-            doc /* A lit key symbol shall have a luminance of 8 cd/m² to 40 cd/m² at full dimming level. */
-            symbolLuminance >= 8 [cd/m^2] and symbolLuminance <= 40 [cd/m^2]
-        }
-        // the platform is rated for 200 000 actuations (SSW-CON-004); the OEM asks for 300 000
-        constraint <'CON-104'> keyDurability {
-            @Satisfies { need = "CRS-304"; partial = true; }
-            doc /* Every key and knob direction shall withstand at least 200 000 actuations. */
-            durabilityCycles >= 200000
-        }
-        constraint <'CON-105'> supplyVoltageRange {
-            @Satisfies { need = "CRS-501"; }
-            doc /* The switch shall operate from 9 V to 16 V. */
-            minOperatingVoltage <= 9 [V] and maxOperatingVoltage >= 16 [V]
-        }
-        constraint <'CON-106'> operatingTemperatureRange {
-            @Satisfies { need = "CRS-502"; }
-            doc /* The switch shall operate from -40 °C to +85 °C. */
-            minOperatingTemperature <= -40 ['°C'] and maxOperatingTemperature >= 85 ['°C']
-        }
-        constraint <'CON-107'> ingressRating {
-            @Satisfies { need = "CRS-503"; }
-            doc /* The switch shall be rated IP5K4. */
-            ipRating == "IP5K4"
-        }
-        constraint <'CON-108'> esdLevels {
-            @Satisfies { need = "CRS-504"; }
-            doc /* The switch shall withstand ±8 kV contact and ±15 kV air discharge. */
-            esdContactLevel >= 8000 [V] and esdAirLevel >= 15000 [V]
-        }
-        constraint <'CON-109'> linProtocol {
-            @Satisfies { need = "CRS-402"; }
-            doc /* The switch shall implement LIN 2.2A. */
-            linVersion == "2.2A"
-        }
-        constraint <'CON-110'> dataMatrixMarking {
-            @Satisfies { need = "CRS-703"; }
-            doc /* The traceability code of every switch shall be a laser-marked Data Matrix; its content is SR-120. */
-            partMarking == "laser Data Matrix"
-        }
-        constraint <'CON-111'> workshopUpdateTime {
-            @Satisfies { need = "CRS-803"; }
-            doc /* A complete software update in the workshop shall take at most 180 s. */
-            reflashTime <= 180 [s]
-        }
-        constraint <'CON-112'> switchMass {
-            @Satisfies { need = "CRS-506"; }
-            doc /* A switch shall weigh at most 60 g. */
-            mass <= 60 [g]
-        }
-        constraint <'CON-121'> emcSeverity {
-            @Satisfies { need = "CRS-505"; }
-            doc /* The switch shall meet OEM-EMC-200 at severity class 3 or higher. */
-            emcSeverityClass >= 3
-        }
-        constraint <'CON-122'> lightColours {
-            @Satisfies { need = "CRS-305"; }
-            doc /* Key symbols shall be lit white and level indicators amber. */
-            symbolColour == "white" and levelIndicatorColour == "amber"
-        }
-        constraint <'CON-123'> quiescentCurrentLimit {
-            @Satisfies { need = "CRS-509"; }
-            doc /* With the LIN bus asleep, the switch shall draw at most 100 µA. */
-            quiescentCurrent <= 0.0001 [A]
-        }
-
-        // the four switches share the seat LIN, so each gets its own node address, coded at end of line (CRS-702)
-        constraint <'CON-124'> distinctNodeAddresses {
-            @Satisfies { need = "CRS-702"; }
-            doc /* The four position switches shall be coded to four different LIN node addresses. */
-            driverSwitch.nad != coDriverSwitch.nad and driverSwitch.nad != rearLeftSwitch.nad
-                and driverSwitch.nad != rearRightSwitch.nad and coDriverSwitch.nad != rearLeftSwitch.nad
-                and coDriverSwitch.nad != rearRightSwitch.nad and rearLeftSwitch.nad != rearRightSwitch.nad
-        }
-
-        part <'LC-101'> driverSwitch :> ACME_SeatSwitch {
-            doc /* Driver seat (left-hand drive): left-hand housing; massage, heating and cooling keys; NAD 0x21. */
-            attribute :>> nad = 33;
-        }
-        part <'LC-102'> coDriverSwitch :> ACME_SeatSwitch {
-            doc /* Co-driver seat: right-hand housing; heating and cooling keys; NAD 0x22. */
-            attribute :>> nad = 34;
-        }
-        part <'LC-103'> rearLeftSwitch :> ACME_SeatSwitch {
-            doc /* Rear left seat: left-hand housing; heating key; NAD 0x23. */
-            attribute :>> nad = 35;
-        }
-        part <'LC-104'> rearRightSwitch :> ACME_SeatSwitch {
-            doc /* Rear right seat: right-hand housing; heating key; NAD 0x24. */
-            attribute :>> nad = 36;
-        }
+        doc /* The vehicle's seat switch: the platform seat switch with its logical components, as this RFQ needs it. */
     }
 
-    allocate comfortKeys.offerDriverComfortKeys to OEM_SeatSwitch.driverSwitch;
-    allocate comfortKeys.offerCoDriverComfortKeys to OEM_SeatSwitch.coDriverSwitch;
-    allocate comfortKeys.offerRearLeftComfortKeys to OEM_SeatSwitch.rearLeftSwitch;
-    allocate comfortKeys.offerRearRightComfortKeys to OEM_SeatSwitch.rearRightSwitch;
-
-    // the platform components meet these as they are
-    satisfy adjustmentRequests by ACME_SeatSwitch.positionSensing;
-    satisfy comfortLevelSteps by ACME_SeatSwitch.keypad;
-    satisfy nightDesignDimming by ACME_SeatSwitch.illumination;
-    satisfy keyStateReporting by ACME_SeatSwitch.linCommunication;
-    satisfy messagePlausibility by ACME_SeatSwitch.linCommunication;
-    satisfy diagnosticIdentification by ACME_SeatSwitch.switchController;
-    satisfy faultCodes by ACME_SeatSwitch.switchController;
-    satisfy authenticatedWrite by ACME_SeatSwitch.switchController;
-    satisfy signedImagesOnly by ACME_SeatSwitch.switchController;
-    satisfy workshopUpdate by ACME_SeatSwitch.linCommunication;
-    satisfy endOfLineTest by ACME_SeatSwitch.switchController;
-    satisfy endOfLineCoding by ACME_SeatSwitch.switchController;
-    satisfy traceabilityContent by ACME_SeatSwitch.switchController;
-    satisfy debugInterfaceClosed by ACME_SeatSwitch.switchController;
-    satisfy installationSpace by ACME_SeatSwitch.enclosure;
-    satisfy seatInPlaceReplacement by ACME_SeatSwitch.enclosure;
+    // the platform components this switch inherits meet these as they are
+    satisfy adjustmentRequests by OEM_SeatSwitch.positionSensing;
+    satisfy comfortLevelSteps by OEM_SeatSwitch.keypad;
+    satisfy nightDesignDimming by OEM_SeatSwitch.illumination;
+    satisfy keyStateReporting by OEM_SeatSwitch.linCommunication;
+    satisfy messagePlausibility by OEM_SeatSwitch.linCommunication;
+    satisfy diagnosticIdentification by OEM_SeatSwitch.switchController;
+    satisfy faultCodes by OEM_SeatSwitch.switchController;
+    satisfy authenticatedWrite by OEM_SeatSwitch.switchController;
+    satisfy signedImagesOnly by OEM_SeatSwitch.switchController;
+    satisfy workshopUpdate by OEM_SeatSwitch.linCommunication;
+    satisfy endOfLineTest by OEM_SeatSwitch.switchController;
+    satisfy endOfLineCoding by OEM_SeatSwitch.switchController;
+    satisfy traceabilityContent by OEM_SeatSwitch.switchController;
+    satisfy debugInterfaceClosed by OEM_SeatSwitch.switchController;
+    satisfy installationSpace by OEM_SeatSwitch.enclosure;
+    satisfy seatInPlaceReplacement by OEM_SeatSwitch.enclosure;
     // what this program adds on top of the platform
     satisfy materialDeclaration by OEM_SeatSwitch;
     satisfy sparePartNumbers by OEM_SeatSwitch;
-    satisfy durabilityGap by OEM_SeatSwitch;
 }

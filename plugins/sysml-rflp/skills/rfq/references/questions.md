@@ -19,7 +19,7 @@ Ask only what the inputs (CRS, platform, RFQ documents) leave open. One topic at
 - Which platform features does the customer's need map to? Show the candidates; ask which fit as they are.
 - Variant choices: where the platform offers variants (power rating, sensor type), which one does the customer need, or is it still open?
 - Which needs have no platform feature? Name them as new features and ask for their functions only where the CRS do not imply them.
-- Does a platform feature meet a CRS only in part? State the gap (value not reached, condition excluded); it becomes `partial = true` and an SR.
+- Does a platform feature meet a CRS only in part? State the gap (value not reached, condition excluded); it becomes `partial = true`, an SR or constraint stating what is met, and a `partial` compliance statement stating the gap.
 
 ## L: logical architecture
 

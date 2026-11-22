@@ -9,11 +9,11 @@ Use cases
 .. raw:: html
    :file: _generated/usecases-OEM_SeatSwitch.svg
 
-Logical architecture
---------------------
+Seat positions
+--------------
 
-.. image:: _generated/OEM_SeatSwitch.svg
-   :alt: The seat switches and their seat positions
+.. image:: _generated/vehicleSeatSwitches.svg
+   :alt: The seat switches of one vehicle, with the housing and button set of each seat position
 
 Model elements
 --------------

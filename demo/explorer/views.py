@@ -19,8 +19,8 @@ KINDS = (
     "context",
     "boundary",
     "interfaces",
-    "activity",
     "composition",
+    "allocation",
     "variants",
     "usecases",
     "trace",
@@ -173,6 +173,12 @@ INTERFACES = (
 MATCH (f:Node {key: $focus})"""
     + PARTS
     + """
+// an action's interfaces are those of the components its functions (own and inherited) are allocated to
+WITH f, CASE WHEN f:ActionUsage THEN COLLECT {
+  MATCH (f)-[:SPECIALIZES*0..1]->(:ActionUsage)-[:OWNS*0..]->(:ActionUsage)-[:ALLOCATED_TO]->(c:PartUsage)
+  RETURN DISTINCT {n: c, parent: null}
+} ELSE parts END AS parts
+WITH CASE WHEN f:ActionUsage THEN null ELSE f END AS f, parts
 WITH f, parts, """
     + PORTS.format(holders="[f] + [p IN parts | p.n]")
     + """ AS ports
@@ -181,38 +187,33 @@ WITH f, parts, ports, COLLECT {
   MATCH (q)-[:TYPED_BY]->()<-[:TYPED_BY]-(:PortUsage)<-[:OWNS]-(i:InterfaceDefinition)
   RETURN DISTINCT i
 } AS interfaces
-WITH [{key: f.key, parent: null}]
+WITH [x IN [f] WHERE x IS NOT NULL | {key: x.key, parent: null}]
   + [p IN parts | {key: p.n.key, parent: p.parent.key}]
   + [x IN ports | {key: x.n.key, parent: x.parent.key}]
   + [i IN interfaces | {key: i.key, parent: null}] AS nodes"""
     + _close("CONNECTS|FLOW|BINDS")
 )
 
+# parts nested in their owner, as a component diagram; a part several owners share is drawn in the one
+# with the lowest key and names the others (`also`, see `view`); its ports are left to the interfaces view
 COMPOSITION = (
     """
 MATCH (f:Node {key: $focus})"""
     + PARTS
     + """
-WITH [{key: f.key, parent: null}] + [p IN parts | {key: p.n.key, parent: null}] AS nodes,
-  COLLECT {
-    UNWIND parts AS p UNWIND p.parents AS o
-    RETURN {src: o.key, dst: p.n.key, type: 'OWNS', label: null}
-  } AS edges
-RETURN nodes, edges"""
+RETURN [{key: f.key, parent: null}] + [p IN parts | {
+  key: p.n.key, owners: [x IN p.parents | {key: x.key, name: x.name}]
+}] AS nodes, [] AS edges"""
 )
 
-# a feature's own actions and those of the feature it specializes (an RFQ feature inherits the
-# platform feature's functions)
-ACTIVITY = """
-MATCH (f:Node {key: $focus})
-MATCH (f)-[:SPECIALIZES*0..1]->(g:ActionUsage)
-MATCH p = (g) ((:Node)-[:OWNS]->(:ActionUsage))+
-WITH g, last(nodes(p)) AS a, nodes(p)[-2] AS owner
-WITH collect({
-  key: a.key,
-  parent: CASE owner WHEN g THEN null ELSE owner.key END,
-  lane: head(COLLECT { MATCH (a)-[:ALLOCATED_TO]->(c:PartUsage) RETURN {key: c.key, name: c.name} })
-}) AS nodes""" + _close("SUCCESSION|FLOW")
+# a logical component between the functions allocated to it and the physical parts it is allocated to,
+# with the requirements it satisfies
+ALLOCATION = """
+MATCH (f:component {key: $focus})
+WITH f, COLLECT { MATCH (x)-[:ALLOCATED_TO]->(f) RETURN x }
+  + COLLECT { MATCH (f)-[:ALLOCATED_TO|SATISFIES]->(x) RETURN x } AS around
+WHERE size(around) > 0
+WITH [n IN [f] + around | {key: n.key, parent: null}] AS nodes""" + _close("ALLOCATED_TO|SATISFIES")
 
 VARIANTS = """
 MATCH (f:Node {key: $focus}) WHERE f.isVariation
@@ -268,7 +269,7 @@ QUERIES = {
     "context": CONTEXT,
     "boundary": BOUNDARY,
     "interfaces": INTERFACES,
-    "activity": ACTIVITY,
+    "allocation": ALLOCATION,
     "composition": COMPOSITION,
     "variants": VARIANTS,
     "usecases": USECASES,
@@ -284,8 +285,8 @@ DEFAULTS = {
     "boundary": TOP_PART,
     "interfaces": TOP_PART,
     "composition": TOP_PART,
-    "activity": "MATCH (n:feature) RETURN n.key ORDER BY coalesce(n.platform, false), "
-    "COUNT { (n)-[:OWNS*]->(:ActionUsage) } DESC, n.key LIMIT 1",
+    "allocation": "MATCH (n:component) WHERE EXISTS { (n)-[:ALLOCATED_TO]-() } "
+    "RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
     "variants": "MATCH (n:Node) WHERE n.isVariation RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
     "usecases": "MATCH (n:UseCaseUsage) RETURN n.key ORDER BY coalesce(n.platform, false), n.key LIMIT 1",
     # a requirement with links, so the default is not a single box
@@ -293,11 +294,11 @@ DEFAULTS = {
     "NOT EXISTS { (n)--(:Need) }, n.key LIMIT 1",
 }
 REASONS = {
-    "activity": "has no actions",
     "variants": "is not a variation",
     "usecases": "is not a use case with a subject",
     "context": "is connected to nothing in its owner",
     "composition": "has no parts",
+    "allocation": "is not an allocated logical component",
 }
 # what a view is drawn for when the focus has none of its own: a port's owner, a function's
 # feature, the variation a variant (or a part that selects it) belongs to; the focus stays highlighted
@@ -305,8 +306,6 @@ PORT_OWNER = "MATCH (o:Node)-[:OWNS]->(:PortUsage {key: $focus}) RETURN o.key LI
 SUBJECTS = {
     "boundary": PORT_OWNER,
     "interfaces": PORT_OWNER,
-    "activity": "MATCH (o:Node)-[:OWNS]->(n:ActionUsage {key: $focus}) "
-    "WHERE NOT EXISTS { (n)-[:SPECIALIZES*0..1]->(:ActionUsage)-[:OWNS]->(:ActionUsage) } RETURN o.key LIMIT 1",
     "variants": "MATCH (:Node {key: $focus})-[:SPECIALIZES*0..1]->()-[:VARIANT_OF]->(v) RETURN v.key LIMIT 1",
 }
 FOCUS = "MATCH (n:Node) WHERE n.key = $focus OR n.qualifiedName = $focus RETURN n.key LIMIT 1"
@@ -358,8 +357,9 @@ def _nodes(graph, rows):
     return out
 
 
-def compliance_rows(needs_path: Path) -> dict:
-    """The kit's compliance rows and customer test requirement rows as dicts, and its findings."""
+def compliance_rows(needs_path: Path, focus: str | None = None) -> dict:
+    """The kit's compliance rows and customer test requirement rows as dicts, and its findings;
+    with `focus`, the row of that requirement and the CTRs applying to it."""
     data = json.loads(needs_path.read_text())
     needs = data["versions"][data.get("current_version", "")]["needs"]
     rows, findings = compliance(needs)
@@ -375,6 +375,9 @@ def compliance_rows(needs_path: Path) -> dict:
         r["satisfied_by"] = list(r["constraints"]) + texts
         r["rating"] = _rating(r, needs[r["crs"]], findings)
     ctrs = [dict(zip(CTR_ROW, r)) for r in ctr_rows(needs)]
+    if focus is not None:
+        out = [r for r in out if r["crs"] == focus]
+        ctrs = [c for c in ctrs if focus in needs[c["ctr"]].get("applies_to", [])]
     return {
         "rows": out,
         "ctrs": ctrs,
@@ -472,13 +475,13 @@ def view(
     if kind == "compliance":
         if needs_path is None:
             raise ValueError("the compliance view needs needs_path")
-        table = compliance_rows(needs_path)
+        table = compliance_rows(needs_path, focus)
         rows, ctrs = table["rows"], table["ctrs"]
         keys = [r["crs"] for r in rows] + [r["ctr"] for r in ctrs]
         nodes = _nodes(graph, [{"key": k, "parent": None} for k in keys])
         return {
             "kind": kind,
-            "focus": None,
+            "focus": focus,
             "nodes": nodes,
             "edges": [],
             "rows": rows,
@@ -494,10 +497,18 @@ def view(
     subject = _read(graph, SUBJECTS[kind], focus=key) if kind in SUBJECTS else []
     drawn = next(iter(subject[0].values())) if subject else key
     records = _read(graph, QUERIES[kind], focus=drawn)
+    if kind == "composition" and records:
+        for n in records[0]["nodes"]:
+            owners = sorted(n.pop("owners", None) or [], key=lambda o: o["key"])
+            if owners:
+                n["parent"], n["also"] = owners[0]["key"], [o["name"] for o in owners[1:]]
     nodes = _nodes(graph, records[0]["nodes"]) if records else []
     # a part alone is no context or composition
     if kind in ("context", "composition") and len(nodes) == 1:
         nodes = []
+    if kind == "composition":
+        for n in nodes:
+            n["compartments"]["ports"] = []
     reason = None
     if not nodes:
         reason = f"{focus or key} {REASONS.get(kind, f'has no {kind} view')}"
@@ -537,6 +548,18 @@ MATCH (:Package)-[:OWNS]->(t:physical) WHERE NOT EXISTS { (t)-[:SPECIALIZES]->(:
 RETURN t.key AS key, t.domain AS domain, coalesce(t.isVariation, false) AS variation,
   COLLECT { MATCH (t)-[:OWNS]->(c:physical) RETURN {key: c.key, parts: COUNT { (c)-[:OWNS]->(:physical) }} } AS parts
 ORDER BY key"""
+# project assemblies (physical, no domain) and the assemblies they own, each with the variants it selects
+PRODUCT_ASSEMBLIES = """
+MATCH (:Package)-[:OWNS]->(t:physical)
+WHERE coalesce(t.domain, '') = '' AND coalesce(t.platform, false) = false
+RETURN t.key AS key, COLLECT {
+  MATCH (t)-[:OWNS]->(c:physical) WHERE coalesce(c.domain, '') = ''
+  RETURN {key: c.key, picks: COLLECT {
+    MATCH (c)-[:OWNS]->(:physical)-[:SPECIALIZES]->(v)<-[:OWNS]-(x) WHERE x.isVariation
+    RETURN x.name + ': ' + v.name
+  }}
+} AS positions
+ORDER BY key"""
 OVERVIEW_COLUMNS = ("Context", "Use cases", "Features", "Logical", "Physical")
 DOMAINS = {"ME": "ME · mechanics", "EE": "EE · electronics", "SW": "SW · software"}
 
@@ -546,8 +569,8 @@ def _count(n, what):
 
 
 def product(graph) -> dict:
-    """The whole product on one page: its context, use cases, features, logical blocks and positions
-    (with the variants each selects), and its physical parts by domain. Top level only; what is
+    """The whole product on one page: its context, use cases, features, logical blocks, its assemblies
+    and their positions (with the variants each selects), and its physical parts by domain. Top level only; what is
     below a box is a count on it. Edges: actor to use case, use case to feature, feature to the
     blocks its functions are allocated to."""
     found = _read(graph, PRODUCT, platform=False)
@@ -613,6 +636,20 @@ def product(graph) -> dict:
                 "domain": d,
             }
         )
+    assemblies = _read(graph, PRODUCT_ASSEMBLIES)
+    if assemblies:
+        rows.append(
+            {
+                "key": "group:AS",
+                "parent": group["Physical"],
+                "name": "Assemblies",
+                "domain": "AS",
+            }
+        )
+    for a in assemblies:
+        add(a["key"], "group:AS")
+        for p in a["positions"]:
+            add(p["key"], a["key"], ({"name": x} for x in sorted(p["picks"])))
     for t in _read(graph, PRODUCT_PHYSICAL):
         if not t["domain"]:
             continue
@@ -849,6 +886,7 @@ V_NODES = """
 MATCH (n:Need) WHERE NOT coalesce(n.platform, false) AND ($keys IS NULL OR n.key IN $keys)
 RETURN n.key AS key, head([l IN labels(n) WHERE l IN $types]) AS type,
   COLLECT { MATCH (t:Node)-[:TESTS]->(n) RETURN {key: t.key, result: t.result} } AS results"""
+# a customer requirement's RFLP chain
 V_REACH = (
     """
 MATCH (f:crs {key: $focus})
@@ -865,6 +903,44 @@ OPTIONAL MATCH (lc)-[:ALLOCATED_TO]->(pc:physical)
 WITH collect(n.key) + collect(fn.key) + collect(lc.key) + collect(pc.key) AS keys
 RETURN [k IN keys WHERE k IS NOT NULL] AS keys"""
 )
+V_NEIGHBOURS = (
+    "UNWIND $keys AS k MATCH (a:Node {key: k})-[:"
+    + NEED_LINKS
+    + "]-(b:Need) RETURN DISTINCT a.key AS a, b.key AS b, head([l IN labels(b) WHERE l IN $types]) AS type"
+)
+V_TYPE = "MATCH (n:Node {key: $focus}) RETURN head([l IN labels(n) WHERE l IN $types]) AS type"
+
+
+def _v_scope(graph, focus) -> list[str]:
+    """The V of any element: its chain up towards the customer requirements and down towards the
+    physical parts, each step strictly to the next level (never sideways through a shared component),
+    plus the tests on what it reached. A test or customer test requirement starts from what it tests."""
+    left = {t: lv for t, (lv, side) in V_PLACE.items() if side != "right"}
+    right = {t for t, (_, side) in V_PLACE.items() if side == "right"}
+
+    def neighbours(keys):
+        return _read(graph, V_NEIGHBOURS, keys=list(keys), types=NEED_TYPES)
+
+    found = _read(graph, V_TYPE, focus=focus, types=NEED_TYPES)
+    kind = found[0]["type"] if found else None
+    seeds = {focus: left[kind]} if kind in left else {}
+    if kind in right:
+        seeds = {r["b"]: left[r["type"]] for r in neighbours([focus]) if r["type"] in left}
+    keep = {focus} | set(seeds)
+    for step in (-1, 1):
+        frontier = dict(seeds)
+        while frontier:
+            nxt = {}
+            for r in neighbours(frontier):
+                lv = left.get(r["type"])
+                if lv is not None and (lv - frontier[r["a"]]) * step > 0 and r["b"] not in keep:
+                    nxt[r["b"]] = lv
+            keep |= set(nxt)
+            frontier = nxt
+    keep |= {r["b"] for r in neighbours(keep) if r["type"] in right}
+    return sorted(keep)
+
+
 V_EDGES = "SATISFIES|REALIZES|MATCHES|PARTIAL_MATCHES|PERFORMS|OWNS|ALLOCATED_TO|VERIFIES|TESTS|IMPLEMENTS|APPLIES_TO"
 
 
@@ -876,10 +952,9 @@ def vmodel(graph, focus):
         if not found:
             raise KeyError(focus)
         focus = next(iter(found[0].values()))
-        # a customer requirement narrows the V to its chain; any other focus is shown in the whole V
+        # a customer requirement narrows the V to its RFLP chain, any other element to its own chain
         reach = _read(graph, V_REACH, focus=focus)
-        if reach and reach[0]["keys"]:
-            keys = reach[0]["keys"]
+        keys = reach[0]["keys"] if reach and reach[0]["keys"] else _v_scope(graph, focus)
     rows, results = [], []
     for r in _read(graph, V_NODES, keys=keys, types=NEED_TYPES):
         if r["type"] not in V_PLACE:
@@ -897,6 +972,9 @@ def vmodel(graph, focus):
             for t in r["results"]
         ]
     nodes = _nodes(graph, rows + results)
+    # an element alone is no V
+    if focus is not None and [n["key"] for n in nodes] in ([], [focus]):
+        nodes = []
     present = {n["key"] for n in nodes}
     edges = [
         {"src": r["a"], "dst": r["b"], "type": r["t"], "label": None}
@@ -914,7 +992,7 @@ def vmodel(graph, focus):
         "nodes": nodes,
         "edges": edges,
         "empty": [lv for lv in (1, 2, 3, 4) if lv not in right],
-        "reason": None if nodes else "no requirements to place",
+        "reason": None if nodes else f"{focus} reaches no requirement" if focus else "no requirements to place",
     }
 
 
