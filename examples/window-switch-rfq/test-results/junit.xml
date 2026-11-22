@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+  <testsuite name="system-tests" tests="11" failures="0" errors="0" skipped="0" timestamp="2026-11-14T08:00:00">
+    <testcase classname="system" name="haptic_measurement" time="600">
+      <properties><property name="verifies" value="STC-101"/></properties>
+    </testcase>
+    <testcase classname="system" name="key_durability" time="600">
+      <properties><property name="verifies" value="STC-102"/></properties>
+    </testcase>
+    <testcase classname="system" name="environmental" time="600">
+      <properties><property name="verifies" value="STC-103"/></properties>
+    </testcase>
+    <testcase classname="system" name="ingress" time="600">
+      <properties><property name="verifies" value="STC-104"/></properties>
+    </testcase>
+    <testcase classname="system" name="lin_conformance" time="600">
+      <properties><property name="verifies" value="STC-105"/></properties>
+    </testcase>
+    <testcase classname="system" name="key_layout_inspection" time="600">
+      <properties><property name="verifies" value="STC-106"/></properties>
+    </testcase>
+    <testcase classname="system" name="window_keys" time="600">
+      <properties><property name="verifies" value="STC-107"/></properties>
+    </testcase>
+    <testcase classname="system" name="child_lock" time="600">
+      <properties><property name="verifies" value="STC-108"/></properties>
+    </testcase>
+    <testcase classname="system" name="night_design" time="600">
+      <properties><property name="verifies" value="STC-109"/></properties>
+    </testcase>
+    <testcase classname="system" name="plausibility" time="600">
+      <properties><property name="verifies" value="STC-110"/></properties>
+    </testcase>
+    <testcase classname="system" name="label_inspection" time="600">
+      <properties><property name="verifies" value="STC-111"/></properties>
+    </testcase>
+  </testsuite>
+  <testsuite name="acceptance-tests" tests="4" failures="0" errors="0" skipped="0" timestamp="2026-11-18T08:00:00">
+    <testcase classname="acceptance" name="window_operation" time="3600">
+      <properties><property name="verifies" value="ATC-101"/></properties>
+    </testcase>
+    <testcase classname="acceptance" name="child_lock" time="3600">
+      <properties><property name="verifies" value="ATC-102"/></properties>
+    </testcase>
+    <testcase classname="acceptance" name="night_design" time="3600">
+      <properties><property name="verifies" value="ATC-103"/></properties>
+    </testcase>
+    <testcase classname="acceptance" name="initial_samples" time="3600">
+      <properties><property name="verifies" value="ATC-104"/></properties>
+    </testcase>
+  </testsuite>
+</testsuites>

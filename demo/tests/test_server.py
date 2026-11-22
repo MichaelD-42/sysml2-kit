@@ -37,7 +37,7 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(
             r.json()["node"]["qualifiedName"],
-            "SeatSwitchRfqPhysical::vehicleSeatSwitches::driverSwitch::driverHousing",
+            "WindowSwitchRfqPhysical::vehicleDoorSwitches::driverDoorSwitch::driverKeyModule",
         )
         self.assertEqual(self.client.get("/api/element/NOPE-1").status_code, 404)
 
@@ -50,11 +50,11 @@ class ServerTest(unittest.TestCase):
             self.client.get("/api/tree?kind=rflp").json()[0]["key"], "LC-100"
         )
         self.assertEqual(
-            self.client.get("/api/tree?kind=platform").json()[0]["key"], "SSW-LC-001"
+            self.client.get("/api/tree?kind=platform").json()[0]["key"], "WSW-LC-001"
         )
         self.assertEqual(self.client.get("/api/tree?kind=nope").status_code, 400)
         self.assertTrue(self.client.get("/api/view/vmodel").json()["nodes"])
-        hits = self.client.get("/api/search?q=driver housing&k=3").json()
+        hits = self.client.get("/api/search?q=driver key module&k=3").json()
         self.assertTrue(hits)
         self.assertIn("PC-101", self.client.get("/api/keys").json())
         compliance = self.client.get("/api/view/compliance").json()
@@ -96,11 +96,11 @@ class ServerTest(unittest.TestCase):
 
     def copy_projects(self, tmp):
         ignore = shutil.ignore_patterns("build", "_build", "_generated")
-        for name in ("seat-switch-rfq", "seat-switch-platform"):
+        for name in ("window-switch-rfq", "window-switch-platform"):
             shutil.copytree(
                 EXAMPLES / name, Path(tmp) / name, symlinks=True, ignore=ignore
             )
-        return Path(tmp) / "seat-switch-rfq"
+        return Path(tmp) / "window-switch-rfq"
 
     def test_reload_failure_keeps_graph(self):
         import tempfile

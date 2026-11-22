@@ -1,6 +1,6 @@
 .PHONY: setup test demo
 
-PROJECT ?= ../examples/seat-switch-rfq
+PROJECT ?= ../examples/window-switch-rfq
 
 setup:
 	uv sync

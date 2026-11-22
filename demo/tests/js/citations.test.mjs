@@ -22,7 +22,7 @@ test("linkCitations keeps fenced code blocks whole", () => {
 
 test("linkCitations marks only key-shaped unknown tokens unresolved", () => {
   assert.doesNotMatch(linkCitations("`peakTorque` via `SATISFIES` in `kW`", new Set()), /unresolved/);
-  for (const k of ["XX-999", "SSW-PC-042", "0f561658-cb71-5ea1-8678-1a2ed8245dce", "testresult__system__x"])
+  for (const k of ["XX-999", "WSW-PC-042", "0f561658-cb71-5ea1-8678-1a2ed8245dce", "testresult__system__x"])
     assert.match(linkCitations(`\`${k}\``, new Set()), /class="unresolved"/, k);
 });
 

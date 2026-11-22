@@ -8,7 +8,7 @@ Terms used in this repository, the plugin and the generated docs. Which layer ow
 
 **RFQ** (request for quotation): a customer's call for an offer. The `rfq` skill builds the architecture that answers it, reusing the supplier's platform.
 
-**Platform**: the supplier's own project of reusable features, components and variants, with the same layout as an RFQ project. An RFQ project pulls it in at `platform/` (git submodule). Its ids carry a tag (`SSW-PC-004`); its needs have `platform: true` and are checked by the platform's own build, not the RFQ's.
+**Platform**: the supplier's own project of reusable features, components and variants, with the same layout as an RFQ project. An RFQ project pulls it in at `platform/` (git submodule). Its ids carry a tag (`WSW-PC-004`); its needs have `platform: true` and are checked by the platform's own build, not the RFQ's.
 
 **V model**: the left side of the V goes down through the RFLP layers; the right side goes up through tests that verify each layer. Here: system tests verify system requirements, acceptance tests verify customer requirements and use cases.
 
@@ -42,7 +42,7 @@ SW architecture and design are physical components: SW components and SW units.
 
 **CST** (compliance statement, `CST-nnn`): the supplier's answer to a CRS that no architecture element can meet, or meets only in part (then it states the gap), in Markdown, with `answers` and `compliance` (comply, partial, not-comply).
 
-**UC** (use case, `UC-nnn`): what an actor does with the system, as a SysML `use case` with a subject and actors. Its title is "The <actor> wants to <goal>" (e.g. "The driver wants to adjust the seat position"), written as the doc of its `objective`; the model name (`adjustSeat`) stays the identifier.
+**UC** (use case, `UC-nnn`): what an actor does with the system, as a SysML `use case` with a subject and actors. Its title is "The <actor> wants to <goal>" (e.g. "The occupant wants to open or close a window"), written as the doc of its `objective`; the model name (`moveWindow`) stays the identifier.
 
 **SR** (system requirement, `SR-nnn`): one verifiable, solution-free `shall`, as a SysML `requirement`.
 
@@ -56,7 +56,7 @@ SW architecture and design are physical components: SW components and SW units.
 
 **PC** (physical component, `PC-nnn`): a part that is built or bought, as a SysML `part` with one domain keyword.
 
-**Assembly** (`PC-nnn`): the product as built, across domains, as a SysML `#Assembly part` with no domain keyword. It owns or references its PCs and carries the product's rated values and constraints. A configuration of the product (one per seat position) is an assembly that subsets the program's assembly and selects its variants.
+**Assembly** (`PC-nnn`): the product as built, across domains, as a SysML `#Assembly part` with no domain keyword. It owns or references its PCs and carries the product's rated values and constraints. A configuration of the product (one per door) is an assembly that subsets the program's assembly and selects its variants.
 
 **SW component** (`PC-nnn`): a `#Software part` owned by the firmware PC; the SW architecture. Its interfaces are `#Software` ports and connections. Logical components are allocated to it.
 

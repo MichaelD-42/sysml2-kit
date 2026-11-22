@@ -85,7 +85,7 @@ class OptionsTest(unittest.TestCase):
         args = sysml["args"]
         roots = [Path(args[i + 1]).name for i, a in enumerate(args) if a == "--project"]
         # the RFQ's own model and the platform's, which sits beside it
-        self.assertEqual(roots, ["seat-switch-rfq", "seat-switch-platform"])
+        self.assertEqual(roots, ["window-switch-rfq", "window-switch-platform"])
         self.assertIn("read-only", self.options.system_prompt)
 
 

@@ -149,16 +149,16 @@ test("toElk keeps overview columns in order and packs a domain group", () => {
 });
 
 test("wrap breaks a use case title into lines at word boundaries", () => {
-  assert.deepEqual(wrap("The occupant wants to adjust the seat position", 28), ["The occupant wants to adjust", "the seat position"]);
+  assert.deepEqual(wrap("The occupant wants to open or close a window", 28), ["The occupant wants to open", "or close a window"]);
   assert.deepEqual(wrap("short", 28), ["short"]);
   assert.deepEqual(wrap("averyveryverylongsingleword x", 10), ["averyveryverylongsingleword", "x"]);
   assert.deepEqual(wrap("", 28), [""]);
 });
 
 test("toElk sizes a use case by its wrapped title", () => {
-  const g = toElk({ kind: "usecases", nodes: [node("U", "UseCaseUsage", null, { name: "The occupant wants to adjust the seat position" })], edges: [] });
+  const g = toElk({ kind: "usecases", nodes: [node("U", "UseCaseUsage", null, { name: "The occupant wants to open or close a window" })], edges: [] });
   const [u] = g.children;
-  assert.deepEqual(u.meta.wrapped, ["The occupant wants to adjust", "the seat position"]);
+  assert.deepEqual(u.meta.wrapped, ["The occupant wants to open", "or close a window"]);
   assert.equal(u.height, 42 + 2 * 16);
 });
 

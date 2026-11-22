@@ -1,8 +1,8 @@
 # Start the model explorer: build a kit project's docs, load it, serve http://127.0.0.1:8000.
-# Usage: demo\start.ps1 [-Project <path>]   (default: the seat-switch RFQ example)
+# Usage: demo\start.ps1 [-Project <path>]   (default: the window-switch RFQ example)
 # The project's Makefile runs sh, find, sed and sort: put Git for Windows' usr\bin on PATH ahead of
 # C:\Windows\System32, whose find.exe is another program.
-param([string]$Project = (Join-Path $PSScriptRoot '..\examples\seat-switch-rfq'))
+param([string]$Project = (Join-Path $PSScriptRoot '..\examples\window-switch-rfq'))
 $ErrorActionPreference = 'Stop'
 # a project given relative to where the script is called from, resolved before moving to demo\
 $Project = (Resolve-Path $Project).Path

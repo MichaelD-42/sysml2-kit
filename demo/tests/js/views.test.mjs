@@ -3,15 +3,15 @@ import assert from "node:assert/strict";
 import { viewsFor, drillKind, MENU } from "../../static/js/render.js";
 import { usesLinks } from "../../static/js/panels.js";
 
-// element props as /api/element returns them for seat-switch ids
+// element props as /api/element returns them for window-switch ids
 const usecase = { key: "UC-101", kind: "UseCaseUsage", layer: "R" };
 const feature = { key: "FEAT-102", kind: "ActionUsage", layer: "F" };
-const fn = { key: "SSW-F-001", kind: "ActionUsage", layer: "F" };
+const fn = { key: "WSW-F-001", kind: "ActionUsage", layer: "F" };
 const logical = { key: "LC-101", kind: "PartUsage", layer: "L" };
 const physical = { key: "PC-101", kind: "PartUsage", layer: "P" };
-const swUnit = { key: "SSW-PC-035", kind: "PartUsage", layer: "P", domain: "SW" };
-const connector = { key: "SSW-PC-022", kind: "PartUsage", layer: "P", domain: "EE" };
-const pin = { key: "SSW-PI-007", kind: "PortUsage", layer: "P" };
+const swUnit = { key: "WSW-PC-021", kind: "PartUsage", layer: "P", domain: "SW" };
+const connector = { key: "WSW-PC-015", kind: "PartUsage", layer: "P", domain: "EE" };
+const pin = { key: "WSW-PI-005", kind: "PortUsage", layer: "P" };
 const crs = { key: "CRS-301", layer: "R", class: "non-functional" };
 const sysreq = { key: "SR-101", kind: "RequirementUsage", layer: "R" };
 const constraint = { key: "CON-101", kind: "ConstraintUsage", layer: "R" };
@@ -26,7 +26,7 @@ test("viewsFor gives each element type its own views and the scoped big-picture 
   assert.deepEqual(viewsFor(pin), { own: ["interfaces"], context: [] });
   assert.deepEqual(viewsFor(crs), { own: ["trace"], context: ["vmodel", "compliance"] });
   for (const n of [constraint, ctr, sysreq]) assert.deepEqual(viewsFor(n), { own: ["trace"], context: ["vmodel"] }, n.key);
-  assert.deepEqual(viewsFor({ key: "SeatSwitchPhysical", kind: "Package" }), { own: ["trace"], context: [] });
+  assert.deepEqual(viewsFor({ key: "WindowSwitchPhysical", kind: "Package" }), { own: ["trace"], context: [] });
 });
 
 test("the model-wide views are the menu, not element tabs", () => {
@@ -45,6 +45,6 @@ test("drillKind keeps a view the element has and otherwise opens its first own v
 
 test("usesLinks links project and platform elements both ways", () => {
   const seen = [];
-  usesLinks([{ key: "PC-101", uses: ["SSW-PC-001"], children: [{ key: "x", children: [] }] }], (a, b) => seen.push([a, b]));
-  assert.deepEqual(seen, [["PC-101", "SSW-PC-001"], ["SSW-PC-001", "PC-101"]]);
+  usesLinks([{ key: "PC-101", uses: ["WSW-PC-004"], children: [{ key: "x", children: [] }] }], (a, b) => seen.push([a, b]));
+  assert.deepEqual(seen, [["PC-101", "WSW-PC-004"], ["WSW-PC-004", "PC-101"]]);
 });

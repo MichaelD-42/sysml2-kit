@@ -3,7 +3,7 @@
 import * as api from "./api.js";
 import { esc } from "./render.js";
 
-// what the agent cites: need ids (PC-101, SSW-PC-002), uids, test result ids
+// what the agent cites: need ids (PC-101, WSW-PC-005), uids, test result ids
 const KEY_SHAPED = /^[A-Z]+(-[A-Z]+)*-\d+$|^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$|^testresult__\S+$/;
 const UID = /^[0-9a-f]{8}-/;
 

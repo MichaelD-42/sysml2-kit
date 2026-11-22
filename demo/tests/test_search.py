@@ -18,7 +18,7 @@ class SearchTest(unittest.TestCase):
         return [h["key"] for h in search(self.graph, self.embedder, q, k)]
 
     def test_exact_key_comes_first(self):
-        for key in ("PC-101", "SSW-PC-002"):
+        for key in ("PC-101", "WSW-PC-005"):
             self.assertEqual(self.keys(key)[0], key)
 
     def test_natural_query_finds_the_limit(self):

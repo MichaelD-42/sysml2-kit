@@ -1,5 +1,5 @@
-"""The seat-switch RFQ (with its platform) carries what the demo shows: attributes, constraints,
-flows, the position switches, the variant selection and the switch context."""
+"""The window-switch RFQ (with its platform) carries what the demo shows: attributes, constraints,
+flows, the door switches, the variant selection and the switch context."""
 
 import json
 import shutil
@@ -10,7 +10,7 @@ from pathlib import Path
 
 from sysml2kit.needs import normalize, platform_dir
 
-RFQ = Path(__file__).resolve().parents[2] / "examples" / "seat-switch-rfq"
+RFQ = Path(__file__).resolve().parents[2] / "examples" / "window-switch-rfq"
 export = []
 
 
@@ -97,54 +97,52 @@ def specialized(elements, qualified_name):
 
 class EnrichedExampleTest(unittest.TestCase):
     def test_attributes_with_units(self):
-        values = texts_of_attribute_values(export, "SeatSwitchPhysical::SwitchAssembly")
-        self.assertRegex(values["actuationForce"], r"^4.5 \[N\]$")
-        self.assertRegex(values["mass"], r"^48 \[g\]$")
+        values = texts_of_attribute_values(export, "WindowSwitchPhysical::SwitchAssembly")
+        self.assertRegex(values["actuationForce"], r"^5 \[N\]$")
+        self.assertRegex(values["mass"], r"^42 \[g\]$")
 
     def test_constraints(self):
         self.assertTrue(named(export, "ConstraintUsage", "actuationForceLimits"))
-        self.assertTrue(named(export, "ConstraintUsage", "driverHousingSide"))
+        self.assertTrue(named(export, "ConstraintUsage", "driverKeys"))
 
-    def test_seat_positions(self):
+    def test_door_positions(self):
         self.assertEqual(
-            part_names(export, "SeatSwitchRfqPhysical::vehicleSeatSwitches"),
-            {"driverSwitch", "coDriverSwitch", "rearLeftSwitch", "rearRightSwitch"},
+            part_names(export, "WindowSwitchRfqPhysical::vehicleDoorSwitches"),
+            {"driverDoorSwitch", "passengerDoorSwitch"},
         )
 
     def test_variant_selection(self):
         self.assertIn(
-            "SeatSwitchPhysical::housing::housingLH",
+            "WindowSwitchPhysical::keyModule::fourKey",
             specialized(
                 export,
-                "SeatSwitchRfqPhysical::vehicleSeatSwitches::driverSwitch::driverHousing",
+                "WindowSwitchRfqPhysical::vehicleDoorSwitches::driverDoorSwitch::driverKeyModule",
             ),
         )
         self.assertIn(
-            "SeatSwitchPhysical::housing::housingRH",
+            "WindowSwitchPhysical::keyModule::oneKey",
             specialized(
                 export,
-                "SeatSwitchRfqPhysical::vehicleSeatSwitches::coDriverSwitch::coDriverHousing",
+                "WindowSwitchRfqPhysical::vehicleDoorSwitches::passengerDoorSwitch::passengerKeyModule",
             ),
         )
 
     def test_assembly_boundary(self):
         self.assertEqual(
-            port_names(export, "SeatSwitchPhysical::SwitchAssembly"),
+            port_names(export, "WindowSwitchPhysical::SwitchAssembly"),
             {"lin", "supply", "ground"},
         )
 
     def test_context(self):
         self.assertEqual(
-            part_names(export, "SeatSwitchRfqContext::seatSwitchContext"),
+            part_names(export, "WindowSwitchRfqContext::doorSwitchContext"),
             {
-                "OEM_SeatSwitch",
-                "seatHarness",
-                "seat",
-                "seatControlUnit",
+                "OEM_WindowSwitch",
+                "doorHarness",
+                "door",
+                "doorControlUnit",
                 "occupant",
-                "technician",
-                "workshopTester",
-                "endOfLineTester",
+                "driver",
             },
         )
 

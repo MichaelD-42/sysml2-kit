@@ -5,7 +5,7 @@ from pathlib import Path
 from explorer import db, load
 from explorer.search import Embedder
 
-RFQ = Path(__file__).resolve().parents[2] / "examples" / "seat-switch-rfq"
+RFQ = Path(__file__).resolve().parents[2] / "examples" / "window-switch-rfq"
 
 _embedder = None
 
@@ -17,7 +17,7 @@ def load_project(graph, project: Path):
 
 
 def rfq() -> db.Graph:
-    """A new graph with the seat-switch RFQ (and its platform) loaded; the caller closes it."""
+    """A new graph with the window-switch RFQ (and its platform) loaded; the caller closes it."""
     graph = db.Graph()
     load_project(graph, RFQ)
     return graph
