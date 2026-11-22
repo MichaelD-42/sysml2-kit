@@ -179,3 +179,14 @@ test("toElk packs a composition's nested parts and draws no ports", () => {
   assert.deepEqual([p.ports, p.children[0].ports], [[], []]);
   assert.ok(p.children[1].meta.tags.includes("also in coDriverSwitch"));
 });
+
+test("toElk tags a modified part and a component's realization degree", () => {
+  const g = toElk({
+    kind: "allocation",
+    nodes: [node("LC-106", "PartUsage", null, { reuse: "partial" }), node("PC-112", "PartUsage", null, { modified: true })],
+    edges: [],
+  });
+  const tags = Object.fromEntries(g.children.map((c) => [c.id, c.meta.tags]));
+  assert.deepEqual(tags["LC-106"], ["reuse: partial"]);
+  assert.deepEqual(tags["PC-112"], ["modified"]);
+});

@@ -48,6 +48,8 @@ KEYWORD_TYPES = {
     ("PartUsage", "Trace::Assembly"): "physical",
     ("PartDefinition", "Trace::Assembly"): "physical",
 }
+# an RFQ derives these itself; the platform realizes them at P, never by specialization
+DERIVED = ("feature", "function", "component", "interface")
 DOMAINS = {
     "Trace::Mechanical": "ME",
     "Trace::Electrical": "EE",
@@ -259,6 +261,7 @@ def convert(elements, locations, platform_files=(), warnings=None):
             in set(platform_files),
             "variant": by_id.get(ref(e, "owningRelationship"), {}).get("@type")
             == "VariantMembership",
+            "modified": "Trace::Modified" in tags,
             **{link: [] for link in LINK_TYPES},
         }
         need_of[e["@id"]] = short
@@ -299,6 +302,7 @@ def convert(elements, locations, platform_files=(), warnings=None):
             found += strings_under(child)
         return list(dict.fromkeys(found))
 
+    generals = {}  # element @id -> @ids it specializes (subsetting, redefinition, typing)
     for e in elements:
         t = e["@type"]
         if t == "SatisfyRequirementUsage":
@@ -357,10 +361,25 @@ def convert(elements, locations, platform_files=(), warnings=None):
                 needs[src][PARTIAL_LINKS[link_type]] += targets
             needs[src][link_type] += targets
         elif t in SPECIALIZATIONS and not e.get("isImplied"):
-            # an end without a short name is not a need, so there is nothing to link
-            src, dst = need_of.get(ref(e, "specific")), need_of.get(ref(e, "general"))
-            if src and dst:
-                needs[src]["specializes"].append(dst)
+            generals.setdefault(ref(e, "specific"), []).append(ref(e, "general"))
+
+    def general_needs(element_id):
+        """Needs an element specializes; through a general without a short name (an inherited
+        `ref part keyCaps :> Platform::keyCaps`) to the needs that one specializes."""
+        found, seen, todo = [], set(), list(generals.get(element_id, []))
+        while todo:
+            g = todo.pop()
+            if g in seen:
+                continue
+            seen.add(g)
+            if g in need_of:
+                found.append(need_of[g])
+            else:
+                todo += generals.get(g, [])
+        return found
+
+    for element_id, short in need_of.items():
+        needs[short]["specializes"] += [g for g in general_needs(element_id) if g != short]
 
     children = set()
     for element_id, short in need_of.items():
@@ -381,6 +400,25 @@ def convert(elements, locations, platform_files=(), warnings=None):
             for i in closure(needs, need["id"], "specializes")
             if needs[i]["type"] == need["type"]
         }
+
+    for need in needs.values():
+        if platform_files and not need["platform"] and need["type"] in DERIVED:
+            general = sorted(i for i in need["specializes"] if needs[i]["platform"])
+            if general:
+                errors.append(
+                    f"{need['id']}: specializes the platform's {general[0]}; an RFQ derives its own "
+                    f"{KIND_NAMES[need['type']][2:]}s and the platform realizes them at P"
+                )
+        if need["modified"] and not (
+            need["type"] == "physical"
+            and any(
+                needs[i]["platform"]
+                for i in closure(needs, need["id"], "specializes")
+            )
+        ):
+            errors.append(
+                f"{need['id']}: #Modified needs a platform part to modify; a part of its own is new"
+            )
 
     model = Model(elements)
     for element_id, short in need_of.items():

@@ -14,12 +14,14 @@ package Trace {
     metadata def Implements { attribute need : String[1..*]; }
 
     // keywords: `#Feature action <'FEAT-001'> x;`, `#Electrical part <'PC-001'> y;`,
-    // `#Assembly part <'PC-002'> z;` for a physical assembly across domains (the product as built)
+    // `#Assembly part <'PC-002'> z;` for a physical assembly across domains (the product as built),
+    // `#Mechanical #Modified part <'PC-003'> c :> Platform::caps;` for a platform part this project changes
     metadata def Feature;
     metadata def Mechanical;
     metadata def Electrical;
     metadata def Software;
     metadata def Assembly;
+    metadata def Modified;
 
     metadata def Matches { attribute need : String[1..*]; attribute partial : Boolean[0..1]; }
 }

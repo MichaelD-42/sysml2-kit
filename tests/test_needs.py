@@ -662,5 +662,134 @@ class ConstraintTest(unittest.TestCase):
             )
 
 
+PLATFORM_FILES = {"platform/p.sysml"}
+
+
+def rfq(*keywords, **overrides):
+    """model() plus a platform part WSW-PC-1 and a platform feature WSW-FEAT-1, as an RFQ build sees them;
+    `keywords` are keyword() dicts, merged so two of one kind share their definition."""
+    extra = {
+        "ppc": el("ppc", "PartUsage", "WSW-PC-1", "caps", owner="pkg"),
+        "pfeat": el("pfeat", "ActionUsage", "WSW-FEAT-1", "control", owner="pkg"),
+        **keyword("kpp", "Mechanical", "ppc"),
+        **keyword("kpf", "Feature", "pfeat"),
+    }
+    for k in keywords:
+        extra.update(k)
+    elements = model(**extra, **overrides)
+    locations = {"WSW-PC-1": "platform/p.sysml:1", "WSW-FEAT-1": "platform/p.sysml:2"}
+    return elements, locations
+
+
+def convert_rfq(elements, locations, platform=True):
+    return convert(elements, locations, PLATFORM_FILES if platform else ())
+
+
+class RealizationTest(unittest.TestCase):
+    def assertError(self, elements, locations, text, platform=True):
+        with self.assertRaises(BridgeError) as ctx:
+            convert_rfq(elements, locations, platform)
+        self.assertIn(text, str(ctx.exception))
+
+    def test_modified_keyword_marks_a_physical_part(self):
+        elements, locations = rfq(
+            keyword("k1", "Mechanical", "pc"),
+            keyword("k2", "Modified", "pc"),
+            keyword("k3", "Mechanical", "other"),
+            pc=el("pc", "PartUsage", "PC-1", "oemCaps", owner="pkg"),
+            other=el("other", "PartUsage", "PC-2", "label", owner="pkg"),
+            r=rel("r", "Subsetting", "pc", "ppc"),
+        )
+        n = convert_rfq(elements, locations)["versions"][""]["needs"]
+        self.assertIs(n["PC-1"]["modified"], True)
+        self.assertIs(n["PC-2"]["modified"], False)
+
+    def test_modified_needs_a_platform_part(self):
+        elements, locations = rfq(
+            keyword("k1", "Mechanical", "pc"),
+            keyword("k2", "Modified", "pc"),
+            pc=el("pc", "PartUsage", "PC-1", "label", owner="pkg"),
+        )
+        self.assertError(
+            elements,
+            locations,
+            "PC-1: #Modified needs a platform part to modify; a part of its own is new",
+        )
+
+    def test_modified_through_a_project_part_reaches_the_platform(self):
+        elements, locations = rfq(
+            keyword("k1", "Mechanical", "pc"),
+            keyword("k2", "Mechanical", "pc2"),
+            keyword("k3", "Modified", "pc2"),
+            pc=el("pc", "PartUsage", "PC-1", "caps", owner="pkg"),
+            pc2=el("pc2", "PartUsage", "PC-2", "oemCaps", owner="pkg"),
+            r1=rel("r1", "Subsetting", "pc", "ppc"),
+            r2=rel("r2", "Subsetting", "pc2", "pc"),
+        )
+        n = convert_rfq(elements, locations)["versions"][""]["needs"]
+        self.assertIs(n["PC-2"]["modified"], True)
+
+    def test_modified_on_a_non_physical_need_is_an_error(self):
+        elements, locations = rfq(keyword("k", "Modified", "lc2"))
+        self.assertError(elements, locations, "LC-2: #Modified needs a platform part")
+
+    def test_project_feature_specializing_the_platform_is_an_error(self):
+        elements, locations = rfq(
+            keyword("kf", "Feature", "feat"),
+            feat=el("feat", "ActionUsage", "FEAT-1", "drive", owner="pkg"),
+            r=rel("r", "Subsetting", "feat", "pfeat"),
+        )
+        self.assertError(
+            elements,
+            locations,
+            "FEAT-1: specializes the platform's WSW-FEAT-1; an RFQ derives its own "
+            "features and the platform realizes them at P",
+        )
+
+    def test_project_component_specializing_the_platform_is_an_error(self):
+        elements, locations = rfq(
+            plc=el("plc", "PartUsage", "WSW-LC-1", "switch", owner="pkg"),
+            r=rel("r", "Subsetting", "lc1", "plc"),
+        )
+        locations["WSW-LC-1"] = "platform/p.sysml:3"
+        self.assertError(
+            elements,
+            locations,
+            "LC-1: specializes the platform's WSW-LC-1; an RFQ derives its own "
+            "logical components and the platform realizes them at P",
+        )
+
+    def test_platform_build_has_no_specialization_error(self):
+        elements, locations = rfq(
+            keyword("kf", "Feature", "feat"),
+            feat=el("feat", "ActionUsage", "FEAT-1", "drive", owner="pkg"),
+            r=rel("r", "Subsetting", "feat", "pfeat"),
+        )
+        n = convert_rfq(elements, locations, platform=False)["versions"][""]["needs"]
+        self.assertEqual(n["FEAT-1"]["specializes"], ["WSW-FEAT-1"])
+
+    def test_redefining_an_inherited_ref_part_reaches_the_platform(self):
+        """`oemCaps :>> keyCaps`, where the platform assembly's `ref part keyCaps :> caps` has no short name."""
+        elements, locations = rfq(
+            keyword("k1", "Mechanical", "pc"),
+            keyword("k2", "Modified", "pc"),
+            ref=el("ref", "PartUsage", None, "keyCaps", owner="pkg"),
+            r1=rel("r1", "Subsetting", "ref", "ppc"),
+            pc=el("pc", "PartUsage", "PC-1", "oemCaps", owner="pkg"),
+            r2=rel("r2", "Redefinition", "pc", "ref"),
+        )
+        n = convert_rfq(elements, locations)["versions"][""]["needs"]
+        self.assertEqual(n["PC-1"]["specializes"], ["WSW-PC-1"])
+
+    def test_physical_part_may_specialize_the_platform(self):
+        elements, locations = rfq(
+            keyword("k1", "Mechanical", "pc"),
+            pc=el("pc", "PartUsage", "PC-1", "caps", owner="pkg"),
+            r=rel("r", "Subsetting", "pc", "ppc"),
+        )
+        n = convert_rfq(elements, locations)["versions"][""]["needs"]
+        self.assertEqual(n["PC-1"]["specializes"], ["WSW-PC-1"])
+
+
 if __name__ == "__main__":
     unittest.main()

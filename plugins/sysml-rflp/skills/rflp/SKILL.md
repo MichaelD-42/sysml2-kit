@@ -22,7 +22,7 @@ A CRS with `:scope: commercial` or `:scope: not-offered` is exempt from `crs-sat
 For each step:
 
 1. Hand the layer to its agent with the scope (all CRS, or the ones the user named).
-   At P, after the `physical-architect` and before the review, the main session states coverage with the user as described under Matching in the `rfq` skill, so the reuse status exists.
+   At P, after the `physical-architect` and before the review, the main session states coverage with the user as described under Matching in the `rfq` skill, so the realization degrees exist.
 2. Run the `rflp-reviewer` agent on that layer. It runs `make lint`, `make docs STRICT=` and `sysml2kit gaps build/needs --layer <X>` (the gate rules of this layer and earlier ones; at V also `sysml2kit compliance`), and reviews writing quality.
 3. Fix blocking findings (via the authoring agent), re-review, up to 3 rounds.
 4. Show the user: what was added (ids and one-line titles), the trace diagram `docs/_generated/trace.svg`, and the reviewer's remaining findings. Ask for approval, changes, or stop. Do not continue without an answer.

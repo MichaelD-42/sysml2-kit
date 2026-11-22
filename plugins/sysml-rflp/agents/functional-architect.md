@@ -12,7 +12,7 @@ Produce in `model/functional/features.sysml`:
 - Each feature owns its functions as nested `action <'F-nnn'>` usages; split a function into sub-functions where it has distinct steps. A function is how a feature is implemented (needs a verb): verb + noun, solution-neutral, each with a `doc`. Order where it matters with `first a then b;`.
 - In each use case, `perform <feature>;` for every feature it needs (this is the realizes link). Every use case performs at least one feature; every feature is performed by one.
 - Cover the functional content of the SRs: an SR that implies behaviour needs a function that can later be allocated to the component satisfying it.
-- RFQ project with a platform: where a platform feature already does the job, specialize it (`#Feature action <'FEAT-101'> windowKeys :> WindowSwitchFeatures::windowControl;`) instead of redrawing it. Do not write `@Matches`; the `rfq` skill states coverage after the user agrees.
+- RFQ project with a platform: the RFQ derives its own features and functions; never subset a platform feature or function (the bridge rejects it). A platform feature that does the job is a model to follow, not to inherit: name it in the report. Do not write `@Matches`; the `rfq` skill states coverage after the user agrees.
 
 Do not add components, allocations or requirements. Never write RFQ ids or links into the platform. Keep existing ids.
 

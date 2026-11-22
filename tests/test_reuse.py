@@ -1,6 +1,13 @@
 import unittest
 
-from sysml2kit.reuse import constraint_reuse, reuse, reused_pcs, unselected_variations
+from sysml2kit.reuse import (
+    component_reuse,
+    constraint_reuse,
+    part_reuse,
+    reuse,
+    reused_pcs,
+    unselected_variations,
+)
 
 
 def need(type_, platform=False, variant=False, **links):
@@ -28,7 +35,7 @@ def chain(pc, lc_platform=False):
 class ReuseTest(unittest.TestCase):
     def test_platform_chain(self):
         needs = {**chain(["PC"]), "PC": need("physical", platform=True)}
-        self.assertEqual(reuse(needs), {"F": "platform"})
+        self.assertEqual(reuse(needs)["F"], "full")
         self.assertEqual(reused_pcs(needs, "F"), {"PC"})
 
     def test_variant_chain(self):
@@ -37,22 +44,22 @@ class ReuseTest(unittest.TestCase):
             "PC": need("physical", specializes=["PV"]),
             "PV": need("physical", platform=True, variant=True),
         }
-        self.assertEqual(reuse(needs), {"F": "variant"})
+        self.assertEqual(reuse(needs)["F"], "full")
 
-    def test_mixed_chain_is_modified(self):
+    def test_mixed_chain_is_partial(self):
         needs = {
             **chain(["P1", "P2"]),
             "P1": need("physical", platform=True),
             "P2": need("physical"),
         }
-        self.assertEqual(reuse(needs), {"F": "modified"})
+        self.assertEqual(reuse(needs)["F"], "partial")
 
     def test_all_new_is_new(self):
         needs = {**chain(["PC"]), "PC": need("physical")}
-        self.assertEqual(reuse(needs), {"F": "new"})
+        self.assertEqual(reuse(needs)["F"], "new")
 
     def test_no_physical_is_incomplete(self):
-        self.assertEqual(reuse(chain([])), {"F": "incomplete"})
+        self.assertEqual(reuse(chain([]))["F"], "incomplete")
 
     def test_inherited_functions_count(self):
         needs = {
@@ -60,7 +67,7 @@ class ReuseTest(unittest.TestCase):
             "PC": need("physical", platform=True),
             "RF": need("feature", specializes=["F"]),
         }
-        self.assertEqual(reuse(needs), {"F": "platform", "RF": "platform"})
+        self.assertEqual((reuse(needs)["F"], reuse(needs)["RF"]), ("full", "full"))
 
     def test_descendants_are_followed(self):
         needs = {
@@ -82,7 +89,7 @@ class ReuseTest(unittest.TestCase):
             "PP": need("physical", platform=True),
             "PN": need("physical"),
         }
-        self.assertEqual(reuse(needs), {"F": "modified"})
+        self.assertEqual(reuse(needs)["F"], "partial")
 
     def test_unbacked_function_makes_feature_incomplete(self):
         needs = {
@@ -90,10 +97,10 @@ class ReuseTest(unittest.TestCase):
             "PC": need("physical", platform=True),
             "FN2": need("function", owned_by=["F"]),
         }
-        self.assertEqual(reuse(needs), {"F": "incomplete"})
+        self.assertEqual(reuse(needs)["F"], "incomplete")
         needs["FN2"]["allocated_to"] = ["LC2"]
         needs["LC2"] = need("component")
-        self.assertEqual(reuse(needs), {"F": "incomplete"})
+        self.assertEqual(reuse(needs)["F"], "incomplete")
 
     def test_assembly_allocation_reaches_parts(self):
         needs = {
@@ -101,7 +108,7 @@ class ReuseTest(unittest.TestCase):
             "PA": need("physical", platform=True, leaf=False),
             "PC": need("physical", owned_by=["PA"]),
         }
-        self.assertEqual(reuse(needs), {"F": "modified"})
+        self.assertEqual(reuse(needs)["F"], "partial")
         self.assertEqual(reused_pcs(needs, "F"), {"PA", "PC"})
 
     def variation(self, lc_targets):
@@ -119,44 +126,44 @@ class ReuseTest(unittest.TestCase):
 
     def test_variation_without_selection_is_incomplete(self):
         needs = self.variation(["PV"])
-        self.assertEqual(reuse(needs), {"F": "incomplete"})
+        self.assertEqual(reuse(needs)["F"], "incomplete")
         self.assertEqual(reused_pcs(needs, "F"), set())
         self.assertEqual(unselected_variations(needs, "F"), {"PV"})
 
     def test_selected_variant_reaches_only_that_variant(self):
         needs = self.variation(["PC"])
         needs["PC"] = need("physical", specializes=["PV1"])
-        self.assertEqual(reuse(needs), {"F": "variant"})
+        self.assertEqual(reuse(needs)["F"], "full")
         self.assertEqual(reused_pcs(needs, "F"), {"PC"})
         self.assertEqual(unselected_variations(needs, "F"), set())
 
     def test_part_subsetting_the_variation_is_unselected(self):
         needs = self.variation(["PC"])
         needs["PC"] = need("physical", specializes=["PV"])
-        self.assertEqual(reuse(needs), {"F": "incomplete"})
+        self.assertEqual(reuse(needs)["F"], "incomplete")
         self.assertEqual(unselected_variations(needs, "F"), {"PV"})
 
     def test_part_subsetting_a_variant_of_the_variation_is_selected(self):
         needs = self.variation(["PC"])
         needs["PV1"]["specializes"] = ["PV"]
         needs["PC"] = need("physical", specializes=["PV1"])
-        self.assertEqual(reuse(needs), {"F": "variant"})
+        self.assertEqual(reuse(needs)["F"], "full")
         self.assertEqual(unselected_variations(needs, "F"), set())
 
     def test_allocation_to_a_variant_reaches_its_parts(self):
         needs = self.variation(["PV1"])
         needs["PV1P"] = need("physical", platform=True, owned_by=["PV1"])
         self.assertEqual(reused_pcs(needs, "F"), {"PV1", "PV1P"})
-        self.assertEqual(reuse(needs), {"F": "variant"})
+        self.assertEqual(reuse(needs)["F"], "full")
 
     def test_platform_allocation_to_variants_selects_none_of_them(self):
         """The platform's own allocations offer every variant; only the project selects one."""
         needs = self.variation(["PV1", "PV2"])
         needs["LC"]["platform"] = True
-        self.assertEqual(reuse(needs), {"F": "incomplete"})
+        self.assertEqual(reuse(needs)["F"], "incomplete")
         self.assertEqual(unselected_variations(needs, "F"), {"PV"})
         needs["PC"] = need("physical", specializes=["PV1"])
-        self.assertEqual(reuse(needs), {"F": "variant"})
+        self.assertEqual(reuse(needs)["F"], "full")
         self.assertEqual(reused_pcs(needs, "F"), {"PV1"})
         self.assertEqual(unselected_variations(needs, "F"), set())
 
@@ -180,9 +187,9 @@ class ReuseTest(unittest.TestCase):
             "PC": need("physical", specializes=["PV"]),
             "PV": need("physical", platform=True),
         }
-        self.assertEqual(constraint_reuse(needs, "CON-1"), "platform")
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "full")
         needs["PV"]["variant"] = True
-        self.assertEqual(constraint_reuse(needs, "CON-1"), "variant")
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "full")
         needs["PC"]["specializes"] = []
         self.assertEqual(constraint_reuse(needs, "CON-1"), "new")
         needs["CON-1"]["owned_by"] = []
@@ -197,9 +204,9 @@ class ReuseTest(unittest.TestCase):
             "PC": need("physical", domain="EE", owned_by=["POS"], specializes=["PV"]),
             "PV": need("physical", platform=True, variant=True, domain="EE"),
         }
-        self.assertEqual(constraint_reuse(needs, "CON-1"), "variant")
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "full")
         needs["NEW"] = need("physical", domain="ME", owned_by=["POS"])
-        self.assertEqual(constraint_reuse(needs, "CON-1"), "modified")
+        self.assertEqual(constraint_reuse(needs, "CON-1"), "partial")
         del needs["POS"], needs["PC"], needs["NEW"]
         self.assertEqual(constraint_reuse(needs, "CON-1"), "new")
 
@@ -213,5 +220,89 @@ class ReuseTest(unittest.TestCase):
         self.assertEqual(constraint_reuse(needs, "CON-1"), "new")
 
 
+class DegreeTest(unittest.TestCase):
+    def test_modified_part_is_partial(self):
+        needs = {
+            **chain(["PC"]),
+            "PC": need("physical", modified=True, specializes=["PP"]),
+            "PP": need("physical", platform=True),
+        }
+        self.assertEqual(part_reuse(needs, "PC"), "partial")
+        self.assertEqual(reuse(needs)["F"], "partial")
+
+    def test_component_degree_from_its_parts(self):
+        needs = {
+            **chain(["PP", "PN"]),
+            "PP": need("physical", platform=True),
+            "PN": need("physical"),
+        }
+        self.assertEqual(component_reuse(needs, "LC"), "partial")
+        needs["LC"]["allocated_to"] = ["PN"]
+        self.assertEqual(component_reuse(needs, "LC"), "new")
+        needs["LC"]["allocated_to"] = []
+        self.assertEqual(component_reuse(needs, "LC"), "incomplete")
+
+    def test_composite_combines_its_leaves(self):
+        needs = {
+            "TOP": need("component", leaf=False),
+            "A": need("component", owned_by=["TOP"], allocated_to=["PP"]),
+            "B": need("component", owned_by=["TOP"]),
+            "PP": need("physical", platform=True),
+            "PN": need("physical"),
+        }
+        self.assertEqual(component_reuse(needs, "TOP"), "incomplete")
+        needs["B"]["allocated_to"] = ["PN"]
+        self.assertEqual(component_reuse(needs, "TOP"), "partial")
+
+    def test_feature_combines_its_components(self):
+        needs = {
+            **chain(["PP"]),
+            "FN2": need("function", owned_by=["F"], allocated_to=["LC2"]),
+            "LC2": need("component", allocated_to=["PP", "PN"]),
+            "PP": need("physical", platform=True),
+            "PN": need("physical"),
+        }
+        self.assertEqual(reuse(needs)["LC"], "full")
+        self.assertEqual(reuse(needs)["F"], "partial")
+
+    def test_reuse_covers_components(self):
+        needs = {**chain(["PC"]), "PC": need("physical", platform=True)}
+        self.assertEqual(reuse(needs), {"F": "full", "LC": "full"})
+
+    def test_part_via_inherited_ref_part_is_full(self):
+        """`oemCaps :>> keyCaps :> Platform::keyCaps`: the redefined ref part is no need, the subset is."""
+        needs = {
+            **chain(["PC"]),
+            "PC": need("physical", specializes=["PP"]),
+            "PP": need("physical", platform=True),
+        }
+        self.assertEqual(part_reuse(needs, "PC"), "full")
+
+    def test_platform_build_is_new(self):
+        needs = {**chain(["PC"]), "PC": need("physical")}
+        self.assertEqual(reuse(needs), {"F": "new", "LC": "new"})
+
+
 if __name__ == "__main__":
     unittest.main()
+
+
+class InheritedPartsTest(unittest.TestCase):
+    def test_part_subsetting_a_partial_project_assembly_is_partial(self):
+        """driverDoorSwitch :> oemWindowSwitch inherits the modified caps oemWindowSwitch owns."""
+        needs = {
+            "PA": need("physical", platform=True, domain=""),
+            "OEM": need("physical", domain="", specializes=["PA"]),
+            "CAPS": need("physical", domain="ME", owned_by=["OEM"], modified=True, specializes=["PP"]),
+            "PP": need("physical", platform=True, domain="ME"),
+            "DOOR": need("physical", domain="", specializes=["OEM"]),
+        }
+        self.assertEqual(part_reuse(needs, "OEM"), "partial")
+        self.assertEqual(part_reuse(needs, "DOOR"), "partial")
+
+    def test_specialization_cycle_terminates(self):
+        needs = {
+            "A": need("physical", domain="", specializes=["B"]),
+            "B": need("physical", domain="", specializes=["A"]),
+        }
+        self.assertEqual(part_reuse(needs, "A"), "new")

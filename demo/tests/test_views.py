@@ -186,8 +186,8 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(self.view("variants")["focus"], "WSW-PC-004")
 
     def test_compliance(self):
-        # two tables: customer requirements, then customer test requirements
-        crs, ctr = (
+        # customer requirements, customer test requirements, then the realization table
+        crs, ctr, _ = (
             (RFQ / "docs" / "_generated" / "compliance.md").read_text().split("\n\n")
         )
         first = re.compile(r"^\| \{need\}`([^`]+)`", re.MULTILINE)
@@ -283,8 +283,8 @@ class ViewsTest(unittest.TestCase):
     def test_rflp_tree_follows_the_chain(self):
         own = views.rflp_tree(self.graph)
         all_paths = set(self.paths(own))
-        # through the platform function and component to the parts this RFQ selects
-        chain = ("LC-100", "UC-101", "FEAT-101", "WSW-F-001", "WSW-LC-002")
+        # through the RFQ function and component to the parts this RFQ selects
+        chain = ("LC-100", "UC-101", "FEAT-101", "F-101", "LC-101")
         self.assertIn(chain + ("PC-101",), all_paths)
         self.assertIn(chain + ("PC-103",), all_paths)
         # the product is the root, its use cases below it, shown by their titles
@@ -322,18 +322,18 @@ class ViewsTest(unittest.TestCase):
         nodes = {}
         for n in self.walk(own):
             nodes.setdefault(n["key"], n)
-        # an RFQ feature lists the platform functions it inherits, marked platform
+        # an RFQ feature lists its own functions
         below = {n["key"] for n in self.walk(nodes["FEAT-104"]["children"])}
-        self.assertIn("WSW-F-010", below)
-        self.assertTrue(nodes["WSW-F-010"]["platform"])
+        self.assertIn("F-110", below)
+        self.assertFalse(nodes["F-110"]["platform"])
         child_lock = {n["key"] for n in nodes["FEAT-102"]["children"]}
-        self.assertLessEqual({"WSW-F-005", "WSW-F-007"}, child_lock)
-        # an inherited function reaches its logical component, the component its physical parts,
+        self.assertLessEqual({"F-105", "F-107"}, child_lock)
+        # a function reaches its logical component, the component its physical parts,
         # a software component its units
         self.assertTrue(
-            any(p[-3:] == ("FEAT-104", "WSW-F-010", "WSW-LC-004") for p in all_paths)
+            any(p[-3:] == ("FEAT-104", "F-110", "LC-103") for p in all_paths)
         )
-        self.assertTrue(any(p[-2:] == ("WSW-LC-004", "WSW-PC-020") for p in all_paths))
+        self.assertTrue(any(p[-2:] == ("LC-103", "WSW-PC-020") for p in all_paths))
         # the product's physical breakdown: assemblies down to software units, in both trees
         firmware = ("WSW-PC-016", "WSW-PC-020", "WSW-PC-021")
         self.assertIn(("LC-100", None) + firmware, all_paths)
@@ -344,7 +344,7 @@ class ViewsTest(unittest.TestCase):
         # a part is expanded in the breakdown; its rows under a logical component say where
         under_lc = [
             n
-            for n in self.walk(nodes["WSW-LC-004"]["children"])
+            for n in self.walk(nodes["LC-103"]["children"])
             if n["key"] == "WSW-PC-020"
         ]
         self.assertEqual(under_lc[0]["again"], "Physical breakdown")
@@ -353,7 +353,7 @@ class ViewsTest(unittest.TestCase):
             any(p[-3:] == ("PC-110", "PC-101", "WSW-PC-005") for p in all_paths)
         )
         # a shared component is expanded once; later rows are marked and have no subtree
-        rows = [n for n in self.walk(own) if n["key"] == "WSW-LC-003"]
+        rows = [n for n in self.walk(own) if n["key"] == "LC-102"]
         self.assertGreater(len(rows), 1)
         self.assertEqual(
             [bool(n["children"]) for n in rows], [True] + [False] * (len(rows) - 1)
@@ -375,7 +375,7 @@ class ViewsTest(unittest.TestCase):
             n["key"]: n for n in self.walk(views.rflp_tree(self.graph, platform=True))
         }
         self.assertIn("WSW-PC-004", own["PC-101"]["uses"])
-        self.assertIn("WSW-LC-001", own["LC-100"]["uses"])
+        self.assertNotIn("WSW-LC-001", own["LC-100"].get("uses") or [])
         self.assertIn("WSW-PC-025", own["PC-110"]["uses"])
         # the key-module variation is no RFLP node; its variants are
         self.assertIn("PC-101", platform["WSW-PC-005"]["uses"])
@@ -538,22 +538,28 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(v["reason"], "WSW-PC-021 has no parts")
 
     def test_allocation_of_a_logical_component(self):
-        v = self.view("allocation", "WSW-LC-002")
+        v = self.view("allocation", "LC-101")
         keys = {n["key"] for n in v["nodes"]}
-        self.assertLessEqual({"WSW-LC-002", "WSW-F-001", "PC-101"}, keys)
+        self.assertLessEqual({"LC-101", "F-101", "PC-101"}, keys)
         edges = {(e["src"], e["dst"], e["type"]) for e in v["edges"]}
-        self.assertIn(("WSW-F-001", "WSW-LC-002", "ALLOCATED_TO"), edges)
-        self.assertIn(("WSW-LC-002", "PC-101", "ALLOCATED_TO"), edges)
+        self.assertIn(("F-101", "LC-101", "ALLOCATED_TO"), edges)
+        self.assertIn(("LC-101", "PC-101", "ALLOCATED_TO"), edges)
+
+    def test_allocation_shows_realization(self):
+        nodes = {n["key"]: n for n in self.view("allocation", "LC-106")["nodes"]}
+        self.assertEqual(nodes["LC-106"]["reuse"], "partial")
+        self.assertIs(nodes["PC-112"]["modified"], True)
+        self.assertFalse(nodes["PC-113"].get("modified"))
 
     def test_allocation_of_a_physical_part_has_none(self):
         self.assertTrue(self.view("allocation", "PC-101")["reason"])
 
     def test_interfaces_of_a_function_are_its_components(self):
-        v = self.view("interfaces", "WSW-F-001")
-        self.assertEqual(v["focus"], "WSW-F-001")
+        v = self.view("interfaces", "F-101")
+        self.assertEqual(v["focus"], "F-101")
         keys = {n["key"] for n in v["nodes"]}
-        self.assertLessEqual({"WSW-LC-002", "WSW-LI-001"}, keys)  # keySensing
-        self.assertNotIn("WSW-F-001", keys)
+        self.assertLessEqual({"LC-101", "LI-101"}, keys)  # keySensing
+        self.assertNotIn("F-101", keys)
 
     def test_vmodel_scoped_to_a_physical_part(self):
         whole = self.view("vmodel")
@@ -601,7 +607,7 @@ class ViewsTest(unittest.TestCase):
             set(names),
         )
         self.assertEqual(parent[names["doorHarness"]], "group:context")
-        # use cases with the features they perform, inherited functions counted
+        # use cases with the features they perform, functions counted
         self.assertLessEqual({"UC-101", "UC-102", "UC-103"}, set(nodes))
         self.assertEqual(nodes["UC-101"]["name"], "The occupant wants to open or close a window")
         self.assertIn("4 functions", tags["FEAT-101"])
@@ -609,9 +615,9 @@ class ViewsTest(unittest.TestCase):
         edges = {(e["src"], e["dst"], e["type"]) for e in v["edges"]}
         self.assertIn(("UC-101", "FEAT-104", "PERFORMS"), edges)
         self.assertIn((names["occupant"], "UC-101", "ACTOR"), edges)
-        # logical: the product and the blocks it inherits
+        # logical: the product and its own blocks
         self.assertEqual(parent["LC-100"], "group:logical")
-        self.assertIn("WSW-LC-006", nodes)
+        self.assertIn("LC-105", nodes)
         # physical: the assemblies, the doors with the variants they select
         self.assertEqual(parent["PC-109"], "group:AS")
         self.assertEqual(parent["PC-110"], "PC-109")
@@ -619,7 +625,7 @@ class ViewsTest(unittest.TestCase):
             {"keyModule: fourKey", "backlight: whiteLeds"},
             set(tags["PC-110"]),
         )
-        self.assertIn(("FEAT-104", "WSW-LC-004", "ALLOCATED_TO"), edges)
+        self.assertIn(("FEAT-104", "LC-103", "ALLOCATED_TO"), edges)
         # physical by domain, top level only; software components with their unit counts
         self.assertEqual(parent["WSW-PC-016"], "group:SW")
         self.assertEqual(parent["WSW-PC-020"], "WSW-PC-016")

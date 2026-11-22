@@ -1,8 +1,9 @@
 package WindowSwitchRfqPhysical {
     doc /* P layer: the vehicle's window switch as built, the platform switch assembly within this RFQ's limits,
      * and the two switches of one vehicle, each selecting the platform key-module and backlight variants of
-     * its door. Everything else is the platform switch as it is (WindowSwitchPhysical). A constraint on each
-     * selection states the customer's door table: which keys and which symbol colour that door gets. */
+     * its door. The RFQ's logical components are allocated to these parts and to platform parts used as they
+     * are (WindowSwitchPhysical); the allocations decide how far the platform realizes each. A constraint on
+     * each selection states the customer's door table: which keys and which symbol colour that door gets. */
 
     private import Trace::*;
     private import WindowSwitchRfqLogical::*;
@@ -54,6 +55,14 @@ package WindowSwitchRfqPhysical {
             @Satisfies { need = "CRS-505"; }
             doc /* A switch shall weigh at most 50 g. */
             mass <= 50 [g]
+        }
+
+        // what this program changes on the platform switch, and what it adds
+        #Mechanical #Modified part <'PC-112'> oemKeyCaps :>> keyCaps :> WindowSwitchPhysical::keyCaps {
+            doc /* Platform key caps WSW-CAP-200 with the OEM's symbol set: a new laser-etching program, BOM WSW-CAP-230. */
+        }
+        #Mechanical part <'PC-113'> partNumberLabel {
+            doc /* Printed label with the door's OEM part number in plain text and as a Data Matrix code, BOM OEM-LBL-010. */
         }
     }
 
@@ -111,8 +120,29 @@ package WindowSwitchRfqPhysical {
     }
 
     allocate OEM_WindowSwitch to oemWindowSwitch;
+    // the selected variants per door
     allocate OEM_WindowSwitch.keySensing to vehicleDoorSwitches.driverDoorSwitch.driverKeyModule;
     allocate OEM_WindowSwitch.illumination to vehicleDoorSwitches.driverDoorSwitch.driverBacklight;
     allocate OEM_WindowSwitch.keySensing to vehicleDoorSwitches.passengerDoorSwitch.passengerKeyModule;
     allocate OEM_WindowSwitch.illumination to vehicleDoorSwitches.passengerDoorSwitch.passengerBacklight;
+    // platform parts used as they are
+    allocate OEM_WindowSwitch.switchController to WindowSwitchPhysical::pcb.microcontroller;
+    allocate OEM_WindowSwitch.powerSupply to WindowSwitchPhysical::pcb.voltageRegulator;
+    allocate OEM_WindowSwitch.powerSupply to WindowSwitchPhysical::vehicleConnector;
+    allocate OEM_WindowSwitch.linCommunication to WindowSwitchPhysical::pcb.linTransceiver;
+    allocate OEM_WindowSwitch.linCommunication to WindowSwitchPhysical::vehicleConnector;
+    allocate OEM_WindowSwitch.illumination to WindowSwitchPhysical::pcb.ledDriver;
+    allocate OEM_WindowSwitch.enclosure to WindowSwitchPhysical::housing;
+    allocate OEM_WindowSwitch.enclosure to WindowSwitchPhysical::seal;
+    // logical components go to SW components, never to SW units
+    allocate OEM_WindowSwitch.switchController to WindowSwitchPhysical::switchFirmware.inputProcessing;
+    allocate OEM_WindowSwitch.linCommunication to WindowSwitchPhysical::switchFirmware.linStack;
+    allocate OEM_WindowSwitch.illumination to WindowSwitchPhysical::switchFirmware.illuminationControl;
+    // a modified platform part and a new one
+    allocate OEM_WindowSwitch.enclosure to oemWindowSwitch.oemKeyCaps;
+    allocate OEM_WindowSwitch.enclosure to oemWindowSwitch.partNumberLabel;
+    allocate OEM_WindowSwitch.enclosure.trimMount to WindowSwitchPhysical::housing.clips;
+    allocate OEM_WindowSwitch.linCommunication.vehicleBus to WindowSwitchPhysical::vehicleConnector.pin3Lin;
+    allocate OEM_WindowSwitch.powerSupply.vehicleSupply to WindowSwitchPhysical::vehicleConnector.pin1Kl30;
+    allocate OEM_WindowSwitch.linCommunication.controllerLink to WindowSwitchPhysical::switchFirmware.linStack.signals;
 }

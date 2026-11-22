@@ -1,6 +1,6 @@
 import unittest
 
-from sysml2kit.compliance import compliance, ctr_rows, table_md
+from sysml2kit.compliance import compliance, ctr_rows, realization_rows, table_md
 
 
 def need(type_, title="", **fields):
@@ -38,14 +38,14 @@ class ComplianceTest(unittest.TestCase):
         rows, findings = compliance(model(matches=["CRS-1"]))
         self.assertEqual(
             rows,
-            [("CRS-1", "Carry load", "", ["F"], "platform", False, [], ["mech"], [])],
+            [("CRS-1", "Carry load", "", ["F"], "full", False, [], ["mech"], [])],
         )
         self.assertEqual(findings, [])
 
     def test_worst_reuse_wins(self):
         needs = model(matches=["CRS-1"])
         needs["F2"] = need("feature", matches=["CRS-1"], reuse="new")
-        needs["F"]["reuse"] = "variant"
+        needs["F"]["reuse"] = "full"
         rows, _ = compliance(needs)
         self.assertEqual(rows[0][4], "new")
         self.assertEqual(rows[0][3], ["F", "F2"])
@@ -156,7 +156,7 @@ class ComplianceTest(unittest.TestCase):
         needs["LC"]["allocated_to"] = ["PC"]
         needs["PC"] = need("physical", specializes=["PV1"], domain="elec")
         rows, findings = compliance(needs)
-        self.assertEqual(rows[0][4], "variant")
+        self.assertEqual(rows[0][4], "full")
         self.assertEqual(rows[0][7], ["elec"])
         self.assertEqual(findings, [])
 
@@ -231,7 +231,7 @@ class ComplianceTest(unittest.TestCase):
                     "Sealing",
                     "non-functional",
                     [],
-                    "platform",
+                    "full",
                     False,
                     [],
                     ["mech"],
@@ -241,12 +241,12 @@ class ComplianceTest(unittest.TestCase):
         )
         self.assertEqual(findings, [])
 
-    def test_constraint_on_a_part_specializing_a_variant_is_variant(self):
+    def test_constraint_on_a_part_specializing_a_variant_is_full(self):
         needs = self.constrained(owned_by=["RP"])
         needs["RP"] = need("physical", specializes=["PC"], domain="elec")
         needs["PC"]["variant"] = True
         rows, findings = compliance(needs)
-        self.assertEqual(rows[0][4], "variant")
+        self.assertEqual(rows[0][4], "full")
         self.assertEqual(findings, [])
 
     def test_constraint_does_not_answer_a_functional_requirement(self):
@@ -350,3 +350,61 @@ class ComplianceTest(unittest.TestCase):
         rows, findings = compliance(needs)
         self.assertEqual([r[2] for r in rows], ["information", "information"])
         self.assertEqual(findings, [])
+
+
+class RealizationTest(unittest.TestCase):
+    def parts(self):
+        return {
+            "LC-1": need(
+                "component", "enclosure", allocated_to=["PC-1", "PC-2", "WSW-PC-3"]
+            ),
+            "PC-1": need("physical", "oemCaps", modified=True, specializes=["WSW-PC-2"]),
+            "PC-2": need("physical", "label"),
+            "WSW-PC-2": need("physical", "keyCaps", platform=True),
+            "WSW-PC-3": need("physical", "housing", platform=True),
+            "WSW-LC-9": need("component", "platformOnly", platform=True),
+        }
+
+    def test_realization_rows(self):
+        self.assertEqual(
+            realization_rows(self.parts()),
+            [
+                (
+                    "LC-1",
+                    "enclosure",
+                    "partial",
+                    [
+                        ("PC-1", "oemCaps", "modified WSW-PC-2"),
+                        ("PC-2", "label", "new"),
+                        ("WSW-PC-3", "housing", ""),
+                    ],
+                )
+            ],
+        )
+
+    def test_project_part_reusing_the_platform_names_it(self):
+        needs = self.parts()
+        needs["PC-1"]["modified"] = False
+        self.assertIn(("PC-1", "oemCaps", "WSW-PC-2"), realization_rows(needs)[0][3])
+
+    def test_realization_row_without_parts(self):
+        needs = {"LC-1": need("component", "spare")}
+        self.assertEqual(realization_rows(needs), [("LC-1", "spare", "incomplete", [])])
+
+    def test_table_has_realization_table(self):
+        out = table_md([], realization=realization_rows(self.parts()))
+        self.assertIn("| Component | Title | Degree | Physical parts |", out)
+        self.assertIn(
+            "| {need}`LC-1` | enclosure | partial | {need}`PC-1` oemCaps (modified WSW-PC-2), "
+            "{need}`PC-2` label (new), {need}`WSW-PC-3` housing |",
+            out,
+        )
+
+    def test_selected_variant_is_named_without_its_variation(self):
+        needs = self.parts()
+        needs["PC-1"].update(modified=False, specializes=["WSW-PV", "WSW-PV1"])
+        needs["WSW-PV"] = need("physical", "keyModule", platform=True)
+        needs["WSW-PV1"] = need(
+            "physical", "fourKey", platform=True, variant=True, owned_by=["WSW-PV"]
+        )
+        self.assertIn(("PC-1", "oemCaps", "WSW-PV1"), realization_rows(needs)[0][3])

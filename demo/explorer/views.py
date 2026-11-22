@@ -314,7 +314,7 @@ UNWIND $keys AS k MATCH (n:Node {key: k})
 RETURN n.key AS key, coalesce(CASE WHEN n:usecase THEN n.title END, n.name, n.title, n.key) AS name,
   coalesce(n.kind, [l IN labels(n) WHERE NOT l IN ['Node', 'Element', 'Need']][0]) AS kind,
   n.shortName AS shortName, n.domain AS domain, n.layer AS layer, n.platform AS platform,
-  n.variant AS variant, n.reuse AS reuse,
+  n.variant AS variant, n.reuse AS reuse, n.modified AS modified,
   COLLECT {
     MATCH p = (n)-[:SPECIALIZES*0..]->()-[:OWNS]->(a:AttributeUsage)
     WITH a.name AS name, a ORDER BY length(p)
@@ -428,7 +428,7 @@ def _summary(rows, ctrs, needs, findings) -> dict:
     ]
     unverified = {f.split(":")[0] for f in findings if f.endswith(NOT_VERIFIED)}
     reused = [r for r in rated if r["reuse"]]
-    kinds = ("platform", "variant", "modified", "new", "incomplete")
+    kinds = ("full", "partial", "new", "incomplete")
     open_ctrs = [c for c in ctrs if not needs[c["ctr"]].get("scope")]
     by_class = {
         c: _share(
@@ -826,8 +826,12 @@ def rflp_tree(graph, platform: bool = False) -> list[dict]:
             if key in expanded:
                 return n | {"children": [], "again": expanded[key]}
             expanded[key] = branch
-        # the other side's elements show only below what is reused from it
-        own = [k for k in kids.get(key, []) if k in info or n["platform"] != platform]
+        # the other side's elements show only below what is reused from it, or the parts that realize a component
+        own = [
+            k
+            for k in kids.get(key, [])
+            if k in info or n["platform"] != platform or n["kind"] == "component"
+        ]
         n["children"] = [
             node(k, seen | {key}, branch)
             for k in sorted(own + inherited.get(key, []))

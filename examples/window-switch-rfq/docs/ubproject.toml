@@ -202,8 +202,13 @@ description = "Engineering domain: ME, EE or SW"
 nullable = true
 
 [needs.fields.reuse]
-description = "Feature reuse: platform, variant, modified, new or incomplete"
+description = "Realization of a feature or logical component: full, partial, new or incomplete"
 nullable = true
+
+[needs.fields.modified]
+description = "A platform part this project changes (#Modified)"
+nullable = true
+schema = { type = "boolean" }
 
 [needs.fields.variant]
 description = "A variant member of a platform variation"

@@ -132,6 +132,10 @@ package PumpPatterns {
     #Electrical part <'PC-106'> selectedController :> controller::controllerPwm {
         doc /* Platform PWM controller, selected for this program. */
     }
+    // a platform part this program changes: #Modified, and the doc says what changes
+    #Mechanical #Modified part <'PC-112'> oemHeatExchanger :> heatExchanger {
+        doc /* Radiator RAD-200 with the customer's mounting brackets: a new bracket die, BOM RAD-210. */
+    }
 
     // --- V: system test cases verify system requirements ---
     verification <'STC-101'> flowBenchTest {

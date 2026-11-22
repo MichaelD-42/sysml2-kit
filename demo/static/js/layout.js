@@ -47,6 +47,7 @@ function describe(node, actors, compound) {
   const typeBox = node.count !== undefined;
   if (node.platform && !typeBox) tags.push("platform");
   if (node.reuse) tags.push(`reuse: ${node.reuse}`);
+  if (node.modified) tags.push("modified");
   if (node.selected === true && node.variant) tags.push("selected");
   if (node.selected === false) tags.push("not selected");
   // a shared part is drawn once, in its first owner

@@ -1,4 +1,6 @@
-"""Platform reuse status of each feature, derived from the needs graph."""
+"""Realization degree of each feature and logical component, derived from the needs graph."""
+
+WORST_FIRST = ["incomplete", "new", "partial", "full"]
 
 
 def closure(needs, start, link):
@@ -70,8 +72,7 @@ def chain_components(needs, feature_id):
     )
 
 
-def _function_reach(needs, feature_id):
-    """Per leaf function: (physical need ids reached, variations reached without a selection)."""
+def _reach_context(needs):
     below = descendants(needs)
     # variants are reached only by allocation to one, or to a part specializing one
     assembly = descendants(needs, lambda n: not n.get("variant"))
@@ -83,37 +84,47 @@ def _function_reach(needs, feature_id):
         if not need["platform"]
         for v in [*need.get("allocated_to", []), *closure(needs, n, "specializes")]
     }
+    return below, assembly, variations, selected
+
+
+def _component_reach(needs, lc, context):
+    """(physical need ids a component and its descendants reach, variations reached without a selected variant)."""
+    below, assembly, variations, selected = context
+    pcs, offered = set(), set()
+    for part in below(lc):
+        for pc in needs[part].get("allocated_to", []):
+            if needs[pc]["platform"] and needs[pc]["variant"] and pc not in selected:
+                offered |= set(needs[pc]["owned_by"]) & variations
+            elif needs[pc]["type"] == "physical":
+                # an assembly reaches its parts
+                pcs |= {i for i in assembly(pc) if needs[i]["type"] == "physical"}
+    unselected = set()
+    for pc in pcs:
+        # a part that is or specializes a variation, but no variant of it, selects nothing
+        chain = closure(needs, pc, "specializes")
+        if not any(needs[i]["variant"] for i in chain):
+            unselected |= chain & variations
+    covered = {
+        o
+        for pc in pcs
+        for i in closure(needs, pc, "specializes")
+        if needs[i]["variant"]
+        for o in needs[i]["owned_by"]
+    }
+    return pcs, unselected | offered - covered
+
+
+def _function_reach(needs, feature_id, context=None):
+    """Per leaf function: (physical need ids reached, variations reached without a selection)."""
+    context = context or _reach_context(needs)
     out = {}
     for fn, components in function_components(needs, feature_id).items():
-        pcs, offered = set(), set()
+        pcs, unselected = set(), set()
         for lc in components:
-            for part in below(lc):
-                for pc in needs[part].get("allocated_to", []):
-                    if (
-                        needs[pc]["platform"]
-                        and needs[pc]["variant"]
-                        and pc not in selected
-                    ):
-                        offered |= set(needs[pc]["owned_by"]) & variations
-                    elif needs[pc]["type"] == "physical":
-                        # an assembly reaches its parts
-                        pcs |= {
-                            i for i in assembly(pc) if needs[i]["type"] == "physical"
-                        }
-        unselected = set()
-        for pc in pcs:
-            # a part that is or specializes a variation, but no variant of it, selects nothing
-            chain = closure(needs, pc, "specializes")
-            if not any(needs[i]["variant"] for i in chain):
-                unselected |= chain & variations
-        covered = {
-            o
-            for pc in pcs
-            for i in closure(needs, pc, "specializes")
-            if needs[i]["variant"]
-            for o in needs[i]["owned_by"]
-        }
-        out[fn] = (pcs, unselected | offered - covered)
+            p, u = _component_reach(needs, lc, context)
+            pcs |= p
+            unselected |= u
+        out[fn] = (pcs, unselected)
     return out
 
 
@@ -137,31 +148,47 @@ def reused_pcs(needs, feature_id):
     return set().union(*function_pcs(needs, feature_id).values())
 
 
+def component_pcs(needs, lc, context=None):
+    """Physical need ids a component reaches; none when it reaches a variation without a selected variant."""
+    pcs, unselected = _component_reach(needs, lc, context or _reach_context(needs))
+    return set() if unselected else pcs
+
+
+def component_reuse(needs, lc, context=None):
+    """full, partial, new or incomplete: a leaf by its parts, a composite by its leaves (incomplete if one is)."""
+    context = context or _reach_context(needs)
+    if not needs[lc]["leaf"]:
+        leaves = [
+            i
+            for i in context[0](lc)
+            if i != lc and needs[i]["type"] == "component" and needs[i]["leaf"]
+        ]
+        degrees = {component_reuse(needs, i, context) for i in leaves}
+        return "incomplete" if not degrees or "incomplete" in degrees else _combine(degrees)
+    pcs = component_pcs(needs, lc, context)
+    return _combine({part_reuse(needs, p) for p in pcs}) if pcs else "incomplete"
+
+
 def reuse(needs):
-    """Map each feature id to platform, variant, modified, new or incomplete."""
-
-    def chain(pc):
-        return [needs[i] for i in closure(needs, pc, "specializes")]
-
+    """Map each feature and logical component id to full, partial, new or incomplete."""
+    context = _reach_context(needs)
     out = {}
-    for fid, feature in needs.items():
-        if feature["type"] != "feature":
-            continue
-        per_function = function_pcs(needs, fid).values()
-        pcs = set().union(*per_function)
-        platform = [any(n["platform"] for n in chain(pc)) for pc in pcs]
-        if not pcs or not all(per_function):
-            out[fid] = "incomplete"
-        elif all(platform):
-            variant = any(n["variant"] for pc in pcs for n in chain(pc))
-            out[fid] = "variant" if variant else "platform"
-        else:
-            out[fid] = "modified" if any(platform) else "new"
+    for fid, n in needs.items():
+        if n["type"] == "component":
+            out[fid] = component_reuse(needs, fid, context)
+        elif n["type"] == "feature":
+            reach = _function_reach(needs, fid, context).values()
+            if not reach or any(u or not p for p, u in reach):
+                out[fid] = "incomplete"
+            else:
+                out[fid] = _combine(
+                    {part_reuse(needs, pc) for p, _ in reach for pc in p}
+                )
     return out
 
 
 def constraint_reuse(needs, con_id):
-    """Platform, variant or new by the part owning the constraint; incomplete without one."""
+    """full, partial or new by the part owning the constraint; incomplete without one."""
     owners = [
         o
         for o in needs[con_id].get("owned_by", [])
@@ -173,16 +200,20 @@ def constraint_reuse(needs, con_id):
 
 
 def part_reuse(needs, part):
-    """Platform, variant or new by the part's specializations; an assembly (no domain) adds its parts'."""
-    chain = [needs[i] for i in closure(needs, part, "specializes")]
+    """full, partial or new by the part's specializations and #Modified; an assembly (no domain) adds its parts'."""
+    chain = closure(needs, part, "specializes")
     own = set()
-    if any(n["platform"] for n in chain):
-        own.add("variant" if any(n["variant"] for n in chain) else "platform")
+    if needs[part].get("modified"):
+        own.add("partial")
+    elif any(needs[i]["platform"] for i in chain):
+        own.add("full")
+    # an assembly has the parts it owns and those it inherits from project parts it specializes
+    owners = {i for i in chain if not needs[i]["platform"]}
     parts = (
         [
             i
             for i, n in needs.items()
-            if part in n["owned_by"] and n["type"] == "physical"
+            if owners & set(n["owned_by"]) and n["type"] == "physical"
         ]
         if needs[part]["type"] == "physical" and not needs[part].get("domain")
         else []
@@ -192,8 +223,7 @@ def part_reuse(needs, part):
 
 
 def _combine(statuses):
-    if statuses == {"new"}:
-        return "new"
-    if statuses & {"new", "modified"}:
-        return "modified"
-    return "variant" if "variant" in statuses else "platform"
+    if statuses in ({"new"}, {"full"}):
+        return next(iter(statuses))
+    return "partial"
+

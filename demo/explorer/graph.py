@@ -23,6 +23,7 @@ NEED_FIELDS = (
     "platform",
     "variant",
     "reuse",
+    "modified",
     "docname",
     "result",
 )

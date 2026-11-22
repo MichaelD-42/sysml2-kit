@@ -114,7 +114,7 @@ MUTATIONS = [
         "all",
         replace(
             "model/logical/architecture.sysml",
-            "satisfy partNumberLabel by OEM_WindowSwitch;",
+            "satisfy partNumberLabel by OEM_WindowSwitch.enclosure;",
             "",
         ),
         r"Need path:\s+SR-106\b.*\n\s+Schema path:\s+sysreq-satisfied",
@@ -221,8 +221,8 @@ MUTATIONS = [
         "all",
         replace(
             "model/logical/architecture.sysml",
-            "as this RFQ needs it. */\n",
-            "as this RFQ needs it. */\n        part <'LC-199'> extraUnit;\n",
+            "The vehicle's window switch as a whole. */\n",
+            "The vehicle's window switch as a whole. */\n        part <'LC-199'> extraUnit;\n",
         ),
         r"Need path:\s+LC-199\b.*\n\s+Schema path:\s+logical-allocated",
     ),
@@ -370,6 +370,27 @@ MUTATIONS = [
         ),
         r"CTR-005: not answered",
     ),
+    (
+        "an RFQ feature specializing a platform feature fails the bridge",
+        "all",
+        replace(
+            "model/functional/features.sysml",
+            # another platform feature, so no inherited function name collides with the RFQ's own
+            "#Feature action <'FEAT-103'> nightDesign {",
+            "#Feature action <'FEAT-103'> nightDesign :> WindowSwitchFeatures::childLock {",
+        ),
+        r"FEAT-103: specializes the platform's WSW-FEAT-002",
+    ),
+    (
+        "#Modified on a part of its own fails the bridge",
+        "all",
+        replace(
+            "model/physical/components.sysml",
+            "#Mechanical part <'PC-113'>",
+            "#Mechanical #Modified part <'PC-113'>",
+        ),
+        r"PC-113: #Modified needs a platform part to modify",
+    ),
 ]
 
 
@@ -402,7 +423,7 @@ def main():
         html = (work / "docs/_build/html/model.html").read_text()
         checks = {
             "SR-106 shows its satisfying component": re.search(
-                r'id="SR-106".*?satisfied by.*?LC-100', html, re.DOTALL
+                r'id="SR-106".*?satisfied by.*?LC-106', html, re.DOTALL
             ),
             "SR-106 shows its system test": re.search(
                 r'id="SR-106".*?verified by.*?STC-111', html, re.DOTALL
@@ -419,6 +440,7 @@ def main():
             failures += not ok
         failures += mutations(MUTATIONS, EXAMPLE)
         failures += information()
+        failures += all_new()
         return 1 if failures + incremental(work) + hook(work) else 0
 
 
@@ -445,6 +467,31 @@ def information():
         )
 
 
+def all_new():
+    """A component realized by new parts only is new in the realization table, and the build stays green."""
+
+    def edit(work):
+        path = work / "model/physical/components.sysml"
+        text = path.read_text()
+        for target in (
+            "WindowSwitchPhysical::housing;",
+            "WindowSwitchPhysical::seal;",
+            "oemWindowSwitch.oemKeyCaps;",
+        ):
+            text = text.replace(f"    allocate OEM_WindowSwitch.enclosure to {target}\n", "")
+        # the modified caps go too, or they would be a part without a logical component
+        text = re.sub(r"        #Mechanical #Modified part <'PC-112'>.*?\n        \}\n", "", text, flags=re.DOTALL)
+        path.write_text(text)
+
+    with build("all", edit) as (code, out, work):
+        table = (work / "docs/_generated/compliance.md").read_text() if code == 0 else ""
+        return report(
+            "a component realized by new parts only is new",
+            re.search(r"^\| \{need\}`LC-106` \| enclosure \| new \|", table, re.MULTILINE),
+            out,
+        )
+
+
 def links_resolve(html_dir):
     """The inlined trace graph links every box to an anchor that exists on its page."""
     page = (html_dir / "traceability.html").read_text()
@@ -463,20 +510,28 @@ def links_resolve(html_dir):
 
 
 def compliance_rows(table):
-    """The compliance table has a variant, a platform, a partial and a statement-only row."""
+    """The compliance table has a full, a partial-reuse, a partial and a statement-only row; the realization
+    table shows the enclosure partly realized by a modified and a new part."""
     text = table.read_text() if table.exists() else ""
     rows = text.split("\n\n")[0].splitlines()[
         2:
     ]  # the requirements table, not the CTR one
     cells = [[c.strip() for c in row.strip("|").split("|")] for row in rows]
+    enclosure = re.search(r"^\| \{need\}`LC-106` .*$", text, re.MULTILINE)
     return {
-        f"compliance table has a {kind} row": any(test(c) for c in cells)
+        "realization table: LC-106 partial, modified PC-112, new PC-113": bool(enclosure)
+        and "| partial |" in enclosure[0]
+        and "`PC-112` oemKeyCaps (modified WSW-PC-002)" in enclosure[0]
+        and "`PC-113` partNumberLabel (new)" in enclosure[0],
+        **{
+            f"compliance table has a {kind} row": any(test(c) for c in cells)
         for kind, test in {
-            "variant": lambda c: c[4] == "variant",
-            "platform": lambda c: c[4] == "platform",
+            "full": lambda c: c[4] == "full",
+            "partial reuse": lambda c: c[4] == "partial",
             "partial": lambda c: c[5] == "yes",
             "statement-only": lambda c: not c[3] and "CST-001" in c[6],
-        }.items()
+            }.items()
+        },
     }
 
 

@@ -1,14 +1,17 @@
 """Compliance table: per customer requirement, the features and statements that answer it."""
 
 from .reuse import (
+    WORST_FIRST,
     chain_components,
+    closure,
+    component_reuse,
     constraint_reuse,
+    part_reuse,
     reuse,
     reused_pcs,
     unselected_variations,
 )
 
-WORST_FIRST = ["incomplete", "new", "modified", "variant", "platform"]
 MET = "partial match without a system requirement stating what is met"
 NO_PARTIAL_CST = "partial, but no partial compliance statement answers it"
 # classes a constraint can answer, and classes that must be verified
@@ -186,8 +189,41 @@ def _satisfied_outside(needs, crs, features):
     )
 
 
-def table_md(rows, ctrs=()):
-    """MyST Markdown tables (requirements, then CTRs if any), every need linked with the need role."""
+def realization_rows(needs):
+    """Per project logical component: (id, title, degree, [(part id, title, note)]) for the parts it is allocated to."""
+
+    def note(pc):
+        if not needs[pc]["platform"] and needs[pc].get("modified"):
+            prefix = "modified "
+        elif part_reuse(needs, pc) == "new":
+            return "new"
+        else:
+            prefix = ""
+        platform = {
+            i for i in closure(needs, pc, "specializes") - {pc} if needs[i]["platform"]
+        }
+        # a selected variant names the part; its variation would only repeat it
+        owners = {o for i in platform if needs[i].get("variant") for o in needs[i]["owned_by"]}
+        return prefix + ", ".join(sorted(platform - owners))
+
+    return [
+        (
+            lc,
+            n["title"],
+            component_reuse(needs, lc),
+            [
+                (pc, needs[pc]["title"], note(pc))
+                for pc in sorted(n.get("allocated_to", []))
+                if needs.get(pc, {}).get("type") == "physical"
+            ],
+        )
+        for lc, n in sorted(needs.items())
+        if n["type"] == "component" and not n["platform"]
+    ]
+
+
+def table_md(rows, ctrs=(), realization=()):
+    """MyST Markdown tables (requirements, CTRs if any, realization if any), every need linked with the need role."""
 
     def cell(text):
         return str(text).replace("|", "\\|")
@@ -219,4 +255,16 @@ def table_md(rows, ctrs=()):
                 f"| {links([ctr])} | {cell(title)} | {purpose} | {method} "
                 f"| {links(tests)} | {statement_links(statements)} |"
             )
+    if realization:
+        out += [
+            "",
+            "| Component | Title | Degree | Physical parts |",
+            "| --- | --- | --- | --- |",
+        ]
+        for lc, title, degree, parts in realization:
+            cells = ", ".join(
+                f"{{need}}`{pc}` {cell(name)}" + (f" ({n})" if n else "")
+                for pc, name, n in parts
+            )
+            out.append(f"| {links([lc])} | {cell(title)} | {degree} | {cells} |")
     return "\n".join(out) + "\n"

@@ -13,7 +13,7 @@ Produce in `model/logical/architecture.sysml`:
 - `allocate <functions>.<leaf> to <system>.<component>;`: every leaf function to exactly one leaf component; every leaf component gets at least one function. Prefer cohesion: functions sharing data or timing go to the same component.
 - `satisfy <SR> by <system>.<component>;`: every SR satisfied by the component(s) responsible; system-level properties (mass, cost) by the top-level component.
 
-Stop at logical components and interfaces: no `#Mechanical`/`#Electrical`/`#Software` parts, no allocation to physical components. If a platform PC already exists for a role, name it in the report so the `physical-architect` allocates to it; do not allocate to it yourself.
+Stop at logical components and interfaces: no `#Mechanical`/`#Electrical`/`#Software` parts, no allocation to physical components. In an RFQ project the components are the RFQ's own breakdown, the one the quote is built from: never subset a platform component (the bridge rejects it). If a platform PC already exists for a role, name it in the report so the `physical-architect` allocates to it; do not allocate to it yourself.
 
 Do not change R or F; if a function cannot be allocated cleanly, report it instead of reshaping the function tree. Keep existing ids.
 

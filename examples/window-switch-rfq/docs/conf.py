@@ -1,4 +1,4 @@
-project = "Seat switch RFQ (sysml2-kit example)"
+project = "Window switch RFQ (sysml2-kit example)"
 extensions = ["myst_parser", "sphinx_needs"]
 # _generated holds pages included into others (compliance.md), not documents of their own
 exclude_patterns = ["_build", "_generated"]

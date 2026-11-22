@@ -6,7 +6,7 @@ import re
 import sys
 from pathlib import Path
 
-from .compliance import compliance, ctr_rows, table_md
+from .compliance import compliance, ctr_rows, realization_rows, table_md
 from .gaps import gaps
 from .needs import BridgeError, text_findings, write_needs
 from .render import trace_svg, use_case_svg, use_cases
@@ -82,7 +82,7 @@ def main(argv=None):
             data = json.loads(Path(args.needs_json).read_text())
             needs = data["versions"][data.get("current_version", "")]["needs"]
             rows, findings = compliance(needs)
-            Path(args.output).write_text(table_md(rows, ctr_rows(needs)))
+            Path(args.output).write_text(table_md(rows, ctr_rows(needs), realization_rows(needs)))
             print(f"sysml2kit: compliance of {len(rows)} requirements -> {args.output}")
             for finding in findings:
                 print(finding)
