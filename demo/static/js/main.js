@@ -1,8 +1,8 @@
-// Wires the page: one focus element, eleven views laid out by ELK, and the side panels.
+// Wires the page: one focus element, the views that apply to it laid out by ELK, and the side panels.
 import * as api from "./api.js";
 import { focus, setFocus, breadcrumb, history } from "./state.js";
 import { toElk, fromElk, layoutV, keyword } from "./layout.js";
-import { svg, esc, drillKind } from "./render.js";
+import { svg, esc, drillKind, offered } from "./render.js";
 import * as panels from "./panels.js";
 
 const KINDS = {
@@ -28,9 +28,13 @@ let token = 0;
 let scale = 1;
 
 const related = new Map(); // key -> keys linked to it through a requirement (both directions)
+const reqLinks = new Map(); // requirement key -> its links [{rel, key, name}]
+const TREES = ["#req-tree", "#rflp-tree", "#plat-tree"];
 
 async function loadModel() {
-  const [roots, reqs, rflp, keys] = await Promise.all([api.tree(), api.tree("requirements"), api.tree("rflp"), api.keys()]);
+  const [roots, reqs, rflp, platform, keys] = await Promise.all([
+    api.tree(), api.tree("requirements"), api.tree("rflp"), api.tree("platform"), api.keys(),
+  ]);
   names.clear(), parents.clear(), knownKeys.clear();
   keys.forEach((k) => knownKeys.add(k));
   const walk = (n, parent) => {
@@ -39,18 +43,23 @@ async function loadModel() {
     n.children.forEach((c) => walk(c, n.key));
   };
   roots.forEach((r) => walk(r, null));
-  related.clear();
+  related.clear(), reqLinks.clear();
   const link = (a, b) => (related.has(a) || related.set(a, new Set()), related.get(a).add(b));
-  for (const g of reqs) for (const r of g.children) for (const l of r.children) link(r.key, l.key), link(l.key, r.key);
+  for (const g of reqs)
+    for (const r of g.children) {
+      reqLinks.set(r.key, r.links);
+      for (const l of r.links) link(r.key, l.key), link(l.key, r.key);
+    }
   const named = (n) => (n.key && !names.has(n.key) && names.set(n.key, n.name), (n.children ?? []).forEach(named));
-  [...reqs, ...rflp].forEach(named);
+  [...reqs, ...rflp, ...platform, ...[...reqLinks.values()].flat()].forEach(named);
   panels.renderTree($("#req-tree"), reqs);
   panels.renderTree($("#rflp-tree"), rflp);
+  panels.renderTree($("#plat-tree"), platform);
 }
 
-// the focus in both trees, plus what it is linked to through a requirement
+// the focus in every tree, plus what it is linked to through a requirement
 function revealTrees(key) {
-  for (const id of ["#req-tree", "#rflp-tree"]) panels.revealInTree($(id), key, related.get(key) ?? new Set());
+  for (const id of TREES) panels.revealInTree($(id), key, related.get(key) ?? new Set());
 }
 
 // unnamed elements (a requirement's constraint) are labelled by their expression
@@ -64,11 +73,17 @@ async function label(nodes) {
   );
 }
 
+// the tabs for `kinds` (all views until there is a focus)
+function renderTabs(kinds = Object.keys(KINDS)) {
+  $("#kinds").innerHTML = kinds
+    .map((k) => `<button type="button" role="tab" id="tab-${k}" aria-controls="canvas" data-kind="${k}">${esc(KINDS[k])}</button>`)
+    .join("");
+  markTab(current.kind);
+}
+
 function tabs() {
   const nav = $("#kinds");
-  nav.innerHTML = Object.entries(KINDS)
-    .map(([k, title]) => `<button type="button" role="tab" id="tab-${k}" aria-controls="canvas" data-kind="${k}">${title}</button>`)
-    .join("");
+  renderTabs();
   nav.onclick = (e) => {
     const b = e.target.closest("[data-kind]");
     if (b) show(b.dataset.kind, focus.get());
@@ -150,16 +165,19 @@ function highlight(key) {
     if ((el.dataset.key ?? el.dataset.row) === key && !el.matches("a")) el.classList.add("focus");
 }
 
-async function inspect(key) {
+// the inspector and breadcrumb for an element from /api/element; a requirement lists its links,
+// any other element the requirements linked to it
+function inspect(key, found) {
   const crumbs = $("#breadcrumb");
   const info = $("#inspector");
   try {
-    const { node, edges } = await api.element(key);
-    if (focus.get() !== key) return;
+    if (found.error) throw found.error;
+    const { node, edges } = found;
     const owner = edges.find((e) => e.type === "OWNS" && e.direction === "in");
     if (owner && !parents.has(key)) parents.set(key, owner.other), names.set(owner.other, owner.name ?? owner.other);
-    const name = node.name ?? node.title ?? node.expression ?? key;
+    const name = (node.kind === "UseCaseUsage" && node.title) || (node.name ?? node.title ?? node.expression ?? key);
     names.set(key, name);
+    const links = reqLinks.get(key) ?? [...(related.get(key) ?? [])].map((k) => ({ rel: "requirements", key: k, name: names.get(k) ?? k }));
     crumbs.innerHTML = breadcrumb(key, parents)
       .map((k) => (k === key ? `<span aria-current="true">${esc(name)}</span>` : panels.keyLink(k, names.get(k) ?? k)))
       .join('<span class="sep" aria-hidden="true">/</span>');
@@ -168,21 +186,28 @@ async function inspect(key) {
       ${node.shortName || !/^[0-9a-f]{8}-/.test(key) ? `<span class="id">${esc(node.shortName ?? key)}</span>` : ""}
       ${node.domain ? `<span class="domain d-${esc(node.domain)}">${esc(node.domain)}</span>` : ""}
       ${value ? `<span>= ${esc(value)}</span>` : ""}${node.expression ? `<span>${esc(node.expression)}</span>` : ""}
-      ${node.doc || node.content ? `<p>${esc(node.doc ?? node.content)}</p>` : ""}`;
+      ${node.doc || node.content ? `<p>${esc(node.doc ?? node.content)}</p>` : ""}${panels.linkList(links)}`;
   } catch (e) {
     info.innerHTML = `<p class="error">${esc(e.message)}</p>`;
   }
 }
 
-function onFocus(key) {
+async function onFocus(key) {
   $("#back").disabled = !history.length;
   revealTrees(key);
-  inspect(key);
+  const found = await api.element(key).catch((error) => ({ error }));
+  if (focus.get() !== key) return;
+  inspect(key, found);
+  // only the views that apply to the element; a view it was picked in stays offered
+  const node = found.node ?? {};
+  const inView = current.keys.has(key);
+  const kinds = offered(node, Object.keys(KINDS));
+  renderTabs(Object.keys(KINDS).filter((k) => kinds.includes(k) || (inView && k === current.kind)));
   // in the V a customer requirement (level 1, left leg) narrows the view to its chain
   const crs = current.kind === "vmodel" && current.view?.nodes.some((n) => n.key === key && n.level === 1 && n.side === "left");
   if (crs && key !== current.view.focus) show(current.kind, key);
-  else if (current.kind === "compliance" || current.kind === "metamodel" || current.keys.has(key)) highlight(key);
-  else show(current.kind, key);
+  else if (current.kind === "compliance" || current.kind === "metamodel" || inView) highlight(key);
+  else show(kinds.includes(current.kind) ? current.kind : drillKind(node, current.kind), key);
 }
 
 // a meta-model type or link lists its instances in the inspector; its boxes are not elements

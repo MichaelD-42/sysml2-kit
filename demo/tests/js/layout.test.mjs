@@ -116,3 +116,12 @@ test("toElk frames meta-model layers in RFLP order and boxes types without an id
   assert.equal(crs.header, "«crs»");
   assert.deepEqual(crs.tags, ["1 instance", "rule crs-class"]);
 });
+
+test("toElk says how many of a meta-model type's instances are platform", () => {
+  const g = toElk({
+    kind: "metamodel",
+    nodes: [{ key: "type:sysreq", name: "System requirement", kind: "sysreq", parent: null, count: 25, platform: 21, rules: [] }],
+    edges: [],
+  });
+  assert.deepEqual(g.children[0].meta.tags, ["25 instances (21 platform)"]);
+});

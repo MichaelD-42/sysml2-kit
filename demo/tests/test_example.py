@@ -123,7 +123,7 @@ class EnrichedExampleTest(unittest.TestCase):
     def test_assembly_boundary(self):
         self.assertEqual(
             port_names(export, "SeatSwitchPhysical::SwitchAssembly"),
-            {"lin", "supply"},
+            {"lin", "supply", "ground"},
         )
 
     def test_context(self):
@@ -131,6 +131,7 @@ class EnrichedExampleTest(unittest.TestCase):
             part_names(export, "SeatSwitchRfqContext::seatSwitchContext"),
             {
                 "seatSwitches",
+                "seatHarness",
                 "seat",
                 "seatControlUnit",
                 "occupant",

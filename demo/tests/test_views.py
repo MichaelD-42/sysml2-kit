@@ -1,5 +1,9 @@
+import json
 import re
+import shutil
+import tempfile
 import unittest
+from pathlib import Path
 
 from explorer import db, load, views
 from explorer.graph import Edge, Graph, Node
@@ -35,6 +39,55 @@ class DefaultFocusTest(unittest.TestCase):
         for kind in ("context", "boundary", "interfaces", "composition"):
             with self.subTest(kind=kind):
                 self.assertEqual(views.view(graph, kind, None)["focus"], "B-1")
+
+
+class SmallGraphTest(unittest.TestCase):
+    def setUp(self):
+        self.graph = db.Graph()
+        self.addCleanup(self.graph.close)
+
+    def test_vmodel_places_software_requirements_with_their_results(self):
+        nodes = [
+            Node("SWR-1", ["Node", "Need", "swreq"], {"key": "SWR-1"}),
+            Node(
+                "testresult__a",
+                ["Node", "Need", "testresult"],
+                {"key": "testresult__a", "result": "passed"},
+            ),
+        ]
+        load.write(
+            Graph({n.key: n for n in nodes}, [Edge("testresult__a", "TESTS", "SWR-1")]),
+            self.graph,
+        )
+        v = views.view(self.graph, "vmodel", None)
+        at = {n["key"]: (n["level"], n["side"]) for n in v["nodes"]}
+        self.assertEqual(at, {"SWR-1": (4, "left"), "testresult__a": (4, "right")})
+
+    def test_a_rule_with_local_and_network_checks_is_on_the_type_and_the_link(self):
+        crs = {"local": {"properties": {"type": {"const": "crs"}}}}
+        rule = {
+            "id": "both",
+            "select": {"properties": {"type": {"const": "sysreq"}}},
+            "validate": {
+                "local": {"required": ["title"]},
+                "network": {"satisfies": {"contains": crs}},
+            },
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            docs.mkdir()
+            shutil.copy(RFQ / "docs" / "ubproject.toml", docs)
+            (docs / "schemas.json").write_text(json.dumps({"schemas": [rule]}))
+            v = views.metamodel(self.graph, Path(tmp))
+        sysreq = next(n for n in v["nodes"] if n["key"] == "type:sysreq")
+        self.assertEqual(sysreq["rules"], ["both"])
+        link = next(
+            e
+            for e in v["edges"]
+            if (e["src"], e["type"], e["dst"])
+            == ("type:sysreq", "SATISFIES", "type:crs")
+        )
+        self.assertEqual(link["rules"], ["both"])
 
 
 class ViewsTest(unittest.TestCase):
@@ -181,7 +234,9 @@ class ViewsTest(unittest.TestCase):
         self.assertIsNone(groups[0]["key"])
         crs = self.requirement("Customer requirements", "CRS-304")
         self.assertEqual(crs["class"], "non-functional")
-        links = {(c["rel"], c["key"]) for c in crs["children"]}
+        # the tree lists requirements only; what they link to is carried for the inspector
+        self.assertEqual(crs["children"], [])
+        links = {(c["rel"], c["key"]) for c in crs["links"]}
         self.assertIn(("satisfied by (partial)", "CON-104"), links)
         self.assertNotIn(("satisfied by", "CON-104"), links)
         self.assertIn(("satisfied by", "SR-119"), links)
@@ -190,14 +245,14 @@ class ViewsTest(unittest.TestCase):
     def test_requirements_tree_lists_what_implements_a_ctr(self):
         ctr = self.requirement("Customer test requirements", "CTR-003")
         self.assertEqual(ctr["kind"], "ctr")
-        links = {(c["rel"], c["key"]) for c in ctr["children"]}
+        links = {(c["rel"], c["key"]) for c in ctr["links"]}
         self.assertIn(("implemented by", "STC-101"), links)
         self.assertLessEqual(
             {("applies to", "CRS-301"), ("applies to", "CRS-302")}, links
         )
         atc = self.requirement("Acceptance tests", "ATC-106")
         self.assertIn(
-            ("implements", "CTR-009"), {(c["rel"], c["key"]) for c in atc["children"]}
+            ("implements", "CTR-009"), {(c["rel"], c["key"]) for c in atc["links"]}
         )
 
     def test_rflp_tree_follows_the_chain(self):
@@ -207,11 +262,24 @@ class ViewsTest(unittest.TestCase):
                 yield here
                 yield from paths(n["children"], here)
 
-        all_paths = set(paths(views.rflp_tree(self.graph)))
+        own = views.rflp_tree(self.graph)
+        all_paths = set(paths(own))
         self.assertIn(("UC-102", "FEAT-102", "F-101", "LC-101", "PC-101"), all_paths)
         self.assertIn(("UC-102", "FEAT-102", "F-101", "LC-101", "PC-102"), all_paths)
-        roots = [n["key"] for n in views.rflp_tree(self.graph)]
-        self.assertLess(roots.index("UC-104"), roots.index("SSW-UC-001"))
+        self.assertEqual(
+            [n["key"] for n in own], ["UC-101", "UC-102", "UC-103", "UC-104"]
+        )
+        self.assertFalse(any(k.startswith("SSW-") for p in all_paths for k in p))
+        platform = views.rflp_tree(self.graph, platform=True)
+        self.assertEqual(platform[0]["key"], "SSW-UC-001")
+        self.assertIn(
+            ("SSW-UC-001", "SSW-FEAT-001", "SSW-F-001", "SSW-LC-003", "SSW-PC-008"),
+            set(paths(platform)),
+        )
+        # a use case is shown by its title
+        self.assertEqual(
+            own[0]["name"], "The occupant wants to adjust the seat position"
+        )
 
     def test_vmodel_levels_and_sides(self):
         v = views.view(self.graph, "vmodel", None)
@@ -272,6 +340,92 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual((unused["count"], unused["unused"]), (0, True))
         self.assertIn("partial_matches", v["unused_links"])
         self.assertNotIn("satisfies", v["unused_links"])
+        # ownership is drawn once, as the declared owned_by link
+        self.assertNotIn("OWNS", {e["type"] for e in v["edges"]})
+        self.assertIn(("component", "OWNED_BY", "component"), edges)
+        # most rules select platform: false, so counts say how many are platform
+        self.assertEqual(types["sysreq"]["platform"], 14)
+        self.assertEqual(types["crs"]["platform"], 0)
+        allocated = edges[("component", "ALLOCATED_TO", "physical")]
+        self.assertGreater(allocated["platform"], 0)
+        self.assertEqual(
+            allocated["label"],
+            f"allocated to ({allocated['count']}, {allocated['platform']} platform)",
+        )
+        self.assertEqual(satisfies["label"], f"satisfies ({satisfies['count']})")
+
+    def edges(self, v):
+        names = {n["key"]: n["name"] for n in v["nodes"]}
+        return {(names[e["src"]], e["type"], names[e["dst"]]) for e in v["edges"]}
+
+    def test_context_shows_the_harness(self):
+        v = self.view("context", "LC-100")
+        self.assertIn("seatHarness", self.names(v))
+        edges = self.edges(v)
+        self.assertIn(("seatHarness", "CONNECTS", "seatSwitches"), edges)
+        self.assertIn(("seatControlUnit", "CONNECTS", "seatHarness"), edges)
+
+    def test_context_of_an_inner_component(self):
+        v = self.view("context", "SSW-LC-005")
+        self.assertIn("switchController", self.names(v))
+
+    def test_context_of_a_part_connected_to_nothing(self):
+        v = views.view(self.graph, "context", "LC-101")
+        self.assertEqual(v["reason"], "LC-101 is connected to nothing in its owner")
+
+    def test_boundary_shows_the_pin_mapping(self):
+        v = self.view("boundary", "SSW-PC-022")
+        edges = {frozenset((a, b)) | {t} for a, t, b in self.edges(v)}
+        for pin, port in (
+            ("pin1Kl30", "supply"),
+            ("pin2Kl31", "ground"),
+            ("pin3Lin", "lin"),
+        ):
+            with self.subTest(pin=pin):
+                self.assertIn(frozenset((pin, port, "BINDS")), edges)
+        self.assertIn(frozenset(("pin1Kl30", "kl30", "CONNECTS")), edges)
+
+    def test_boundary_of_a_selected_variant_has_the_variation_ports(self):
+        v = self.view("boundary", "PC-102")
+        ports = {n["name"] for n in v["nodes"] if n["parent"] == "PC-102"}
+        self.assertLessEqual({"contacts", "levelLeds"}, ports)
+
+    def test_structure_views_of_a_port_show_its_owner(self):
+        for kind in ("boundary", "interfaces"):
+            with self.subTest(kind=kind):
+                v = self.view(kind, "SSW-PI-007")
+                self.assertEqual(v["focus"], "SSW-PI-007")
+                self.assertLessEqual(
+                    {"SSW-PC-022", "SSW-PI-007"}, {n["key"] for n in v["nodes"]}
+                )
+
+    def test_firmware_composition_has_components_and_units(self):
+        v = self.view("composition", "SSW-PC-016")
+        edges = {(e["src"], e["dst"]) for e in v["edges"]}
+        self.assertIn(("SSW-PC-016", "SSW-PC-034"), edges)
+        self.assertIn(("SSW-PC-034", "SSW-PC-035"), edges)
+
+    def test_composition_of_a_leaf(self):
+        v = views.view(self.graph, "composition", "SSW-PC-035")
+        self.assertEqual(v["reason"], "SSW-PC-035 has no parts")
+
+    def test_activity_of_a_function_is_its_feature(self):
+        v = self.view("activity", "SSW-F-001")
+        self.assertEqual(v["focus"], "SSW-F-001")
+        self.assertLessEqual({"SSW-F-001", "SSW-F-002"}, {n["key"] for n in v["nodes"]})
+
+    def test_variants_of_a_selection_is_its_variation(self):
+        v = self.view("variants", "PC-101")
+        self.assertEqual(v["focus"], "PC-101")
+        self.assertIn("SSW-PC-001", {n["key"] for n in v["nodes"]})
+
+    def test_usecases_show_titles(self):
+        v = self.view("usecases", "UC-101")
+        names = {n["key"]: n["name"] for n in v["nodes"]}
+        self.assertEqual(
+            names["UC-104"],
+            "The end-of-line tester wants to flash, code and test each switch for its seat position",
+        )
 
     def test_unknown_kind(self):
         with self.assertRaises(ValueError):

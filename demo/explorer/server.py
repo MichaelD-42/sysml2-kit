@@ -61,6 +61,7 @@ def create_app(graph, embedder, project: Path, agent_factory=None) -> FastAPI:
             "packages": views.tree,
             "requirements": views.requirements_tree,
             "rflp": views.rflp_tree,
+            "platform": lambda g: views.rflp_tree(g, platform=True),
         }
         if kind not in trees:
             raise ValueError(f"unknown tree kind {kind!r}")

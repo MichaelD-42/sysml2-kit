@@ -213,6 +213,13 @@ export function renderCompliance(el, view, focus) {
     ${view.findings?.length ? `<h3>Findings</h3><ul class="findings">${view.findings.map((f) => `<li>${esc(typeof f === "string" ? f : JSON.stringify(f))}</li>`).join("")}</ul>` : ""}`;
 }
 
+/** Inspector HTML for links [{rel, key, name}]: one line per relation, each key a focus link. */
+export function linkList(links) {
+  const byRel = new Map();
+  for (const l of links) byRel.set(l.rel, [...(byRel.get(l.rel) ?? []), keyLink(l.key, l.name)]);
+  return [...byRel].map(([rel, ks]) => `<p class="links"><span class="rel">${esc(rel)}</span> ${ks.join(", ")}</p>`).join("");
+}
+
 /** Inspector HTML for a meta-model need type or link: its count, the rules on it, its instances. */
 export function instanceList(item) {
   const type = (k) => k.replace(/^type:/, "");

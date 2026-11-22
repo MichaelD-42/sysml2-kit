@@ -79,17 +79,19 @@ WITH f, [p IN found WHERE NOT p.n IN redefined] AS parts"""
 # ports a part shows: its own and those of what it specializes or is typed by
 PORTS = """COLLECT {{
   UNWIND {holders} AS h
-  MATCH (h)-[:SPECIALIZES|TYPED_BY*0..]->()-[:OWNS]->(q:PortUsage)
+  MATCH (h)-[:SPECIALIZES|TYPED_BY|VARIANT_OF*0..]->()-[:OWNS]->(q:PortUsage)
   RETURN {{n: q, parent: h}}
 }}"""
 
 CONTEXT = (
     """
 MATCH (f:Node {key: $focus})
-WITH f, COLLECT { MATCH (p:PartUsage)-[:SPECIALIZES]->(f) RETURN p } AS uses
+WITH f, [f] + COLLECT { MATCH (p:PartUsage)-[:SPECIALIZES]->(f) RETURN p } AS uses
+// a connection may end on a port the part inherits (the harness wires to SwitchAssembly's ports)
 WITH f, uses, COLLECT {
   UNWIND uses AS p
-  MATCH (o)-[:OWNS]->(p), (o)-[:OWNS]->(x:PartUsage)-[:OWNS*0..1]->()-[:CONNECTS|FLOW]-()<-[:OWNS*0..1]-(p)
+  MATCH (o)-[:OWNS]->(p), (o)-[:OWNS]->(x:PartUsage)-[:OWNS*0..1]->()-[:CONNECTS|FLOW]-()<-[:OWNS*0..1]-()
+    <-[:SPECIALIZES|TYPED_BY*0..]-(p)
   WHERE x <> p
   RETURN DISTINCT x
 } AS others,
@@ -98,10 +100,14 @@ COLLECT {
   MATCH (uc:UseCaseUsage)-[:SUBJECT]->({name: f.name}), (uc)-[:OWNS]->(a:PartUsage)
   RETURN {a: a, uc: uc.name}
 } AS actors
-// one node per actor name, the context's own part when it has one
+// one node per actor name, the context's own part when it has one (so its connections show)
+WITH f, uses, others, actors, COLLECT {
+  UNWIND uses AS p MATCH (o)-[:OWNS]->(p), (o)-[:OWNS]->(x:PartUsage) WHERE x <> p RETURN DISTINCT x
+} AS siblings
 WITH f, uses, others, actors, COLLECT {
   UNWIND actors AS x WITH x WHERE NOT x.a.name IN [o IN others | o.name]
-  WITH x.a.name AS name, collect(x.a)[0] AS a RETURN a
+  WITH x.a.name AS name, collect(x.a)[0] AS a
+  RETURN coalesce([s IN siblings WHERE s.name = name][0], a)
 } AS cast
 WITH f, uses, others + cast AS shown, actors
 // the usages that specialize the focus are drawn as the focus itself
@@ -109,7 +115,8 @@ WITH f, [n IN [f] + shown | {key: n.key, parent: null}] AS nodes,
   [n IN [f] + uses + shown | n.key] AS keys, [p IN uses | p.key] AS folded,
   [x IN actors | {src: [n IN shown WHERE n.name = x.a.name][0].key, dst: f.key, type: 'ACTOR', label: x.uc}] AS extra
 RETURN nodes, COLLECT {
-  MATCH (a:Node)-[:OWNS*0..1]->()-[r:CONNECTS|FLOW]->()<-[:OWNS*0..1]-(b:Node)
+  MATCH (a:Node)-[:SPECIALIZES|TYPED_BY*0..]->()-[:OWNS*0..1]->()-[r:CONNECTS|FLOW]->()
+    <-[:OWNS*0..1]-()<-[:SPECIALIZES|TYPED_BY*0..]-(b:Node)
   WHERE a.key IN keys AND b.key IN keys AND a <> b
   RETURN DISTINCT {
     src: CASE WHEN a.key IN folded THEN f.key ELSE a.key END,
@@ -125,7 +132,7 @@ BOUNDARY = (
     """
 MATCH (f:Node {key: $focus})
 WITH f, COLLECT {
-  MATCH (f)-[:SPECIALIZES|TYPED_BY*0..]->()-[:OWNS]->(q:PortUsage) RETURN DISTINCT q
+  MATCH (f)-[:SPECIALIZES|TYPED_BY|VARIANT_OF*0..]->()-[:OWNS]->(q:PortUsage) RETURN DISTINCT q
 } AS fports, COLLECT {
   MATCH (f) ((:Node)-[:SPECIALIZES|TYPED_BY]->(:PartUsage|PartDefinition))* ()-[:OWNS]->(c:PartUsage)
   RETURN DISTINCT c
@@ -138,7 +145,7 @@ WITH f, fports, parts, """
     + """ AS pports
 WITH f, fports, parts, pports, COLLECT {
   UNWIND fports AS q
-  MATCH (q)-[:CONNECTS|FLOW]-(r:PortUsage)<-[:OWNS]-(o:Node)
+  MATCH (q)-[:CONNECTS|FLOW|BINDS]-(r:PortUsage)<-[:OWNS]-(o:Node)
   WHERE NOT r IN fports AND NOT r IN [x IN pports | x.n]
   RETURN DISTINCT {port: r, part: o}
 } AS outside
@@ -148,7 +155,7 @@ WITH [{key: f.key, parent: null}]
   + [x IN pports | {key: x.n.key, parent: x.parent.key}]
   + [x IN outside | {key: x.part.key, parent: null}]
   + [x IN outside | {key: x.port.key, parent: x.part.key}] AS nodes"""
-    + _close("CONNECTS|FLOW")
+    + _close("CONNECTS|FLOW|BINDS")
 )
 
 INTERFACES = (
@@ -168,7 +175,7 @@ WITH [{key: f.key, parent: null}]
   + [p IN parts | {key: p.n.key, parent: p.parent.key}]
   + [x IN ports | {key: x.n.key, parent: x.parent.key}]
   + [i IN interfaces | {key: i.key, parent: null}] AS nodes"""
-    + _close("CONNECTS|FLOW")
+    + _close("CONNECTS|FLOW|BINDS")
 )
 
 COMPOSITION = (
@@ -273,11 +280,23 @@ REASONS = {
     "activity": "has no actions",
     "variants": "is not a variation",
     "usecases": "is not a use case with a subject",
+    "context": "is connected to nothing in its owner",
+    "composition": "has no parts",
+}
+# what a view is drawn for when the focus has none of its own: a port's owner, a function's
+# feature, the variation a variant (or a part that selects it) belongs to; the focus stays highlighted
+PORT_OWNER = "MATCH (o:Node)-[:OWNS]->(:PortUsage {key: $focus}) RETURN o.key LIMIT 1"
+SUBJECTS = {
+    "boundary": PORT_OWNER,
+    "interfaces": PORT_OWNER,
+    "activity": "MATCH (o:Node)-[:OWNS]->(n:ActionUsage {key: $focus}) "
+    "WHERE NOT EXISTS { (n)-[:OWNS]->(:ActionUsage) } RETURN o.key LIMIT 1",
+    "variants": "MATCH (:Node {key: $focus})-[:SPECIALIZES*0..1]->()-[:VARIANT_OF]->(v) RETURN v.key LIMIT 1",
 }
 FOCUS = "MATCH (n:Node) WHERE n.key = $focus OR n.qualifiedName = $focus RETURN n.key LIMIT 1"
 NODES = """
 UNWIND $keys AS k MATCH (n:Node {key: k})
-RETURN n.key AS key, coalesce(n.name, n.title, n.key) AS name,
+RETURN n.key AS key, coalesce(CASE WHEN n:usecase THEN n.title END, n.name, n.title, n.key) AS name,
   coalesce(n.kind, [l IN labels(n) WHERE NOT l IN ['Node', 'Element', 'Need']][0]) AS kind,
   n.shortName AS shortName, n.domain AS domain, n.layer AS layer, n.platform AS platform,
   n.variant AS variant, n.reuse AS reuse,
@@ -288,7 +307,7 @@ RETURN n.key AS key, coalesce(n.name, n.title, n.key) AS name,
     RETURN {name: name, value: a.value, unit: a.unit}
   } AS attributes,
   COLLECT {
-    MATCH (n)-[:SPECIALIZES|TYPED_BY*0..]->()-[:OWNS]->(q:PortUsage)
+    MATCH (n)-[:SPECIALIZES|TYPED_BY|VARIANT_OF*0..]->()-[:OWNS]->(q:PortUsage)
     RETURN DISTINCT {key: q.key, name: q.name}
   } AS ports"""
 TREE = """
@@ -371,8 +390,13 @@ def view(
     if not found:
         raise KeyError(focus or f"no default focus for {kind}")
     key = next(iter(found[0].values()))
-    records = _read(graph, QUERIES[kind], focus=key)
+    subject = _read(graph, SUBJECTS[kind], focus=key) if kind in SUBJECTS else []
+    drawn = next(iter(subject[0].values())) if subject else key
+    records = _read(graph, QUERIES[kind], focus=drawn)
     nodes = _nodes(graph, records[0]["nodes"]) if records else []
+    # a part alone is no context or composition
+    if kind in ("context", "composition") and len(nodes) == 1:
+        nodes = []
     reason = None
     if not nodes:
         reason = f"{focus or key} {REASONS.get(kind, f'has no {kind} view')}"
@@ -426,7 +450,7 @@ ORDER BY platform, CASE kind WHEN 'crs' THEN 0 WHEN 'ctr' THEN 1 WHEN 'sysreq' T
 
 
 def requirements_tree(graph) -> list[dict]:
-    """Requirements grouped by document section, each with the elements linked to it."""
+    """Requirements grouped by document section, each with the elements linked to it as `links`."""
     groups = {}
     for r in _read(
         graph,
@@ -441,24 +465,24 @@ def requirements_tree(graph) -> list[dict]:
             for x in r["links"]
             if x["type"].startswith("PARTIAL_")
         }
-        kids = [
+        links = [
             {
                 "key": x["key"],
                 "name": x["name"],
                 "kind": x["kind"],
-                "children": [],
                 "rel": (OUT_REL if x["dir"] == "out" else IN_REL)[x["type"]],
             }
             for x in r["links"]
             if not (x["dir"] == "in" and (x["type"], x["key"]) in partial)
         ]
-        kids.sort(key=lambda k: (k["rel"], k["key"]))
+        links.sort(key=lambda k: (k["rel"], k["key"]))
         groups.setdefault(r["grp"], []).append(
             {
                 "key": r["key"],
                 "name": r["name"],
                 "kind": r["kind"],
-                "children": kids,
+                "children": [],
+                "links": links,
                 "platform": r["platform"],
                 "class": r["class"],
             }
@@ -478,30 +502,31 @@ WHERE (type(r) = 'PERFORMS' AND a:usecase AND b:feature)
 RETURN a.key AS src, b.key AS dst"""
 RFLP_NODES = """
 MATCH (n:usecase|feature|function|component|physical)
-RETURN n.key AS key, coalesce(n.name, n.title, n.key) AS name, head([l IN labels(n) WHERE l IN $types]) AS kind,
-  n.domain AS domain, coalesce(n.platform, false) AS platform"""
+RETURN n.key AS key, coalesce(CASE WHEN n:usecase THEN n.title END, n.name, n.title, n.key) AS name,
+  head([l IN labels(n) WHERE l IN $types]) AS kind, n.domain AS domain, coalesce(n.platform, false) AS platform"""
 
 
-def rflp_tree(graph) -> list[dict]:
-    """Use case > feature > function (nested) > logical > physical; a shared element repeats."""
-    info = {r["key"]: r for r in _read(graph, RFLP_NODES, types=NEED_TYPES)}
+def rflp_tree(graph, platform: bool = False) -> list[dict]:
+    """Use case > feature > function (nested) > logical > physical, of the project or of its
+    platform; a shared element repeats."""
+    info = {
+        r["key"]: r
+        for r in _read(graph, RFLP_NODES, types=NEED_TYPES)
+        if r["platform"] == platform
+    }
     kids = {}
     for r in _read(graph, RFLP):
-        kids.setdefault(r["src"], []).append(r["dst"])
+        if r["src"] in info and r["dst"] in info:
+            kids.setdefault(r["src"], []).append(r["dst"])
 
     def node(key, seen):
         n = dict(info[key])
         n["children"] = [
-            node(k, seen | {key})
-            for k in sorted(kids.get(key, []), key=lambda k: (info[k]["platform"], k))
-            if k not in seen
+            node(k, seen | {key}) for k in sorted(kids.get(key, [])) if k not in seen
         ]
         return n
 
-    roots = sorted(
-        (k for k, v in info.items() if v["kind"] == "usecase"),
-        key=lambda k: (info[k]["platform"], k),
-    )
+    roots = sorted(k for k, v in info.items() if v["kind"] == "usecase")
     return [node(k, frozenset()) for k in roots]
 
 
@@ -517,6 +542,7 @@ V_PLACE = {
     "feature": (3, "left"),
     "function": (3, "left"),
     "component": (4, "left"),
+    "swreq": (4, "left"),
     "physical": (5, "bottom"),
 }
 V_NODES = """
@@ -599,13 +625,16 @@ LAYER_TITLES = {
     "P": "Physical",
     "V": "Verification",
 }
+# ownership once, as the declared owned_by link; a link instance is platform when its source is
 META_EDGES = """
-MATCH (a:Need)-[r]->(b:Need)
+MATCH (a:Need)-[r]->(b:Need) WHERE type(r) <> 'OWNS'
 RETURN head([l IN labels(a) WHERE l IN $types]) AS src, type(r) AS type,
-  head([l IN labels(b) WHERE l IN $types]) AS dst, a.key AS a, b.key AS b
+  head([l IN labels(b) WHERE l IN $types]) AS dst, a.key AS a, b.key AS b,
+  coalesce(a.platform, false) AS platform
 ORDER BY a, b"""
 META_NODES = """
-MATCH (n:Need) RETURN head([l IN labels(n) WHERE l IN $types]) AS type, n.key AS key ORDER BY key"""
+MATCH (n:Need) RETURN head([l IN labels(n) WHERE l IN $types]) AS type, n.key AS key,
+  coalesce(n.platform, false) AS platform ORDER BY key"""
 
 
 def _rule_types(schema):
@@ -620,24 +649,27 @@ def metamodel(graph, project: Path) -> dict:
     types = {t["directive"]: t["title"] for t in conf["types"]}
     declared = conf.get("links", {})
     instances = {t: [] for t in types}
+    platform = dict.fromkeys(types, 0)
     for r in _read(graph, META_NODES, types=list(types)):
         if r["type"]:
             instances[r["type"]].append(r["key"])
+            platform[r["type"]] += r["platform"]
     edges = {}
 
     def edge(src, link, dst):
         return edges.setdefault(
             (src, link, dst),
-            {"instances": [], "rules": [], "declared": link in declared},
+            {"instances": [], "platform": 0, "rules": [], "declared": link in declared},
         )
 
     for r in _read(graph, META_EDGES, types=list(types)):
         if r["src"] and r["dst"]:
-            edge(r["src"], r["type"].lower(), r["dst"])["instances"].append(
-                [r["a"], r["b"]]
-            )
+            e = edge(r["src"], r["type"].lower(), r["dst"])
+            e["instances"].append([r["a"], r["b"]])
+            e["platform"] += r["platform"]
     node_rules = {t: [] for t in types}
-    # a rule's link check is an edge from the selected type (network) or into it (network_back)
+    # a rule's link check is an edge from the selected type (network) or into it (network_back);
+    # its local check (or a rule with no link check) is on the type; a rule may have both
     for rule in schemas:
         selected, checks = _rule_types(rule["select"]), rule["validate"]
         linked = False
@@ -648,7 +680,7 @@ def metamodel(graph, project: Path) -> dict:
                     for o in _rule_types(check["contains"]["local"]):
                         ends = (s, o) if direction == "network" else (o, s)
                         edge(ends[0], link, ends[1])["rules"].append(rule["id"])
-        if not linked:
+        if "local" in checks or not linked:
             for s in selected:
                 node_rules[s].append(rule["id"])
     used = {link for (_, link, _), e in edges.items() if e["instances"]}
@@ -669,6 +701,7 @@ def metamodel(graph, project: Path) -> dict:
             "kind": t,
             "parent": f"layer:{layers[t]}",
             "count": len(instances[t]),
+            "platform": platform[t],
             "instances": instances[t],
             "rules": node_rules[t],
         }
@@ -683,7 +716,8 @@ def metamodel(graph, project: Path) -> dict:
                 "src": f"type:{s}",
                 "dst": f"type:{d}",
                 "type": link.upper(),
-                "label": f"{declared.get(link, {}).get('outgoing', link)} ({len(e['instances'])})",
+                "label": f"{declared.get(link, {}).get('outgoing', link)} ({len(e['instances'])}"
+                + (f", {e['platform']} platform)" if e["platform"] else ")"),
                 "count": len(e["instances"]),
                 "unused": not e["instances"],
                 **e,

@@ -4,14 +4,35 @@
 export const esc = (s) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-const STRUCTURE = new Set(["composition", "boundary", "interfaces"]);
+// the views that apply to an element type, in tab order; ALWAYS are offered for every element
+const VIEWS = {
+  usecase: ["usecases", "trace"],
+  behaviour: ["activity", "trace"],
+  logical: ["context", "boundary", "interfaces", "composition", "trace"],
+  physical: ["boundary", "interfaces", "composition", "variants", "trace"],
+  port: ["boundary", "interfaces", "trace"],
+  requirement: ["trace", "vmodel"],
+};
+const ALWAYS = ["compliance", "vmodel", "metamodel"];
+
+/** The views that apply to an element (its `kind` metaclass and need `layer`); trace for anything else. */
+export function viewsFor(node) {
+  const kind = node.kind ?? "";
+  if (kind === "UseCaseUsage") return VIEWS.usecase;
+  if (kind === "ActionUsage") return VIEWS.behaviour;
+  if (kind === "PortUsage") return VIEWS.port;
+  if (/^Part/.test(kind)) return node.layer === "L" ? VIEWS.logical : VIEWS.physical;
+  if (node.layer || /^(Requirement|Constraint|VerificationCase)/.test(kind)) return VIEWS.requirement;
+  return ["trace"];
+}
+
+/** The tabs offered for an element: its views and ALWAYS, in `order`. */
+export const offered = (node, order) => order.filter((k) => viewsFor(node).includes(k) || ALWAYS.includes(k));
 
 /** The view a double-click on `node` drills into from view `current`. */
 export function drillKind(node, current) {
-  if (node.kind === "ActionUsage") return "activity";
-  if (node.kind === "UseCaseUsage") return "usecases";
-  if (/Part|Port|Reference/.test(node.kind)) return STRUCTURE.has(current) ? current : "composition";
-  return "trace";
+  const views = viewsFor(node);
+  return views.includes(current) ? current : views[0];
 }
 
 const MARKERS = `<defs>

@@ -31,14 +31,16 @@ function describe(node, actors, compound) {
   const lines = attributes.map((a) => (a.value == null || a.value === "" ? a.name : `${a.name} = ${a.value}${a.unit ? ` ${a.unit}` : ""}`));
   if (node.kind === "InterfaceDefinition") lines.push(...ports.map((p) => `end ${p.name}`));
   const tags = [];
-  if (node.platform) tags.push("platform");
+  // a meta-model need type (or layer): its instance count and the rules on it; its key is no id
+  const typeBox = node.count !== undefined;
+  if (node.platform && !typeBox) tags.push("platform");
   if (node.reuse) tags.push(`reuse: ${node.reuse}`);
   if (node.selected === true && node.variant) tags.push("selected");
   if (node.selected === false) tags.push("not selected");
   if (node.lane) tags.push(`allocated to ${node.lane.name}`);
-  // a meta-model need type (or layer): its instance count and the rules on it; its key is no id
-  const typeBox = node.count !== undefined;
-  if (typeBox) tags.push(`${node.count} instance${node.count === 1 ? "" : "s"}`, ...(node.rules ?? []).map((r) => `rule ${r}`));
+  // the platform share, since most rules check only the project's own needs (platform: false)
+  const share = node.platform ? ` (${node.platform} platform)` : "";
+  if (typeBox) tags.push(`${node.count} instance${node.count === 1 ? "" : "s"}${share}`, ...(node.rules ?? []).map((r) => `rule ${r}`));
   const id = typeBox ? null : node.shortName ?? (/^[0-9a-f]{8}-/.test(node.key) ? null : node.key);
   const header = [`«${keyword(node.kind)}»`, id, node.domain].filter(Boolean).join(" ");
   return { ...node, shape, header, lines, tags };
@@ -188,7 +190,7 @@ export function fromElk(laid) {
   return out;
 }
 
-const V_LEVELS = ["Customer requirements · acceptance", "System · system tests", "Features and functions", "Logical components", "Physical components"];
+const V_LEVELS = ["Customer requirements · acceptance", "System · system tests", "Features and functions", "Logical components · software requirements", "Physical components"];
 
 /** Where a straight line from rect a's centre towards rect b's centre leaves a. */
 function border(a, b) {

@@ -47,6 +47,7 @@ CONNECTORS = {
     "InterfaceUsage": "CONNECTS",
     "FlowUsage": "FLOW",
     "SuccessionAsUsage": "SUCCESSION",
+    "BindingConnectorAsUsage": "BINDS",
 }
 # (metaclass, source field, target field) -> edge type, for relationships between two elements
 RELATIONSHIPS = {
@@ -237,6 +238,13 @@ def build(export, needs):
                 owner_node(ref(e.get("owner"))),
                 "REQUIRES",
                 uid_key.get(ref(e.get("ownedConstraint"))),
+            )
+        elif kind == "VariantMembership":
+            # the variant's specialization of its variation is implied, so it gets its own edge
+            add(
+                uid_key.get(ref(e.get("ownedVariantUsage"))),
+                "VARIANT_OF",
+                owner_node(ref(e.get("owner"))),
             )
         elif kind == "SubjectMembership":
             add(

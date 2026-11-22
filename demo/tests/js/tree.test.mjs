@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { renderCompliance, renderTree } from "../../static/js/panels.js";
+import { renderCompliance, renderTree, linkList } from "../../static/js/panels.js";
 
 test("renderTree escapes names, relations and groups, and hides generated ids", () => {
   const el = {};
@@ -34,4 +34,15 @@ test("renderCompliance shows classes and a table of customer test requirements",
   assert.match(el.innerHTML, /<tr data-row="CTR-1">/);
   assert.match(el.innerHTML, /data-key="STC-1"/);
   assert.match(el.innerHTML, /data-key="CST-1"[^>]*>CST-1<\/a> partial/);
+});
+
+test("linkList puts one relation per line and escapes it", () => {
+  const html = linkList([
+    { rel: "satisfied <by>", key: "SR-119", name: "range" },
+    { rel: "satisfied <by>", key: "CON-104", name: "a < b" },
+    { rel: "test requirement", key: "CTR-002", name: "haptics" },
+  ]);
+  assert.equal(html.match(/<p class="links">/g).length, 2);
+  assert.match(html, /satisfied &lt;by&gt;<\/span> <a [^>]*data-key="SR-119"[^>]*>range<\/a>, <a [^>]*data-key="CON-104"[^>]*>a &lt; b<\/a>/);
+  assert.equal(linkList([]), "");
 });
