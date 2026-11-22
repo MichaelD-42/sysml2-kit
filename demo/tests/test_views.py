@@ -255,41 +255,109 @@ class ViewsTest(unittest.TestCase):
             ("implements", "CTR-009"), {(c["rel"], c["key"]) for c in atc["links"]}
         )
 
-    def test_rflp_tree_follows_the_chain(self):
-        def paths(nodes, prefix=()):
-            for n in nodes:
-                here = prefix + (n["key"],)
-                yield here
-                yield from paths(n["children"], here)
+    def paths(self, nodes, prefix=()):
+        for n in nodes:
+            here = prefix + (n["key"],)
+            yield here
+            yield from self.paths(n["children"], here)
 
+    def test_rflp_tree_follows_the_chain(self):
         own = views.rflp_tree(self.graph)
-        all_paths = set(paths(own))
-        self.assertIn(("UC-102", "FEAT-102", "F-101", "LC-101", "PC-101"), all_paths)
-        self.assertIn(("UC-102", "FEAT-102", "F-101", "LC-101", "PC-102"), all_paths)
+        all_paths = set(self.paths(own))
+        chain = ("LC-100", "UC-102", "FEAT-102", "F-101", "LC-101")
+        self.assertIn(chain + ("PC-101",), all_paths)
+        self.assertIn(chain + ("PC-102",), all_paths)
+        # the product is the root, its use cases below it, shown by their titles
+        self.assertEqual([n["key"] for n in own], ["LC-100"])
+        self.assertEqual(own[0]["name"], "seatSwitches")
+        ucs = own[0]["children"]
         self.assertEqual(
-            [n["key"] for n in own], ["UC-101", "UC-102", "UC-103", "UC-104"]
+            [n["key"] for n in ucs], ["UC-101", "UC-102", "UC-103", "UC-104"]
         )
-        self.assertFalse(any(k.startswith("SSW-") for p in all_paths for k in p))
+        self.assertEqual(
+            ucs[0]["name"], "The occupant wants to adjust the seat position"
+        )
         platform = views.rflp_tree(self.graph, platform=True)
-        self.assertEqual(platform[0]["key"], "SSW-UC-001")
+        self.assertEqual([n["key"] for n in platform], ["SSW-LC-001"])
+        self.assertEqual(platform[0]["name"], "seatSwitch")
         self.assertIn(
-            ("SSW-UC-001", "SSW-FEAT-001", "SSW-F-001", "SSW-LC-003", "SSW-PC-008"),
-            set(paths(platform)),
+            (
+                "SSW-LC-001",
+                "SSW-UC-001",
+                "SSW-FEAT-001",
+                "SSW-F-001",
+                "SSW-LC-003",
+                "SSW-PC-008",
+            ),
+            set(self.paths(platform)),
         )
-        # a use case is shown by its title
+        self.assertFalse(
+            any(
+                k.startswith(("LC-", "PC-", "FEAT-", "UC-"))
+                for p in self.paths(platform)
+                for k in p
+            )
+        )
+
+    def test_rflp_tree_is_what_the_product_consists_of(self):
+        own = views.rflp_tree(self.graph)
+        all_paths = set(self.paths(own))
+        nodes = {}
+        for n in self.walk(own):
+            nodes.setdefault(n["key"], n)
+        # an RFQ feature lists the platform functions it inherits, marked platform
+        below = {n["key"] for n in self.walk(nodes["FEAT-104"]["children"])}
+        self.assertIn("SSW-F-011", below)
+        self.assertTrue(nodes["SSW-F-011"]["platform"])
+        comfort = {n["key"] for n in nodes["FEAT-102"]["children"]}
+        self.assertIn("F-101", comfort)
+        self.assertTrue(any(k.startswith("SSW-F-") for k in comfort))
+        # an inherited function reaches its logical component, the component its physical parts,
+        # a software component its units
+        self.assertTrue(
+            any(p[-3:] == ("FEAT-104", "SSW-F-011", "SSW-LC-005") for p in all_paths)
+        )
+        self.assertTrue(any(p[-2:] == ("SSW-LC-005", "SSW-PC-034") for p in all_paths))
+        self.assertTrue(
+            any(p[-3:] == ("SSW-LC-005", "SSW-PC-034", "SSW-PC-035") for p in all_paths)
+        )
+        # a position's part shows the variant it selects
+        self.assertTrue(
+            any(p[-3:] == ("LC-101", "PC-101", "SSW-PC-002") for p in all_paths)
+        )
+        # a shared component is expanded once; later rows are marked and have no subtree
+        rows = [n for n in self.walk(own) if n["key"] == "SSW-LC-004"]
+        self.assertGreater(len(rows), 1)
         self.assertEqual(
-            own[0]["name"], "The occupant wants to adjust the seat position"
+            [bool(n["children"]) for n in rows], [True] + [False] * (len(rows) - 1)
         )
+        self.assertTrue(all(n.get("again") for n in rows[1:]))
+
+    def test_activity_of_a_feature_includes_inherited_actions(self):
+        v = self.view("activity", "FEAT-104")
+        keys = {n["key"] for n in v["nodes"]}
+        self.assertLessEqual({"SSW-F-011", "SSW-F-012", "SSW-F-013"}, keys)
+        self.assertIn(
+            ("SSW-F-012", "SSW-F-013", "SUCCESSION"),
+            {(e["src"], e["dst"], e["type"]) for e in v["edges"]},
+        )
+        keys = {n["key"] for n in self.view("activity", "FEAT-102")["nodes"]}
+        self.assertIn("F-101", keys)
+        self.assertTrue(any(k.startswith("SSW-F-") for k in keys))
+
+    def walk(self, nodes):
+        for n in nodes:
+            yield n
+            yield from self.walk(n["children"])
 
     def test_rflp_trees_carry_what_uses_the_platform(self):
-        def walk(nodes):
-            for n in nodes:
-                yield n
-                yield from walk(n["children"])
-
-        own = {n["key"]: n for n in walk(views.rflp_tree(self.graph))}
+        own = {
+            n["key"]: n
+            for n in self.walk(views.rflp_tree(self.graph))
+            if not n["platform"]
+        }
         platform = {
-            n["key"]: n for n in walk(views.rflp_tree(self.graph, platform=True))
+            n["key"]: n for n in self.walk(views.rflp_tree(self.graph, platform=True))
         }
         self.assertIn("SSW-PC-001", own["PC-101"]["uses"])
         self.assertIn("SSW-LC-001", own["LC-101"]["uses"])
@@ -465,6 +533,58 @@ class ViewsTest(unittest.TestCase):
             names["UC-104"],
             "The end-of-line tester wants to flash, code and test each switch for its seat position",
         )
+
+    def test_product_overview(self):
+        v = self.view("product")
+        self.assertEqual(v["focus"], "LC-100")
+        nodes = {n["key"]: n for n in v["nodes"]}
+        tags = {
+            k: [a["name"] for a in n["compartments"]["attributes"]]
+            for k, n in nodes.items()
+        }
+        parent = {k: n["parent"] for k, n in nodes.items()}
+        names = {n["name"]: k for k, n in nodes.items()}
+        # the columns, in order
+        groups = [n for n in v["nodes"] if n["kind"] == "group" and n["parent"] is None]
+        self.assertEqual(
+            [g["name"] for g in sorted(groups, key=lambda g: g["partition"])],
+            ["Context", "Use cases", "Features", "Logical", "Physical"],
+        )
+        # context: actors and the vehicle side, not the product itself
+        self.assertLessEqual(
+            {"occupant", "seatControlUnit", "seatHarness", "endOfLineTester"},
+            set(names),
+        )
+        self.assertEqual(parent[names["seatHarness"]], "group:context")
+        # use cases with the features they perform, inherited functions counted
+        self.assertLessEqual({"UC-101", "UC-102", "UC-103", "UC-104"}, set(nodes))
+        self.assertIn("8 functions", tags["FEAT-102"])
+        self.assertIn("4 functions", tags["FEAT-104"])
+        edges = {(e["src"], e["dst"], e["type"]) for e in v["edges"]}
+        self.assertIn(("UC-101", "FEAT-104", "PERFORMS"), edges)
+        self.assertIn((names["occupant"], "UC-101", "ACTOR"), edges)
+        # logical: the positions under the product, with the variants they select; the blocks
+        self.assertEqual(parent["LC-101"], "LC-100")
+        self.assertLessEqual(
+            {"housing: housingLH", "buttonSet: massageHeatingCooling"},
+            set(tags["LC-101"]),
+        )
+        self.assertIn("SSW-LC-008", nodes)
+        self.assertIn(("FEAT-104", "SSW-LC-005", "ALLOCATED_TO"), edges)
+        # physical by domain, top level only; software components with their unit counts
+        self.assertEqual(parent["SSW-PC-016"], "group:SW")
+        self.assertEqual(parent["SSW-PC-034"], "SSW-PC-016")
+        self.assertIn("6 units", tags["SSW-PC-034"])
+        self.assertEqual(parent["SSW-PC-001"], "group:ME")
+        self.assertIn("2 variants", tags["SSW-PC-001"])
+        self.assertEqual(parent["SSW-PC-007"], "group:EE")
+        self.assertNotIn("SSW-PC-035", nodes)
+        self.assertNotIn("SSW-PC-008", nodes)
+        # every edge ends on a drawn box
+        self.assertLessEqual(
+            {k for e in v["edges"] for k in (e["src"], e["dst"])}, set(nodes)
+        )
+        self.assertLess(len(v["nodes"]), 60)
 
     def test_unknown_kind(self):
         with self.assertRaises(ValueError):

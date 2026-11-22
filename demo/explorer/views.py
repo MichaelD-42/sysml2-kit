@@ -9,6 +9,7 @@ from explorer.graph import LAYERS
 from sysml2kit.compliance import compliance, ctr_rows
 
 KINDS = (
+    "product",
     "context",
     "boundary",
     "interfaces",
@@ -194,13 +195,16 @@ WITH [{key: f.key, parent: null}] + [p IN parts | {key: p.n.key, parent: null}] 
 RETURN nodes, edges"""
 )
 
+# a feature's own actions and those of the feature it specializes (an RFQ feature inherits the
+# platform feature's functions)
 ACTIVITY = """
 MATCH (f:Node {key: $focus})
-MATCH p = (f) ((:Node)-[:OWNS]->(:ActionUsage))+
-WITH f, last(nodes(p)) AS a, nodes(p)[-2] AS owner
+MATCH (f)-[:SPECIALIZES*0..1]->(g:ActionUsage)
+MATCH p = (g) ((:Node)-[:OWNS]->(:ActionUsage))+
+WITH g, last(nodes(p)) AS a, nodes(p)[-2] AS owner
 WITH collect({
   key: a.key,
-  parent: CASE owner WHEN f THEN null ELSE owner.key END,
+  parent: CASE owner WHEN g THEN null ELSE owner.key END,
   lane: head(COLLECT { MATCH (a)-[:ALLOCATED_TO]->(c:PartUsage) RETURN {key: c.key, name: c.name} })
 }) AS nodes""" + _close("SUCCESSION|FLOW")
 
@@ -296,7 +300,7 @@ SUBJECTS = {
     "boundary": PORT_OWNER,
     "interfaces": PORT_OWNER,
     "activity": "MATCH (o:Node)-[:OWNS]->(n:ActionUsage {key: $focus}) "
-    "WHERE NOT EXISTS { (n)-[:OWNS]->(:ActionUsage) } RETURN o.key LIMIT 1",
+    "WHERE NOT EXISTS { (n)-[:SPECIALIZES*0..1]->(:ActionUsage)-[:OWNS]->(:ActionUsage) } RETURN o.key LIMIT 1",
     "variants": "MATCH (:Node {key: $focus})-[:SPECIALIZES*0..1]->()-[:VARIANT_OF]->(v) RETURN v.key LIMIT 1",
 }
 FOCUS = "MATCH (n:Node) WHERE n.key = $focus OR n.qualifiedName = $focus RETURN n.key LIMIT 1"
@@ -369,6 +373,8 @@ def view(
 ) -> dict:
     if kind not in KINDS:
         raise ValueError(f"unknown view kind {kind!r}")
+    if kind == "product":
+        return product(graph)
     if kind == "metamodel":
         if project is None:
             raise ValueError("the meta-model view needs the project")
@@ -412,6 +418,148 @@ def view(
         "nodes": nodes,
         "edges": records[0]["edges"] if nodes else [],
         "reason": reason,
+    }
+
+
+PRODUCT_UCS = """
+MATCH (f:Node {key: $product}), (uc:UseCaseUsage)-[:SUBJECT]->({name: f.name})
+RETURN uc.key AS key, uc.name AS name,
+  COLLECT { MATCH (uc)-[:OWNS]->(a:PartUsage) RETURN a.name } AS actors,
+  COLLECT { MATCH (uc)-[:PERFORMS]->(x:feature) RETURN x.key } AS features
+ORDER BY key"""
+# a feature's functions, its own and those of the feature it specializes, and where they are allocated
+PRODUCT_FEATURES = """
+UNWIND $keys AS k MATCH (x:Node {key: k})
+RETURN k AS key,
+  COUNT { MATCH (x)-[:SPECIALIZES*0..1]->(:feature)-[:OWNS*]->(fn:function) RETURN DISTINCT fn } AS functions,
+  COLLECT { MATCH (x)-[:SPECIALIZES*0..1]->(:feature)-[:OWNS*]->(:function)-[:ALLOCATED_TO]->(c:component)
+            RETURN DISTINCT c.key } AS lcs"""
+# the product's positions (its own parts) and the logical blocks of what it specializes
+PRODUCT_LOGICAL = """
+MATCH (f:Node {key: $product})
+RETURN COLLECT { MATCH (f)-[:OWNS]->(c:component) RETURN {key: c.key, picks: COLLECT {
+    MATCH (c)-[:ALLOCATED_TO]->(:physical)-[:SPECIALIZES]->(v)<-[:OWNS]-(x) WHERE x.isVariation
+    RETURN x.name + ': ' + v.name
+  }} } AS positions,
+  COLLECT { MATCH (f)-[:SPECIALIZES]->()-[:OWNS]->(c:component) RETURN DISTINCT c.key } AS blocks"""
+# top-level physical parts (a project part that selects a variant is no part of its own)
+PRODUCT_PHYSICAL = """
+MATCH (:Package)-[:OWNS]->(t:physical) WHERE NOT EXISTS { (t)-[:SPECIALIZES]->(:physical) }
+RETURN t.key AS key, t.domain AS domain, coalesce(t.isVariation, false) AS variation,
+  COLLECT { MATCH (t)-[:OWNS]->(c:physical) RETURN {key: c.key, parts: COUNT { (c)-[:OWNS]->(:physical) }} } AS parts
+ORDER BY key"""
+OVERVIEW_COLUMNS = ("Context", "Use cases", "Features", "Logical", "Physical")
+DOMAINS = {"ME": "ME · mechanics", "EE": "EE · electronics", "SW": "SW · software"}
+
+
+def _count(n, what):
+    return [{"name": f"{n} {what}{'' if n == 1 else 's'}"}] if n else []
+
+
+def product(graph) -> dict:
+    """The whole product on one page: its context, use cases, features, logical blocks and positions
+    (with the variants each selects), and its physical parts by domain. Top level only; what is
+    below a box is a count on it. Edges: actor to use case, use case to feature, feature to the
+    blocks its functions are allocated to."""
+    found = _read(graph, PRODUCT, platform=False)
+    if not found:
+        return {
+            "kind": "product",
+            "focus": None,
+            "nodes": [],
+            "edges": [],
+            "reason": "no product",
+        }
+    focus = found[0]["key"]
+    group = {t: f"group:{t.split()[0].lower()}" for t in OVERVIEW_COLUMNS}
+    rows, edges = [], []  # edges carry an empty label: the column says what they mean
+
+    def add(key, parent, attributes=()):
+        rows.append({"key": key, "parent": parent, "attributes": list(attributes)})
+
+    # context: the parts around the product, each actor once; how they connect is the context view
+    ctx = _read(graph, CONTEXT, focus=focus)[0]
+    around = [n["key"] for n in ctx["nodes"] if n["key"] != focus]
+    for k in around:
+        add(k, group["Context"])
+    by_name = {r["name"]: r["key"] for r in _read(graph, NODES, keys=around)}
+    ucs = _read(graph, PRODUCT_UCS, product=focus)
+    features = list(dict.fromkeys(k for uc in ucs for k in uc["features"]))
+    feats = {r["key"]: r for r in _read(graph, PRODUCT_FEATURES, keys=features)}
+    for uc in ucs:
+        add(uc["key"], group["Use cases"])
+        edges += [
+            {"src": by_name[a], "dst": uc["key"], "type": "ACTOR", "label": ""}
+            for a in uc["actors"]
+            if a in by_name
+        ]
+        edges += [
+            {"src": uc["key"], "dst": f, "type": "PERFORMS", "label": ""}
+            for f in uc["features"]
+        ]
+    for f in features:
+        add(f, group["Features"], _count(feats[f]["functions"], "function"))
+
+    logical = _read(graph, PRODUCT_LOGICAL, product=focus)[0]
+    add(focus, group["Logical"])
+    for p in logical["positions"]:
+        add(p["key"], focus, ({"name": x} for x in sorted(p["picks"])))
+    for b in logical["blocks"]:
+        add(b, group["Logical"])
+    lcs = {p["key"] for p in logical["positions"]} | set(logical["blocks"])
+    edges += [
+        {"src": f, "dst": c, "type": "ALLOCATED_TO", "label": ""}
+        for f in features
+        for c in feats[f]["lcs"]
+        if c in lcs
+    ]
+
+    # physical parts by domain; which block they realize is in the trace view and the tree
+    for d, title in DOMAINS.items():
+        rows.append(
+            {
+                "key": f"group:{d}",
+                "parent": group["Physical"],
+                "name": title,
+                "domain": d,
+            }
+        )
+    for t in _read(graph, PRODUCT_PHYSICAL):
+        if not t["domain"]:
+            continue
+        what = "variant" if t["variation"] else "part"
+        # a software part shows its components, each with its unit count
+        if t["domain"] == "SW" and t["parts"]:
+            add(t["key"], f"group:{t['domain']}")
+            for c in t["parts"]:
+                add(c["key"], t["key"], _count(c["parts"], "unit"))
+        else:
+            add(t["key"], f"group:{t['domain']}", _count(len(t["parts"]), what))
+
+    nodes = _nodes(graph, [r for r in rows if not r["key"].startswith("group:")])
+    for n in nodes:
+        # a use case by its short name: its title is in the inspector
+        if n["kind"] == "UseCaseUsage":
+            n["name"] = next(uc["name"] for uc in ucs if uc["key"] == n["key"])
+    columns = [
+        {"key": group[t], "name": t, "parent": None, "partition": i}
+        for i, t in enumerate(OVERVIEW_COLUMNS)
+    ]
+    groups = [
+        {
+            "kind": "group",
+            "domain": None,
+            "compartments": {"attributes": [], "ports": []},
+        }
+        | g
+        for g in columns + [r for r in rows if r["key"].startswith("group:")]
+    ]
+    return {
+        "kind": "product",
+        "focus": focus,
+        "nodes": groups + nodes,
+        "edges": edges,
+        "reason": None,
     }
 
 
@@ -500,12 +648,17 @@ def requirements_tree(graph) -> list[dict]:
 
 
 RFLP = """
-MATCH (a:Node)-[r:PERFORMS|OWNS|ALLOCATED_TO]->(b:Node)
+MATCH (a:Node)-[r:PERFORMS|OWNS|ALLOCATED_TO|SPECIALIZES]->(b:Node)
 WHERE (type(r) = 'PERFORMS' AND a:usecase AND b:feature)
    OR (type(r) = 'OWNS' AND (a:feature OR a:function) AND b:function)
    OR (type(r) = 'ALLOCATED_TO' AND a:function AND b:component)
    OR (type(r) = 'ALLOCATED_TO' AND a:component AND b:physical)
-RETURN a.key AS src, b.key AS dst"""
+   OR (type(r) IN ['OWNS', 'SPECIALIZES'] AND a:physical AND b:physical)
+RETURN a.key AS src, b.key AS dst, type(r) = 'SPECIALIZES' AS reuse"""
+# the product a tree is rooted at: the first top-level logical component of the project or platform
+PRODUCT = """
+MATCH (:Package)-[:OWNS]->(n:component) WHERE coalesce(n.platform, false) = $platform
+RETURN n.key AS key ORDER BY n.key LIMIT 1"""
 # a project RFLP element and the platform one it specializes, is typed by or is a variant of
 RFLP_USES = """
 MATCH (a:usecase|feature|function|component|physical)-[:SPECIALIZES|TYPED_BY|VARIANT_OF*1..3]->
@@ -519,33 +672,57 @@ RETURN n.key AS key, coalesce(CASE WHEN n:usecase THEN n.title END, n.name, n.ti
 
 
 def rflp_tree(graph, platform: bool = False) -> list[dict]:
-    """Use case > feature > function (nested) > logical > physical, of the project or of its
-    platform; a shared element repeats. Each node lists the elements on the other side it uses
-    or is used by (`uses`)."""
-    info = {
-        r["key"]: r
-        for r in _read(graph, RFLP_NODES, types=NEED_TYPES)
-        if r["platform"] == platform
-    }
-    uses = {}
+    """The product (project or platform) > use case > feature > function (nested) > logical >
+    physical (its parts, and the variant a project part selects). A project feature also lists
+    the platform functions it inherits. A shared feature or function repeats; a logical or
+    physical component is expanded where it first shows, later rows are marked `again`. Each
+    node lists the elements on the other side it uses or is used by (`uses`)."""
+    every = {r["key"]: r for r in _read(graph, RFLP_NODES, types=NEED_TYPES)}
+    info = {k: r for k, r in every.items() if r["platform"] == platform}
+    kids, uses, inherited = {}, {}, {}
+    for r in _read(graph, RFLP):
+        if r["src"] in every and r["dst"] in every:
+            # a part shows the part it specializes, a project part the platform variant it selects
+            (inherited if r["reuse"] else kids).setdefault(r["src"], []).append(
+                r["dst"]
+            )
     for r in _read(graph, RFLP_USES):
         mine, other = (r["b"], r["a"]) if platform else (r["a"], r["b"])
         uses.setdefault(mine, []).append(other)
-    kids = {}
-    for r in _read(graph, RFLP):
-        if r["src"] in info and r["dst"] in info:
-            kids.setdefault(r["src"], []).append(r["dst"])
+        # a project feature does what the platform feature it specializes does
+        if not platform and every[r["a"]]["kind"] == every[r["b"]]["kind"] == "feature":
+            inherited.setdefault(r["a"], []).extend(kids.get(r["b"], []))
+    expanded = set()
 
     def node(key, seen):
-        n = dict(info[key])
+        n = dict(every[key])
         n["uses"] = sorted(uses.get(key, []))
+        if n["kind"] in ("component", "physical"):
+            if key in expanded:
+                return n | {"children": [], "again": True}
+            expanded.add(key)
+        # the other side's elements show only below what is reused from it
+        own = [k for k in kids.get(key, []) if k in info or n["platform"] != platform]
         n["children"] = [
-            node(k, seen | {key}) for k in sorted(kids.get(key, [])) if k not in seen
+            node(k, seen | {key})
+            for k in sorted(own + inherited.get(key, []))
+            if k not in seen
         ]
         return n
 
-    roots = sorted(k for k, v in info.items() if v["kind"] == "usecase")
-    return [node(k, frozenset()) for k in roots]
+    ucs = sorted(k for k, v in info.items() if v["kind"] == "usecase")
+    found = _read(graph, PRODUCT, platform=platform)
+    if not found or found[0]["key"] not in info:
+        return [node(k, frozenset()) for k in ucs]
+    root = found[0]["key"]
+    expanded.add(root)
+    return [
+        dict(
+            info[root],
+            uses=sorted(uses.get(root, [])),
+            children=[node(k, frozenset({root})) for k in ucs],
+        )
+    ]
 
 
 # V-model: need type -> (level, side)

@@ -4,6 +4,7 @@ const DOWN = new Set(["composition", "variants"]);
 const PORT_VIEWS = new Set(["boundary", "interfaces", "composition"]);
 const NEED_LINKS = new Set(["SATISFIES", "ALLOCATED_TO", "VERIFIES", "REALIZES", "MATCHES", "PARTIAL_MATCHES", "ANSWERS", "TESTS", "REQUIRES", "IMPLEMENTS", "APPLIES_TO"]);
 const PORT = 10;
+const PACKED = { "elk.hierarchyHandling": "SEPARATE_CHILDREN", "elk.algorithm": "rectpacking", "elk.spacing.nodeNode": "16" };
 
 export const textWidth = (s, px = 12) => String(s ?? "").length * px * 0.6;
 
@@ -41,8 +42,9 @@ function describe(node, actors, compound) {
   // the platform share, since most rules check only the project's own needs (platform: false)
   const share = node.platform ? ` (${node.platform} platform)` : "";
   if (typeBox) tags.push(`${node.count} instance${node.count === 1 ? "" : "s"}${share}`, ...(node.rules ?? []).map((r) => `rule ${r}`));
-  const id = typeBox ? null : node.shortName ?? (/^[0-9a-f]{8}-/.test(node.key) ? null : node.key);
-  const header = [`«${keyword(node.kind)}»`, id, node.domain].filter(Boolean).join(" ");
+  const id = typeBox || node.kind === "group" ? null : node.shortName ?? (/^[0-9a-f]{8}-/.test(node.key) ? null : node.key);
+  // an overview column or domain group is a titled frame, no element
+  const header = node.kind === "group" ? "" : [`«${keyword(node.kind)}»`, id, node.domain].filter(Boolean).join(" ");
   return { ...node, shape, header, lines, tags };
 }
 
@@ -94,6 +96,8 @@ export function toElk(view) {
     const item = { id: n.key, meta, ports: portsOf.get(n.key), layoutOptions: {} };
     if (compound) {
       item.layoutOptions["elk.padding"] = "[top=48,left=18,bottom=18,right=18]";
+      // an overview domain group has no edges inside: its parts are packed, not stacked
+      if (view.kind === "product" && n.domain) Object.assign(item.layoutOptions, PACKED);
       item.layoutOptions["elk.portLabels.placement"] = "INSIDE";
       item.layoutOptions["elk.nodeSize.constraints"] = "PORTS PORT_LABELS MINIMUM_SIZE";
       item.layoutOptions["elk.nodeSize.minimum"] = `(${size(meta)[0]}, 60)`;
@@ -102,8 +106,9 @@ export function toElk(view) {
       if (item.ports.length) item.layoutOptions["elk.nodeSize.constraints"] = "PORTS MINIMUM_SIZE";
       item.layoutOptions["elk.nodeSize.minimum"] = `(${item.width}, ${item.height})`;
     }
-    // meta-model layers are frames kept in RFLP order, left to right
-    if (n.kind === "layer") item.layoutOptions["elk.partitioning.partition"] = String("RFLPV".indexOf(n.key.slice(-1)));
+    // meta-model layers and overview columns are frames kept in order, left to right
+    const partition = n.kind === "layer" ? "RFLPV".indexOf(n.key.slice(-1)) : n.partition;
+    if (partition !== undefined) item.layoutOptions["elk.partitioning.partition"] = String(partition);
     elk.set(n.key, item);
   }
   const root = {
@@ -118,7 +123,7 @@ export function toElk(view) {
       "elk.layered.spacing.nodeNodeBetweenLayers": "56",
       "elk.spacing.edgeLabel": "4",
       "elk.padding": "[top=16,left=16,bottom=16,right=16]",
-      ...(view.kind === "metamodel" ? { "elk.partitioning.activate": "true" } : {}),
+      ...(view.kind === "metamodel" || view.kind === "product" ? { "elk.partitioning.activate": "true" } : {}),
     },
     children: [],
   };

@@ -45,11 +45,12 @@ class ServerTest(unittest.TestCase):
         self.assertTrue(self.client.get("/api/tree").json())
         reqs = self.client.get("/api/tree?kind=requirements").json()
         self.assertIn("Customer requirements", [g["name"] for g in reqs])
+        # each tree is rooted at its product
         self.assertEqual(
-            self.client.get("/api/tree?kind=rflp").json()[0]["key"], "UC-101"
+            self.client.get("/api/tree?kind=rflp").json()[0]["key"], "LC-100"
         )
         self.assertEqual(
-            self.client.get("/api/tree?kind=platform").json()[0]["key"], "SSW-UC-001"
+            self.client.get("/api/tree?kind=platform").json()[0]["key"], "SSW-LC-001"
         )
         self.assertEqual(self.client.get("/api/tree?kind=nope").status_code, 400)
         self.assertTrue(self.client.get("/api/view/vmodel").json()["nodes"])

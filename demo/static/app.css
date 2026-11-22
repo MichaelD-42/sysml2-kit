@@ -253,7 +253,10 @@ caption { text-align: left; color: var(--muted); padding: 8px; }
 
 /* requirement and model trees, stacked; each scrolls on its own */
 .tree-col { display: flex; flex-direction: column; min-height: 0; }
-.tree-part { flex: 1 1 33%; min-height: 0; overflow: auto; }
+/* each section is as tall as its content; the column scrolls as one */
+.tree-part { flex: none; }
+.tree-part > summary { cursor: pointer; }
+.tree-part > summary h2 { display: inline; }
 .tree-part + .tree-part { border-top: 1px solid var(--rule); }
 .tree .group { font-weight: 700; color: var(--ink); }
 .tree .rel, #inspector .rel { font-size: 11px; color: var(--muted); }

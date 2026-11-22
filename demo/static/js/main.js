@@ -6,6 +6,7 @@ import { svg, esc, drillKind, offered, viewsFor } from "./render.js";
 import * as panels from "./panels.js";
 
 const KINDS = {
+  product: "Product overview",
   context: "System context",
   boundary: "System boundary",
   interfaces: "Interfaces",
@@ -19,11 +20,12 @@ const KINDS = {
   metamodel: "Meta-model",
 };
 const $ = (s) => document.querySelector(s);
+const WHOLE = new Set(["product", "compliance", "metamodel"]); // views of the whole model, no focus
 const elk = new globalThis.ELK();
 const names = new Map(); // key -> display name
 const parents = new Map(); // key -> owner key
 const knownKeys = new Set();
-const current = { kind: "context", keys: new Set(), view: null };
+const current = { kind: "product", keys: new Set(), view: null };
 let token = 0;
 let scale = 1;
 
@@ -116,7 +118,7 @@ async function show(kind, key) {
   canvas.setAttribute("aria-busy", "true");
   const note = $("#note");
   try {
-    let view = await api.view(kind, kind === "compliance" || kind === "metamodel" ? null : key);
+    let view = await api.view(kind, WHOLE.has(kind) ? null : key);
     let why = "";
     if (view.reason && key) {
       // the focus has no such view: show the default one and say why
@@ -145,7 +147,9 @@ async function show(kind, key) {
       if (mine !== token) return;
       current.laid = laid;
       canvas.innerHTML = svg(laid, focus.get());
-      fit(laid.width < canvas.clientWidth ? 1 : Math.max(0.8, canvas.clientWidth / laid.width));
+      // the overview is one picture: it opens fitted to the canvas
+      if (kind === "product") fitView();
+      else fit(laid.width < canvas.clientWidth ? 1 : Math.max(0.8, canvas.clientWidth / laid.width));
     }
     if (!focus.get() && view.focus) setFocus(view.focus);
   } catch (e) {
@@ -153,6 +157,12 @@ async function show(kind, key) {
   } finally {
     if (mine === token) canvas.removeAttribute("aria-busy");
   }
+}
+
+function fitView() {
+  const c = $("#canvas");
+  const s = current.laid && Math.min(c.clientWidth / current.laid.width, c.clientHeight / current.laid.height);
+  if (current.laid) fit(s || 1); // a hidden canvas has no size
 }
 
 function fit(s) {
@@ -210,7 +220,8 @@ async function onFocus(key) {
   const crs = current.kind === "vmodel" && current.view?.nodes.some((n) => n.key === key && n.level === 1 && n.side === "left");
   if (crs && key !== current.view.focus) show(current.kind, key);
   else if (current.kind === "compliance" || current.kind === "metamodel" || inView) highlight(key);
-  else show(kinds.includes(current.kind) ? current.kind : drillKind(node, current.kind), key);
+  // an element not on the overview opens in its own view
+  else show(kinds.includes(current.kind) && current.kind !== "product" ? current.kind : drillKind(node, current.kind), key);
 }
 
 // a meta-model type or link lists its instances in the inspector; its boxes are not elements
@@ -252,10 +263,7 @@ function wire() {
   $("#back").onclick = () => focus.back();
   $("#zoom-in").onclick = () => fit(scale * 1.25);
   $("#zoom-out").onclick = () => fit(scale / 1.25);
-  $("#zoom-fit").onclick = () => {
-    const c = $("#canvas");
-    if (current.laid) fit(Math.min(c.clientWidth / current.laid.width, c.clientHeight / current.laid.height));
-  };
+  $("#zoom-fit").onclick = fitView;
   $("#reload").onclick = async (e) => {
     const status = $("#reload-status");
     e.target.disabled = true;
@@ -294,6 +302,7 @@ tabs();
 wire();
 focus.subscribe(onFocus);
 await loadModel();
+panels.rememberSections(document.querySelectorAll(".tree-part"));
 panels.mountSearch($("#search"), names);
 panels.mountAsk($("#ask"), knownKeys, names);
-await show("context", null);
+await show("product", null);

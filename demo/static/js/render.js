@@ -13,7 +13,7 @@ const VIEWS = {
   port: ["boundary", "interfaces", "trace"],
   requirement: ["trace", "vmodel"],
 };
-const ALWAYS = ["compliance", "vmodel", "metamodel"];
+const ALWAYS = ["product", "compliance", "vmodel", "metamodel"];
 
 /** The views that apply to an element (its `kind` metaclass and need `layer`); trace for anything else. */
 export function viewsFor(node) {
@@ -92,6 +92,8 @@ function shape(n) {
 }
 
 function node(n, focus) {
+  // an overview group frame is no element: not focusable
+  if (n.kind === "group") return `<g class="n s-frame group${domainClass(n.domain)}">${shape(n)}</g>`;
   const cls = `n s-${n.shape}${domainClass(n.domain)}${n.outcome ? ` o-${esc(n.outcome)}` : ""}${n.key === focus ? " focus" : ""}${n.selected === false ? " unselected" : ""}`;
   return `<g class="${cls}" data-key="${esc(n.key)}" tabindex="0" role="button" aria-label="${esc(`${n.header} ${n.name}`)}"><title>${esc(n.name)} (Enter: focus, Shift+Enter: drill down)</title>${shape(n)}</g>`;
 }

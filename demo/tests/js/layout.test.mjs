@@ -125,3 +125,25 @@ test("toElk says how many of a meta-model type's instances are platform", () => 
   });
   assert.deepEqual(g.children[0].meta.tags, ["25 instances (21 platform)"]);
 });
+
+test("toElk keeps overview columns in order and packs a domain group", () => {
+  const group = (key, name, parent, extra = {}) => ({ key, name, kind: "group", parent, compartments: { attributes: [], ports: [] }, ...extra });
+  const g = toElk({
+    kind: "product",
+    nodes: [
+      group("group:context", "Context", null, { partition: 0 }),
+      group("group:physical", "Physical", null, { partition: 4 }),
+      group("group:SW", "SW · software", "group:physical", { domain: "SW" }),
+      node("P", "PartUsage", "group:SW", { domain: "SW" }),
+      node("A", "PartUsage", "group:context"),
+    ],
+    edges: [],
+  });
+  assert.equal(g.layoutOptions["elk.partitioning.activate"], "true");
+  assert.deepEqual(g.children.map((c) => c.layoutOptions["elk.partitioning.partition"]), ["0", "4"]);
+  const sw = g.children[1].children[0];
+  assert.equal(sw.layoutOptions["elk.algorithm"], "rectpacking");
+  assert.equal(g.children[1].layoutOptions["elk.algorithm"], undefined);
+  // a group is a titled frame: no keyword, no id
+  assert.equal(sw.meta.header, "");
+});
