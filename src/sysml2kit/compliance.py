@@ -203,7 +203,9 @@ def realization_rows(needs):
             i for i in closure(needs, pc, "specializes") - {pc} if needs[i]["platform"]
         }
         # a selected variant names the part; its variation would only repeat it
-        owners = {o for i in platform if needs[i].get("variant") for o in needs[i]["owned_by"]}
+        owners = {
+            o for i in platform if needs[i].get("variant") for o in needs[i]["owned_by"]
+        }
         return prefix + ", ".join(sorted(platform - owners))
 
     return [

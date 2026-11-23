@@ -478,16 +478,27 @@ def all_new():
             "WindowSwitchPhysical::seal;",
             "oemWindowSwitch.oemKeyCaps;",
         ):
-            text = text.replace(f"    allocate OEM_WindowSwitch.enclosure to {target}\n", "")
+            text = text.replace(
+                f"    allocate OEM_WindowSwitch.enclosure to {target}\n", ""
+            )
         # the modified caps go too, or they would be a part without a logical component
-        text = re.sub(r"        #Mechanical #Modified part <'PC-112'>.*?\n        \}\n", "", text, flags=re.DOTALL)
+        text = re.sub(
+            r"        #Mechanical #Modified part <'PC-112'>.*?\n        \}\n",
+            "",
+            text,
+            flags=re.DOTALL,
+        )
         path.write_text(text)
 
     with build("all", edit) as (code, out, work):
-        table = (work / "docs/_generated/compliance.md").read_text() if code == 0 else ""
+        table = (
+            (work / "docs/_generated/compliance.md").read_text() if code == 0 else ""
+        )
         return report(
             "a component realized by new parts only is new",
-            re.search(r"^\| \{need\}`LC-106` \| enclosure \| new \|", table, re.MULTILINE),
+            re.search(
+                r"^\| \{need\}`LC-106` \| enclosure \| new \|", table, re.MULTILINE
+            ),
             out,
         )
 
@@ -519,17 +530,19 @@ def compliance_rows(table):
     cells = [[c.strip() for c in row.strip("|").split("|")] for row in rows]
     enclosure = re.search(r"^\| \{need\}`LC-106` .*$", text, re.MULTILINE)
     return {
-        "realization table: LC-106 partial, modified PC-112, new PC-113": bool(enclosure)
+        "realization table: LC-106 partial, modified PC-112, new PC-113": bool(
+            enclosure
+        )
         and "| partial |" in enclosure[0]
         and "`PC-112` oemKeyCaps (modified WSW-PC-002)" in enclosure[0]
         and "`PC-113` partNumberLabel (new)" in enclosure[0],
         **{
             f"compliance table has a {kind} row": any(test(c) for c in cells)
-        for kind, test in {
-            "full": lambda c: c[4] == "full",
-            "partial reuse": lambda c: c[4] == "partial",
-            "partial": lambda c: c[5] == "yes",
-            "statement-only": lambda c: not c[3] and "CST-001" in c[6],
+            for kind, test in {
+                "full": lambda c: c[4] == "full",
+                "partial reuse": lambda c: c[4] == "partial",
+                "partial": lambda c: c[5] == "yes",
+                "statement-only": lambda c: not c[3] and "CST-001" in c[6],
             }.items()
         },
     }

@@ -213,7 +213,9 @@ MATCH (f:component {key: $focus})
 WITH f, COLLECT { MATCH (x)-[:ALLOCATED_TO]->(f) RETURN x }
   + COLLECT { MATCH (f)-[:ALLOCATED_TO|SATISFIES]->(x) RETURN x } AS around
 WHERE size(around) > 0
-WITH [n IN [f] + around | {key: n.key, parent: null}] AS nodes""" + _close("ALLOCATED_TO|SATISFIES")
+WITH [n IN [f] + around | {key: n.key, parent: null}] AS nodes""" + _close(
+    "ALLOCATED_TO|SATISFIES"
+)
 
 VARIANTS = """
 MATCH (f:Node {key: $focus}) WHERE f.isVariation
@@ -501,7 +503,10 @@ def view(
         for n in records[0]["nodes"]:
             owners = sorted(n.pop("owners", None) or [], key=lambda o: o["key"])
             if owners:
-                n["parent"], n["also"] = owners[0]["key"], [o["name"] for o in owners[1:]]
+                n["parent"], n["also"] = (
+                    owners[0]["key"],
+                    [o["name"] for o in owners[1:]],
+                )
     nodes = _nodes(graph, records[0]["nodes"]) if records else []
     # a part alone is no context or composition
     if kind in ("context", "composition") and len(nodes) == 1:
@@ -929,7 +934,9 @@ def _v_scope(graph, focus) -> list[str]:
     kind = found[0]["type"] if found else None
     seeds = {focus: left[kind]} if kind in left else {}
     if kind in right:
-        seeds = {r["b"]: left[r["type"]] for r in neighbours([focus]) if r["type"] in left}
+        seeds = {
+            r["b"]: left[r["type"]] for r in neighbours([focus]) if r["type"] in left
+        }
     keep = {focus} | set(seeds)
     for step in (-1, 1):
         frontier = dict(seeds)
@@ -937,7 +944,11 @@ def _v_scope(graph, focus) -> list[str]:
             nxt = {}
             for r in neighbours(frontier):
                 lv = left.get(r["type"])
-                if lv is not None and (lv - frontier[r["a"]]) * step > 0 and r["b"] not in keep:
+                if (
+                    lv is not None
+                    and (lv - frontier[r["a"]]) * step > 0
+                    and r["b"] not in keep
+                ):
                     nxt[r["b"]] = lv
             keep |= set(nxt)
             frontier = nxt
@@ -958,7 +969,9 @@ def vmodel(graph, focus):
         focus = next(iter(found[0].values()))
         # a customer requirement narrows the V to its RFLP chain, any other element to its own chain
         reach = _read(graph, V_REACH, focus=focus)
-        keys = reach[0]["keys"] if reach and reach[0]["keys"] else _v_scope(graph, focus)
+        keys = (
+            reach[0]["keys"] if reach and reach[0]["keys"] else _v_scope(graph, focus)
+        )
     rows, results = [], []
     for r in _read(graph, V_NODES, keys=keys, types=NEED_TYPES):
         if r["type"] not in V_PLACE:
@@ -996,7 +1009,11 @@ def vmodel(graph, focus):
         "nodes": nodes,
         "edges": edges,
         "empty": [lv for lv in (1, 2, 3, 4) if lv not in right],
-        "reason": None if nodes else f"{focus} reaches no requirement" if focus else "no requirements to place",
+        "reason": None
+        if nodes
+        else f"{focus} reaches no requirement"
+        if focus
+        else "no requirements to place",
     }
 
 

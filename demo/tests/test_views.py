@@ -199,7 +199,9 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(row["constraints"], ["CON-101"])
         self.assertEqual(row["satisfied_by"], ["CON-101"])
         by = {r["crs"]: r["satisfied_by"] for r in v["rows"]}
-        self.assertEqual(by["CRS-506"], ["SR-106"])  # textual SR answers a non-functional CRS
+        self.assertEqual(
+            by["CRS-506"], ["SR-106"]
+        )  # textual SR answers a non-functional CRS
         self.assertEqual(
             by["CRS-302"], ["CON-102"]
         )  # met in part; CST-004 states the gap
@@ -207,7 +209,9 @@ class ViewsTest(unittest.TestCase):
         rating = {r["crs"]: r["rating"] for r in v["rows"]}
         self.assertEqual(rating["CRS-301"], "comply")
         self.assertEqual(rating["CRS-302"], "partial")
-        self.assertEqual(rating["CRS-203"], "partial")  # matched in part; CST-005 states the gap
+        self.assertEqual(
+            rating["CRS-203"], "partial"
+        )  # matched in part; CST-005 states the gap
         self.assertEqual(rating["CRS-205"], "not offered")
         self.assertEqual(rating["CRS-901"], "commercial")
         self.assertEqual(rating["CRS-101"], "information")
@@ -358,7 +362,9 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(
             [bool(n["children"]) for n in rows], [True] + [False] * (len(rows) - 1)
         )
-        self.assertEqual(rows[1]["again"], "The occupant wants to open or close a window")
+        self.assertEqual(
+            rows[1]["again"], "The occupant wants to open or close a window"
+        )
 
     def walk(self, nodes):
         for n in nodes:
@@ -387,7 +393,9 @@ class ViewsTest(unittest.TestCase):
             for r in g["children"]
             for x in r["links"]
         }
-        self.assertEqual(names["UC-101"], "The occupant wants to open or close a window")
+        self.assertEqual(
+            names["UC-101"], "The occupant wants to open or close a window"
+        )
 
     def test_vmodel_levels_and_sides(self):
         v = views.view(self.graph, "vmodel", None)
@@ -529,7 +537,10 @@ class ViewsTest(unittest.TestCase):
         shared = [n for n in v["nodes"] if n.get("also")]
         self.assertTrue(shared)
         self.assertTrue(
-            all(n["parent"] == "PC-110" and n["also"] == ["passengerDoorSwitch"] for n in shared)
+            all(
+                n["parent"] == "PC-110" and n["also"] == ["passengerDoorSwitch"]
+                for n in shared
+            )
         )
         self.assertIn(nodes["WSW-PC-012"]["parent"], nodes)
 
@@ -583,7 +594,9 @@ class ViewsTest(unittest.TestCase):
     def test_usecases_show_titles(self):
         v = self.view("usecases", "UC-101")
         names = {n["key"]: n["name"] for n in v["nodes"]}
-        self.assertEqual(names["UC-103"], "The occupant wants to find the window keys in the dark")
+        self.assertEqual(
+            names["UC-103"], "The occupant wants to find the window keys in the dark"
+        )
 
     def test_product_overview(self):
         v = self.view("product")
@@ -609,7 +622,9 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(parent[names["doorHarness"]], "group:context")
         # use cases with the features they perform, functions counted
         self.assertLessEqual({"UC-101", "UC-102", "UC-103"}, set(nodes))
-        self.assertEqual(nodes["UC-101"]["name"], "The occupant wants to open or close a window")
+        self.assertEqual(
+            nodes["UC-101"]["name"], "The occupant wants to open or close a window"
+        )
         self.assertIn("4 functions", tags["FEAT-101"])
         self.assertIn("4 functions", tags["FEAT-104"])
         edges = {(e["src"], e["dst"], e["type"]) for e in v["edges"]}

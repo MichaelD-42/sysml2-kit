@@ -293,7 +293,13 @@ class InheritedPartsTest(unittest.TestCase):
         needs = {
             "PA": need("physical", platform=True, domain=""),
             "OEM": need("physical", domain="", specializes=["PA"]),
-            "CAPS": need("physical", domain="ME", owned_by=["OEM"], modified=True, specializes=["PP"]),
+            "CAPS": need(
+                "physical",
+                domain="ME",
+                owned_by=["OEM"],
+                modified=True,
+                specializes=["PP"],
+            ),
             "PP": need("physical", platform=True, domain="ME"),
             "DOOR": need("physical", domain="", specializes=["OEM"]),
         }

@@ -97,7 +97,9 @@ def specialized(elements, qualified_name):
 
 class EnrichedExampleTest(unittest.TestCase):
     def test_attributes_with_units(self):
-        values = texts_of_attribute_values(export, "WindowSwitchPhysical::SwitchAssembly")
+        values = texts_of_attribute_values(
+            export, "WindowSwitchPhysical::SwitchAssembly"
+        )
         self.assertRegex(values["actuationForce"], r"^5 \[N\]$")
         self.assertRegex(values["mass"], r"^42 \[g\]$")
 

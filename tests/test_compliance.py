@@ -358,7 +358,9 @@ class RealizationTest(unittest.TestCase):
             "LC-1": need(
                 "component", "enclosure", allocated_to=["PC-1", "PC-2", "WSW-PC-3"]
             ),
-            "PC-1": need("physical", "oemCaps", modified=True, specializes=["WSW-PC-2"]),
+            "PC-1": need(
+                "physical", "oemCaps", modified=True, specializes=["WSW-PC-2"]
+            ),
             "PC-2": need("physical", "label"),
             "WSW-PC-2": need("physical", "keyCaps", platform=True),
             "WSW-PC-3": need("physical", "housing", platform=True),

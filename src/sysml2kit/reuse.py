@@ -164,7 +164,11 @@ def component_reuse(needs, lc, context=None):
             if i != lc and needs[i]["type"] == "component" and needs[i]["leaf"]
         ]
         degrees = {component_reuse(needs, i, context) for i in leaves}
-        return "incomplete" if not degrees or "incomplete" in degrees else _combine(degrees)
+        return (
+            "incomplete"
+            if not degrees or "incomplete" in degrees
+            else _combine(degrees)
+        )
     pcs = component_pcs(needs, lc, context)
     return _combine({part_reuse(needs, p) for p in pcs}) if pcs else "incomplete"
 
@@ -226,4 +230,3 @@ def _combine(statuses):
     if statuses in ({"new"}, {"full"}):
         return next(iter(statuses))
     return "partial"
-
