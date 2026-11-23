@@ -2,76 +2,78 @@ import json
 import unittest
 from pathlib import Path
 
-from sysml2kit.constraints import Model, Unevaluable, evaluate
+from sysml2kit.constraints import Model, Unevaluable
 from sysml2kit.needs import normalize
 
-VALUES = {
-    ("mass",): "48 [g]",
-    ("force",): "4.5 [N]",
-    ("minTemp",): "-40 ['°C']",
-    ("ip",): '"IP5K4"',
-    ("cycles",): "200000",
-    ("lum",): "20 [cd / m^2]",
-    ("a", "nad"): "33",
-    ("b", "nad"): "34",
-    ("ok",): "true",
-}
+FIXTURES = Path(__file__).parent / "fixtures"
 
 
-def lookup(chain):
-    if chain not in VALUES:
-        raise Unevaluable(f"{'.'.join(chain)} has no value")
-    return VALUES[chain]
+def load(name):
+    return Model(normalize(json.loads((FIXTURES / f"{name}.json").read_text())))
+
+
+def named(model, name):
+    return next(
+        e["@id"]
+        for e in model.by_id.values()
+        if e["@type"] == "ConstraintUsage" and e.get("name") == name
+    )
 
 
 class EvaluateTest(unittest.TestCase):
+    """Constraints evaluated from the expression tree `sysml export` writes (fixtures/expressions.sysml)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.model = load("expressions")
+
+    def check(self, name):
+        return self.model.check(named(self.model, name))
+
     def test_holds(self):
-        for text in (
-            "mass <= 60 [g]",
-            "force >= 3.0 [N] and force <= 6.5 [N]",
-            "minTemp <= -40 ['°C']",
-            'ip == "IP5K4"',
-            "cycles >= 200000",
-            "lum >= 8 [cd/m^2] and lum <= 40 [cd/m^2]",
-            "a.nad != b.nad",
-            "not (mass > 60 [g]) or cycles < 1",
-            "ok",
+        for name in (
+            "holdsMass",
+            "holdsForce",
+            "holdsTemp",
+            "holdsIp",
+            "holdsCycles",
+            "holdsLum",
+            "holdsChain",
+            "holdsNotOr",
+            "holdsBool",
         ):
-            with self.subTest(text=text):
-                self.assertTrue(evaluate(text, lookup))
+            with self.subTest(name=name):
+                self.assertTrue(self.check(name)[0])
 
     def test_violated(self):
-        for text in ("mass <= 40 [g]", "cycles >= 300000", 'ip == "IP6K9K"'):
-            with self.subTest(text=text):
-                self.assertFalse(evaluate(text, lookup))
+        for name in ("failsMass", "failsCycles", "failsIp"):
+            with self.subTest(name=name):
+                self.assertFalse(self.check(name)[0])
+
+    def test_reports_text_and_values(self):
+        self.assertEqual(
+            self.check("failsMass"), (False, "mass <= 40 [g]", {"mass": "48 [g]"})
+        )
+        self.assertEqual(self.check("holdsChain")[2], {"a.nad": "33", "b.nad": "34"})
 
     def test_different_units_are_not_compared(self):
         with self.assertRaisesRegex(Unevaluable, r"units differ: g and kg"):
-            evaluate("mass <= 0.06 [kg]", lookup)
+            self.check("unitsDiffer")
 
     def test_missing_value(self):
-        with self.assertRaisesRegex(Unevaluable, "c.nad has no value"):
-            evaluate("a.nad != c.nad", lookup)
+        with self.assertRaisesRegex(Unevaluable, "unset has no value"):
+            self.check("noValue")
 
-    def test_unsupported_syntax(self):
-        with self.assertRaises(Unevaluable):
-            evaluate("mass->size() == 1", lookup)
-
-    def test_a_comparison_must_give_a_boolean(self):
-        with self.assertRaisesRegex(Unevaluable, "not a boolean"):
-            evaluate("mass", lookup)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_unsupported_operator(self):
+        with self.assertRaisesRegex(Unevaluable, r"operator '\*'"):
+            self.check("arithmetic")
 
 
 class InheritedTest(unittest.TestCase):
     """A constraint holds for every part that inherits it, with that part's own values."""
 
     def setUp(self):
-        path = Path(__file__).parent / "fixtures" / "inherited_constraint.json"
-        self.model = Model(normalize(json.loads(path.read_text())))
+        self.model = load("inherited_constraint")
 
     def results(self):
         constraint = next(
