@@ -449,7 +449,12 @@ def convert(elements, locations, platform_files=(), warnings=None, mapping=None)
 
     for need in needs.values():
         for key in link_types:
-            need[key] = sorted(set(need[key]))
+            # a connector's ends are ordered (source, then target); every other link is a set
+            need[key] = (
+                list(dict.fromkeys(need[key]))
+                if key == "connects"
+                else sorted(set(need[key]))
+            )
     for need in needs.values():
         # leaf functions/components carry allocation rules (see schemas.json); subsetting a composite inherits its children
         need["leaf"] = not children & {

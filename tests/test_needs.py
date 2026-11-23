@@ -363,7 +363,7 @@ class ConnectsMappingTest(unittest.TestCase):
         for kind in ("InterfaceUsage", "ConnectionUsage"):
             n = needs_of(self.connector(kind))
             self.assertEqual(n["LI-2"]["type"], "interface")
-            self.assertEqual(n["LI-2"]["connects"], ["LC-3", "LI-1"], kind)
+            self.assertEqual(n["LI-2"]["connects"], ["LI-1", "LC-3"], kind)
 
     def test_mapping(self):
         mapping = {
