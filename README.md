@@ -94,6 +94,11 @@ Requirement classes, constraints and customer test requirements change the rules
 - A partially met CRS (partial match or `partial = true` constraint) needs a CST with `:compliance: partial` (finding `partial, but no partial compliance statement answers it`). A partial match still needs an SR in the feature's chain, now stating what is met (`partial match without a system requirement stating what is met`); a partial constraint no longer needs an SR. Delete SRs that only restated a partial constraint's gap.
 - New finding `<CRS>: system requirement <SR> is satisfied outside the chain of its matching features`: every SR satisfying a matched CRS must be satisfied by a component that a matching feature's functions reach.
 
+## Upgrading to the next release
+
+- `docs/ubproject.toml`: add the link `connects` (copy from the template). A `connect` or `interface` usage with a short name is now an interface need whose `connects` names the needs that own its two ends; `ConnectionUsage` maps to `interface`.
+- New and optional: `sysml2kit needs --map <file>` and `sysml2kit myst <needs.json> <out.md> --map <file>` adapt the bridge to a project's own method (need types, id patterns, metadata as links or fields) and write the needs as MyST directives for projects that keep needs in Markdown. The map is JSON with the keys `keywords`, `ids`, `metadata_links`, `metadata_fields` (read by `needs`) and `types`, `links`, `fields` (read by `myst`).
+
 ## Pipeline
 
 ```text

@@ -171,6 +171,10 @@ outgoing = "applies to"
 incoming = "partially satisfied by"
 outgoing = "partially satisfies"
 
+[needs.links.connects]
+incoming = "connected by"
+outgoing = "connects"
+
 [needs.links.answers]
 incoming = "answered by"
 outgoing = "answers"

@@ -26,6 +26,7 @@ NEED_TYPES = {
     "PortUsage": "interface",
     "InterfaceDefinition": "interface",
     "InterfaceUsage": "interface",
+    "ConnectionUsage": "interface",
     "VerificationCaseDefinition": "systest",
     "VerificationCaseUsage": "systest",
     "ConstraintUsage": "constraint",
@@ -91,7 +92,10 @@ LINK_TYPES = (
     "partial_matches",
     "implements",
     "partial_satisfies",
+    "connects",
 )
+# connector usages whose two ends become a `connects` link to the needs that own them
+CONNECTORS = ("InterfaceUsage", "ConnectionUsage")
 # relationships whose `specific` end specializes the `general` end
 SPECIALIZATIONS = ("Subsetting", "Redefinition", "Subclassification", "FeatureTyping")
 # Trace metadata definition (qualified, so another library's `Satisfies` is not a trace link) -> link type
@@ -175,8 +179,18 @@ def normalize(elements):
     return elements
 
 
-def convert(elements, locations, platform_files=(), warnings=None):
-    """needs.json content; a constraint that does not hold is an error, one that cannot be evaluated a warning."""
+def convert(elements, locations, platform_files=(), warnings=None, mapping=None):
+    """needs.json content; a constraint that does not hold is an error, one that cannot be evaluated a warning.
+
+    `mapping` (see `load_mapping`) adapts the bridge to a project's own method: `keywords` maps
+    keyword metadata to a need type, `ids` a need type to the id pattern it must match,
+    `metadata_links` and `metadata_fields` metadata to a link type or a field taking its strings."""
+    mapping = mapping or {}
+    keyword_map = mapping.get("keywords", {})
+    id_patterns = mapping.get("ids", {})
+    trace_metadata = {**TRACE_METADATA, **mapping.get("metadata_links", {})}
+    field_metadata = mapping.get("metadata_fields", {})
+    link_types = tuple(dict.fromkeys(LINK_TYPES + tuple(trace_metadata.values())))
     elements = normalize(elements)
     by_id = {e["@id"]: e for e in elements}
     errors = []
@@ -210,6 +224,7 @@ def convert(elements, locations, platform_files=(), warnings=None):
             ),
             kind,
         )
+        kind = next((keyword_map[k] for k in sorted(tags) if k in keyword_map), kind)
         domains = sorted(tags & DOMAINS.keys())
         if len(domains) > 1:
             errors.append(
@@ -225,7 +240,11 @@ def convert(elements, locations, platform_files=(), warnings=None):
                 f"add it to NEED_TYPES or remove the short name"
             )
             continue
-        if kind in PREFIXES and not re.fullmatch(
+        if kind in id_patterns:
+            if not re.fullmatch(id_patterns[kind], short):
+                errors.append(f"{short}: a {kind} id matches {id_patterns[kind]}")
+                continue
+        elif kind in PREFIXES and not re.fullmatch(
             rf"([A-Z][A-Z0-9]*-)?{PREFIXES[kind]}-\d+", short
         ):
             errors.append(
@@ -262,7 +281,7 @@ def convert(elements, locations, platform_files=(), warnings=None):
             "variant": by_id.get(ref(e, "owningRelationship"), {}).get("@type")
             == "VariantMembership",
             "modified": "Trace::Modified" in tags,
-            **{link: [] for link in LINK_TYPES},
+            **{link: [] for link in link_types},
         }
         need_of[e["@id"]] = short
 
@@ -319,6 +338,11 @@ def convert(elements, locations, platform_files=(), warnings=None):
             ends = refs(e, "relatedFeature")
             if len(ends) == 2:
                 link("allocated_to", ends[0], ends[1], "allocate")
+        elif t in CONNECTORS and e["@id"] in need_of:
+            # each end is a port or part; the need is the end itself or its nearest owning need
+            for end in refs(e, "relatedFeature"):
+                target = end if end in need_of else owning_need(end)
+                link("connects", e["@id"], target or end, need_of[e["@id"]])
         elif t == "PerformActionUsage":
             # `perform f;` inside a use case: the function realizes the use case
             use_case = owning_need(e["@id"])
@@ -333,8 +357,24 @@ def convert(elements, locations, platform_files=(), warnings=None):
         elif t == "MetadataUsage":
             types = [by_id.get(m, {}).get("qualifiedName") for m in refs(e, "type")]
             # keyword metadata (`#Feature`) types a need above; it is not a trace link
+            field = next(
+                (field_metadata[n] for n in types if n in field_metadata), None
+            )
+            if field:
+                annotated = refs(e, "annotatedElement")
+                src = need_of.get(annotated[0]) if annotated else None
+                values = strings_under(e["@id"])
+                if not src or len(values) != 1:
+                    errors.append(
+                        f"@{types[0]}: needs a short-named element and one string"
+                    )
+                elif field in needs[src] and field not in field_metadata.values():
+                    errors.append(f"{src}: field {field} is the bridge's own")
+                else:
+                    needs[src][field] = values[0]
+                continue
             link_type = next(
-                (TRACE_METADATA[n] for n in types if n in TRACE_METADATA), None
+                (trace_metadata[n] for n in types if n in trace_metadata), None
             )
             if not link_type:
                 continue
@@ -379,7 +419,9 @@ def convert(elements, locations, platform_files=(), warnings=None):
         return found
 
     for element_id, short in need_of.items():
-        needs[short]["specializes"] += [g for g in general_needs(element_id) if g != short]
+        needs[short]["specializes"] += [
+            g for g in general_needs(element_id) if g != short
+        ]
 
     children = set()
     for element_id, short in need_of.items():
@@ -391,7 +433,7 @@ def convert(elements, locations, platform_files=(), warnings=None):
                 children.add(need_of[parent])
 
     for need in needs.values():
-        for key in LINK_TYPES:
+        for key in link_types:
             need[key] = sorted(set(need[key]))
     for need in needs.values():
         # leaf functions/components carry allocation rules (see schemas.json); subsetting a composite inherits its children
@@ -412,8 +454,7 @@ def convert(elements, locations, platform_files=(), warnings=None):
         if need["modified"] and not (
             need["type"] == "physical"
             and any(
-                needs[i]["platform"]
-                for i in closure(needs, need["id"], "specializes")
+                needs[i]["platform"] for i in closure(needs, need["id"], "specializes")
             )
         ):
             errors.append(
@@ -460,7 +501,29 @@ def text_findings(needs):
     return findings
 
 
-def write_needs(export_path, out_path, model_files, platform_files=(), warnings=None):
+def load_mapping(path):
+    """A project's mapping file (JSON), or {} for the kit's own method; see `convert` and `myst.to_myst`."""
+    if not path:
+        return {}
+    mapping = json.loads(Path(path).read_text())
+    known = {
+        "keywords",
+        "ids",
+        "metadata_links",
+        "metadata_fields",
+        "types",
+        "links",
+        "fields",
+    }
+    unknown = sorted(set(mapping) - known)
+    if unknown:
+        raise BridgeError(f"{path}: unknown keys {', '.join(unknown)}")
+    return mapping
+
+
+def write_needs(
+    export_path, out_path, model_files, platform_files=(), warnings=None, mapping=None
+):
     elements = json.loads(Path(export_path).read_text())
     if not isinstance(elements, list) or not all(
         "@id" in e and "@type" in e for e in elements
@@ -468,7 +531,9 @@ def write_needs(export_path, out_path, model_files, platform_files=(), warnings=
         raise BridgeError(
             f"{export_path}: not SysML v2 interchange JSON (expected a list of elements with @id/@type)"
         )
-    result = convert(elements, source_locations(model_files), platform_files, warnings)
+    result = convert(
+        elements, source_locations(model_files), platform_files, warnings, mapping
+    )
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     Path(out_path).write_text(json.dumps(result, indent=2, sort_keys=True))
     return result["versions"][""]["needs"]

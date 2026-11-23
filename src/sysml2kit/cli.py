@@ -8,7 +8,8 @@ from pathlib import Path
 
 from .compliance import compliance, ctr_rows, realization_rows, table_md
 from .gaps import gaps
-from .needs import BridgeError, text_findings, write_needs
+from .myst import to_myst
+from .needs import BridgeError, load_mapping, text_findings, write_needs
 from .render import trace_svg, use_case_svg, use_cases
 
 
@@ -29,6 +30,13 @@ def main(argv=None):
         default=[],
         help="the .sysml files that belong to the platform",
     )
+    p.add_argument("--map", help="project mapping file (JSON): types, ids, metadata")
+    p = sub.add_parser(
+        "myst", help="bridge needs.json (`sysml2kit needs`) -> MyST need directives"
+    )
+    p.add_argument("needs_json")
+    p.add_argument("output")
+    p.add_argument("--map", help="project mapping file (JSON): types, links, fields")
     p = sub.add_parser("usecases", help="one use case diagram SVG per subject")
     p.add_argument("export")
     p.add_argument("output_dir")
@@ -61,11 +69,22 @@ def main(argv=None):
         if args.command == "needs":
             warnings = []
             needs = write_needs(
-                args.export, args.output, args.model_files, args.platform, warnings
+                args.export,
+                args.output,
+                args.model_files,
+                args.platform,
+                warnings,
+                load_mapping(args.map),
             )
             print(f"sysml2kit: {len(needs)} needs -> {args.output}")
             for finding in warnings + text_findings(needs):
                 print(f"sysml2kit: warning: {finding}", file=sys.stderr)
+        elif args.command == "myst":
+            data = json.loads(Path(args.needs_json).read_text())
+            needs = data["versions"][data.get("current_version", "")]["needs"]
+            text = to_myst(needs, load_mapping(args.map), Path(args.needs_json).name)
+            Path(args.output).write_text(text)
+            print(f"sysml2kit: {len(needs)} needs -> {args.output}")
         elif args.command == "usecases":
             out = Path(args.output_dir)
             out.mkdir(parents=True, exist_ok=True)
@@ -82,7 +101,9 @@ def main(argv=None):
             data = json.loads(Path(args.needs_json).read_text())
             needs = data["versions"][data.get("current_version", "")]["needs"]
             rows, findings = compliance(needs)
-            Path(args.output).write_text(table_md(rows, ctr_rows(needs), realization_rows(needs)))
+            Path(args.output).write_text(
+                table_md(rows, ctr_rows(needs), realization_rows(needs))
+            )
             print(f"sysml2kit: compliance of {len(rows)} requirements -> {args.output}")
             for finding in findings:
                 print(finding)

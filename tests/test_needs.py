@@ -283,8 +283,8 @@ class ConvertTest(unittest.TestCase):
 
     def test_unmapped_kind(self):
         self.assertBridgeError(
-            model(x=el("x", "ConnectionUsage", "C-1", "c", owner="pkg")),
-            "no need type for ConnectionUsage",
+            model(x=el("x", "StateUsage", "C-1", "c", owner="pkg")),
+            "no need type for StateUsage",
         )
 
     def test_trace_metadata_on_element_without_short_name(self):
@@ -323,6 +323,71 @@ def keyword(id_, meta, target):
             "qualifiedName": f"Trace::{meta}",
         },
     }
+
+
+def meta(id_, qualified, annotated, *values):
+    """A metadata usage typed by `qualified`, its definition, and its string literals."""
+    lits = [
+        {"@id": f"{id_}-v{i}", "@type": "LiteralString", "value": v}
+        for i, v in enumerate(values)
+    ]
+    return {
+        id_: el(
+            id_,
+            "MetadataUsage",
+            owner=annotated,
+            type=ids(f"{id_}-def"),
+            annotatedElement=ids(annotated),
+            ownedElement=ids(*(x["@id"] for x in lits)),
+        ),
+        f"{id_}-def": {
+            **el(f"{id_}-def", "MetadataDefinition", name=qualified),
+            "qualifiedName": qualified,
+        },
+        **{x["@id"]: x for x in lits},
+    }
+
+
+class ConnectsMappingTest(unittest.TestCase):
+    def connector(self, kind="InterfaceUsage"):
+        # lc3 sits beside lc2 under lc1; the interface joins lc2's port LI-1 and a nameless port of lc3
+        return model(
+            lc3=el("lc3", "PartUsage", "LC-3", "brakes", owner="lc1"),
+            p3=el("p3", "PortUsage", None, "pIn", owner="lc3"),
+            ci=el(
+                "ci", kind, "LI-2", "drive", owner="lc1", relatedFeature=ids("li", "p3")
+            ),
+        )
+
+    def test_interface_connects_owners_of_its_ends(self):
+        for kind in ("InterfaceUsage", "ConnectionUsage"):
+            n = needs_of(self.connector(kind))
+            self.assertEqual(n["LI-2"]["type"], "interface")
+            self.assertEqual(n["LI-2"]["connects"], ["LC-3", "LI-1"], kind)
+
+    def test_mapping(self):
+        mapping = {
+            "keywords": {"Arch::External": "external"},
+            "ids": {"component": r"LC_\d+", "external": r"EXT_\w+"},
+            "metadata_links": {"Arch::Carries": "carries"},
+            "metadata_fields": {"Arch::Medium": "medium"},
+        }
+        elements = model(
+            lc1=el("lc1", "PartUsage", "LC_1", "vehicle", owner="pkg"),
+            lc2=el("lc2", "PartUsage", "LC_2", "powertrain", owner="lc1"),
+            ext=el("ext", "PartUsage", "EXT_ROAD", "road", owner="pkg"),
+            **meta("m1", "Arch::External", "ext"),
+            **meta("m2", "Arch::Carries", "li", "FUNC_1", "FUNC_2"),
+            **meta("m3", "Arch::Medium", "li", "data"),
+        )
+        n = convert(elements, {}, mapping=mapping)["versions"][""]["needs"]
+        self.assertEqual(n["EXT_ROAD"]["type"], "external")
+        self.assertEqual(n["LI-1"]["carries"], ["FUNC_1", "FUNC_2"])
+        self.assertEqual(n["LI-1"]["medium"], "data")
+        self.assertEqual(n["LC_2"]["owned_by"], ["LC_1"])
+        with self.assertRaises(BridgeError) as caught:
+            convert(model(), {}, mapping=mapping)
+        self.assertIn(r"LC-1: a component id matches LC_\d+", str(caught.exception))
 
 
 class KeywordTest(unittest.TestCase):
