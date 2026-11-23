@@ -120,7 +120,7 @@ A flat JSON array of elements with `@type`, `@id` and every metamodel property; 
 
 | Tool | Version | Role |
 |---|---|---|
-| `sysml` (sysmlv2-cli) | fork [MichaelD-42/sysml-v2-rs](https://github.com/MichaelD-42/sysml-v2-rs) tag `v0.2.0-kit.3` (upstream 0.2.0 + ids on variant members; `relations` and `trace` credit nothing for a `satisfy` whose `by` end does not resolve; several `--project` roots for the MCP server) | parse, resolve, validate, export, internal diagrams, MCP server |
+| `sysml` (sysmlv2-cli) | fork [MichaelD-42/sysml-v2-rs](https://github.com/MichaelD-42/sysml-v2-rs) tag `v0.2.0-kit.4` (upstream 0.2.0 + ids on variant members; `relations` and `trace` credit nothing for a `satisfy` whose `by` end does not resolve; several `--project` roots for the MCP server; a reserved word naming a usage and a modifier after a `#tag` are errors, as in the Pilot) | parse, resolve, validate, export, internal diagrams, MCP server |
 | sphinx-needs | 9.2.0 | needs, links, schema rules |
 | ub-test-reports | 2.0.0 | JUnit → needs |
 | sysml2kit | this repo | export → needs, use case and trace diagrams |
