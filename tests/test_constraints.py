@@ -41,12 +41,16 @@ class EvaluateTest(unittest.TestCase):
             "holdsChain",
             "holdsNotOr",
             "holdsBool",
+            "convertsMass",
+            "convertsDerived",
+            "convertsLength",
+            "convertsBoundary",
         ):
             with self.subTest(name=name):
                 self.assertTrue(self.check(name)[0])
 
     def test_violated(self):
-        for name in ("failsMass", "failsCycles", "failsIp"):
+        for name in ("failsMass", "failsCycles", "failsIp", "failsConverted"):
             with self.subTest(name=name):
                 self.assertFalse(self.check(name)[0])
 
@@ -56,9 +60,14 @@ class EvaluateTest(unittest.TestCase):
         )
         self.assertEqual(self.check("holdsChain")[2], {"a.nad": "33", "b.nad": "34"})
 
-    def test_different_units_are_not_compared(self):
-        with self.assertRaisesRegex(Unevaluable, r"units differ: g and kg"):
-            self.check("unitsDiffer")
+    def test_different_dimensions_are_not_compared(self):
+        with self.assertRaisesRegex(Unevaluable, r"dimensions differ: g and m"):
+            self.check("dimensionsDiffer")
+
+    def test_temperatures_in_different_units_are_not_compared(self):
+        # the library converts °C to K by factor only, as a temperature difference
+        with self.assertRaisesRegex(Unevaluable, r"temperatures in °C and K"):
+            self.check("temperatureOffset")
 
     def test_missing_value(self):
         with self.assertRaisesRegex(Unevaluable, "unset has no value"):

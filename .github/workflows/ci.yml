@@ -51,6 +51,8 @@ jobs:
         with: { name: sysml, path: bin }
       - run: chmod +x bin/sysml && echo "$PWD/bin" >> "$GITHUB_PATH"
       - run: pip install -e . -r examples/window-switch-rfq/requirements.txt
+      # the unit table is generated from the library of the pinned sysml; a tag bump must regenerate it
+      - run: python -m sysml2kit.units && git diff --exit-code src/sysml2kit/units.json
       - run: python tests/acceptance.py
 
   omg-corpus:

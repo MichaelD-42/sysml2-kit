@@ -1,0 +1,6261 @@
+{
+ "eb3f3453-8f8c-5360-b4c0-f4e7326b9f10": {
+  "name": "ISQ::TemperatureDifferenceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "eb3f3453-8f8c-5360-b4c0-f4e7326b9f10": 1
+  }
+ },
+ "4ab44e19-3001-59dd-b60f-fc96c97e4151": {
+  "name": "ISQAcoustics::AcousticImpedanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4ab44e19-3001-59dd-b60f-fc96c97e4151": 1
+  }
+ },
+ "7b3cb824-d0cf-565a-ae0e-604e404a4be9": {
+  "name": "ISQAcoustics::CartesianSoundIntensity3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "7b3cb824-d0cf-565a-ae0e-604e404a4be9": 1
+  }
+ },
+ "74700fff-1ac7-50f0-b007-819c816cfbed": {
+  "name": "ISQAcoustics::CharacteristicImpedanceOfAMediumForLongitudinalWavesValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "74700fff-1ac7-50f0-b007-819c816cfbed": 1
+  }
+ },
+ "373a7dff-2e5e-5bb4-97d8-7f60c2eb4bcd": {
+  "name": "ISQAcoustics::LogarithmicFrequencyRangeValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "16c7a573-0e7e-5a0e-8cfe-187c9003e287": {
+  "name": "ISQAcoustics::SoundEnergyDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "16c7a573-0e7e-5a0e-8cfe-187c9003e287": 1
+  }
+ },
+ "69ac6fc4-1840-5ee7-9066-2618ac3153d3": {
+  "name": "ISQAcoustics::SoundExposureLevelValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "079f24a9-797e-5850-8233-b055778d6f4c": {
+  "name": "ISQAcoustics::SoundExposureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "079f24a9-797e-5850-8233-b055778d6f4c": 1
+  }
+ },
+ "603b7deb-e00b-55f8-9c43-679515fd635d": {
+  "name": "ISQAcoustics::SoundIntensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "603b7deb-e00b-55f8-9c43-679515fd635d": 1
+  }
+ },
+ "8808fd30-14a1-58d2-a5c0-60847414b24c": {
+  "name": "ISQAcoustics::SoundPowerLevelValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "641eb19a-61bb-5bed-ac7b-0f96e0bbaf2f": {
+  "name": "ISQAcoustics::SoundPressureLevelValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "6883cd8e-a735-5850-991f-2bc31a08d7c6": {
+  "name": "ISQAtomicNuclear::AbsorbedDoseRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "6883cd8e-a735-5850-991f-2bc31a08d7c6": 1
+  }
+ },
+ "dc0e6020-a75e-5146-ac3a-7bfc5847c37f": {
+  "name": "ISQAtomicNuclear::AbsorbedDoseValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "dc0e6020-a75e-5146-ac3a-7bfc5847c37f": 1
+  }
+ },
+ "614c27a5-2787-5667-8888-63b4c5f601a1": {
+  "name": "ISQAtomicNuclear::ActivityDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "614c27a5-2787-5667-8888-63b4c5f601a1": 1
+  }
+ },
+ "409ff1fe-7c20-541f-8841-b68c11c9bbad": {
+  "name": "ISQAtomicNuclear::AtomicAttenuationCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "409ff1fe-7c20-541f-8841-b68c11c9bbad": 1
+  }
+ },
+ "1fcc03cb-efc5-5b12-97e6-292e7f08a20e": {
+  "name": "ISQAtomicNuclear::AverageEnergyLossPerElementaryChargeProducedValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "1fcc03cb-efc5-5b12-97e6-292e7f08a20e": 1
+  }
+ },
+ "e5006586-c6bc-5b48-b5bc-26e6ae047799": {
+  "name": "ISQAtomicNuclear::CartesianMagneticDipoleMoment3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "e5006586-c6bc-5b48-b5bc-26e6ae047799": 1
+  }
+ },
+ "5411115e-5df3-5327-85e6-f72e420a1675": {
+  "name": "ISQAtomicNuclear::CartesianParticleCurrentDensity3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "5411115e-5df3-5327-85e6-f72e420a1675": 1
+  }
+ },
+ "588f288f-249d-5ce2-92e5-9387f5908339": {
+  "name": "ISQAtomicNuclear::CartesianSpin3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "588f288f-249d-5ce2-92e5-9387f5908339": 1
+  }
+ },
+ "2c1f79dd-8d98-5716-9483-c86f6f336a28": {
+  "name": "ISQAtomicNuclear::CartesianTotalAngularMomentum3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "2c1f79dd-8d98-5716-9483-c86f6f336a28": 1
+  }
+ },
+ "67847490-7ff3-52fd-a57e-09ac5a82f87d": {
+  "name": "ISQAtomicNuclear::DecayConstantValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "67847490-7ff3-52fd-a57e-09ac5a82f87d": 1
+  }
+ },
+ "a5b2ea2d-0e97-5128-913b-e6000ede53e3": {
+  "name": "ISQAtomicNuclear::DirectionAndEnergyDistributionOfCrossSectionValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a5b2ea2d-0e97-5128-913b-e6000ede53e3": 1
+  }
+ },
+ "eebe0caa-24e9-542f-aff3-56c8c27f0bf3": {
+  "name": "ISQAtomicNuclear::DirectionDistributionOfCrossSectionValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "eebe0caa-24e9-542f-aff3-56c8c27f0bf3": 1
+  }
+ },
+ "fbd68142-e9a4-5f8d-9d42-e0182210ebef": {
+  "name": "ISQAtomicNuclear::DoseEquivalentValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "fbd68142-e9a4-5f8d-9d42-e0182210ebef": 1
+  }
+ },
+ "0221de6f-ef4b-5463-8106-272c40b7faca": {
+  "name": "ISQAtomicNuclear::EnergyDistributionOfCrossSectionValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0221de6f-ef4b-5463-8106-272c40b7faca": 1
+  }
+ },
+ "22b308b4-5332-5faf-b6d4-bdb086f93360": {
+  "name": "ISQAtomicNuclear::EnergyFluenceRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "22b308b4-5332-5faf-b6d4-bdb086f93360": 1
+  }
+ },
+ "a442a352-a1af-50b1-8305-4506cc6829f6": {
+  "name": "ISQAtomicNuclear::EnergyFluenceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a442a352-a1af-50b1-8305-4506cc6829f6": 1
+  }
+ },
+ "e751b9c6-9b9c-551c-9a03-fa1f8d70c65b": {
+  "name": "ISQAtomicNuclear::ExposureRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "e751b9c6-9b9c-551c-9a03-fa1f8d70c65b": 1
+  }
+ },
+ "6409bafd-88f5-521a-8e99-ab0f3138ccc7": {
+  "name": "ISQAtomicNuclear::ExposureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "6409bafd-88f5-521a-8e99-ab0f3138ccc7": 1
+  }
+ },
+ "1610d2e1-c93b-5464-9686-c47ff8d38f98": {
+  "name": "ISQAtomicNuclear::FastFissionFactorValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "d03f8214-5de7-5178-afb8-5f6d7c04ff62": {
+  "name": "ISQAtomicNuclear::GyromagneticRatioOfTheElectronValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d03f8214-5de7-5178-afb8-5f6d7c04ff62": 1
+  }
+ },
+ "b37500cb-d1ea-58db-a55c-87ff87aecc51": {
+  "name": "ISQAtomicNuclear::GyromagneticRatioValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "b37500cb-d1ea-58db-a55c-87ff87aecc51": 1
+  }
+ },
+ "a4be180e-bcec-5ac3-bdbd-707f68577379": {
+  "name": "ISQAtomicNuclear::HartreeEnergyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a4be180e-bcec-5ac3-bdbd-707f68577379": 1
+  }
+ },
+ "7d65dbe7-1b1f-5e8a-8f46-fdd7cb40b2e1": {
+  "name": "ISQAtomicNuclear::InfiniteMultiplicationFactorValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "763c1122-4acb-5fca-a028-2f2f57d9f026": {
+  "name": "ISQAtomicNuclear::IonNumberDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "763c1122-4acb-5fca-a028-2f2f57d9f026": 1
+  }
+ },
+ "96b649c5-ee4c-57f5-be27-bbeeaa68f5a8": {
+  "name": "ISQAtomicNuclear::KermaRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "96b649c5-ee4c-57f5-be27-bbeeaa68f5a8": 1
+  }
+ },
+ "639fb4fb-91ae-5586-9fc9-7f5424285d3d": {
+  "name": "ISQAtomicNuclear::KermaValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "639fb4fb-91ae-5586-9fc9-7f5424285d3d": 1
+  }
+ },
+ "fdb51dde-c7ab-5c7a-9976-7de015dc24b5": {
+  "name": "ISQAtomicNuclear::LarmorFrequencyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "fdb51dde-c7ab-5c7a-9976-7de015dc24b5": 1
+  }
+ },
+ "25dbeaa5-e57b-569d-951a-064420cb133a": {
+  "name": "ISQAtomicNuclear::LinearAttenuationCoefficientForIonizingRadiationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "25dbeaa5-e57b-569d-951a-064420cb133a": 1
+  }
+ },
+ "1895851e-4691-51a2-8c8b-459133713867": {
+  "name": "ISQAtomicNuclear::LinearEnergyTransferValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "1895851e-4691-51a2-8c8b-459133713867": 1
+  }
+ },
+ "11409b0f-6f57-54a1-b5e6-128b52dd17ae": {
+  "name": "ISQAtomicNuclear::LinearIonizationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "11409b0f-6f57-54a1-b5e6-128b52dd17ae": 1
+  }
+ },
+ "1fd65b0a-d20c-58b5-b424-e0b41ffd2c9b": {
+  "name": "ISQAtomicNuclear::MagneticDipoleMomentValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "1fd65b0a-d20c-58b5-b424-e0b41ffd2c9b": 1
+  }
+ },
+ "c518e4f1-96c4-55cb-9a69-ae247fd72779": {
+  "name": "ISQAtomicNuclear::MassAttenuationCoefficientForIonizingRadiationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c518e4f1-96c4-55cb-9a69-ae247fd72779": 1
+  }
+ },
+ "10cc4b6c-6852-548c-9ea9-f8a11fb638fb": {
+  "name": "ISQAtomicNuclear::MassEnergyTransferCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "10cc4b6c-6852-548c-9ea9-f8a11fb638fb": 1
+  }
+ },
+ "4e9f5e9f-815a-5568-b5b1-81d9b77f3695": {
+  "name": "ISQAtomicNuclear::MeanMassRangeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4e9f5e9f-815a-5568-b5b1-81d9b77f3695": 1
+  }
+ },
+ "4efc179a-8298-5794-9966-a377c14d166d": {
+  "name": "ISQAtomicNuclear::MobilityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4efc179a-8298-5794-9966-a377c14d166d": 1
+  }
+ },
+ "c9755a51-6f12-5c64-83f7-e9e5369f2d76": {
+  "name": "ISQAtomicNuclear::MolarAttenuationCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c9755a51-6f12-5c64-83f7-e9e5369f2d76": 1
+  }
+ },
+ "b37db866-0e9a-5fa2-bb49-6b6345d513c9": {
+  "name": "ISQAtomicNuclear::MultiplicationFactorValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "ddfff29d-5654-5f52-8733-1b6feb9c3425": {
+  "name": "ISQAtomicNuclear::NonLeakageProbabilityValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "f4c3ddb2-2a89-5383-90c4-fe2fc2334a7f": {
+  "name": "ISQAtomicNuclear::NuclearActivityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f4c3ddb2-2a89-5383-90c4-fe2fc2334a7f": 1
+  }
+ },
+ "597551a1-4db9-5c28-ba8b-f9b375f9cfa0": {
+  "name": "ISQAtomicNuclear::NuclearQuadrupoleMomentValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "597551a1-4db9-5c28-ba8b-f9b375f9cfa0": 1
+  }
+ },
+ "48eb99a1-723f-5f32-90df-b4d5d3649893": {
+  "name": "ISQAtomicNuclear::ParticleCurrentDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "48eb99a1-723f-5f32-90df-b4d5d3649893": 1
+  }
+ },
+ "752f0cab-dec5-5924-8cf3-ff0e426f3988": {
+  "name": "ISQAtomicNuclear::ParticleEmissionRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "752f0cab-dec5-5924-8cf3-ff0e426f3988": 1
+  }
+ },
+ "c6da46b6-aba1-5964-92f5-f6f123986825": {
+  "name": "ISQAtomicNuclear::ParticleFluenceRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c6da46b6-aba1-5964-92f5-f6f123986825": 1
+  }
+ },
+ "617de586-fd03-5ad7-b3b8-4ad7ee77786f": {
+  "name": "ISQAtomicNuclear::ParticleFluenceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "617de586-fd03-5ad7-b3b8-4ad7ee77786f": 1
+  }
+ },
+ "68e998a2-9be0-535a-880f-f08da91e98a4": {
+  "name": "ISQAtomicNuclear::ParticleNumberDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "68e998a2-9be0-535a-880f-f08da91e98a4": 1
+  }
+ },
+ "6b15e1d6-2c8f-5001-ae7a-52a63f2df6ee": {
+  "name": "ISQAtomicNuclear::ParticleSourceDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "6b15e1d6-2c8f-5001-ae7a-52a63f2df6ee": 1
+  }
+ },
+ "21373064-58be-56a7-9d3c-5d98aecb4fff": {
+  "name": "ISQAtomicNuclear::QualityFactorForIonizingRadiationValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "c234460a-0ebf-5340-b8ae-f64d2fff5a0e": {
+  "name": "ISQAtomicNuclear::RecombinationCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c234460a-0ebf-5340-b8ae-f64d2fff5a0e": 1
+  }
+ },
+ "2ee5b6d5-b1db-5d94-ad8f-d305c7e447be": {
+  "name": "ISQAtomicNuclear::RydbergConstantValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2ee5b6d5-b1db-5d94-ad8f-d305c7e447be": 1
+  }
+ },
+ "ef049dd5-fc8d-52b7-882d-637bf692f343": {
+  "name": "ISQAtomicNuclear::SlowingDownDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "ef049dd5-fc8d-52b7-882d-637bf692f343": 1
+  }
+ },
+ "7149a55a-d9f1-5e1a-883f-76c2d7b5028d": {
+  "name": "ISQAtomicNuclear::SpecificActivityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "7149a55a-d9f1-5e1a-883f-76c2d7b5028d": 1
+  }
+ },
+ "0c72601f-52ff-5149-9e41-9288b31f3531": {
+  "name": "ISQAtomicNuclear::SpinValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0c72601f-52ff-5149-9e41-9288b31f3531": 1
+  }
+ },
+ "64f23bca-3cd9-5375-93b1-a0301d04dace": {
+  "name": "ISQAtomicNuclear::SurfaceActivityDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "64f23bca-3cd9-5375-93b1-a0301d04dace": 1
+  }
+ },
+ "12ca4a7e-c5d5-54a2-8778-aa8f241d6b96": {
+  "name": "ISQAtomicNuclear::ThermalUtilizationFactorValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "317669ae-4e08-5008-8902-aabd9cb05c84": {
+  "name": "ISQAtomicNuclear::TotalAngularMomentumValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "317669ae-4e08-5008-8902-aabd9cb05c84": 1
+  }
+ },
+ "123e39c0-b43c-56e5-a224-f5a996fb98b0": {
+  "name": "ISQAtomicNuclear::TotalLinearStoppingPowerValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "123e39c0-b43c-56e5-a224-f5a996fb98b0": 1
+  }
+ },
+ "c1ccfd01-9546-5785-a113-675dd635a8ca": {
+  "name": "ISQAtomicNuclear::TotalMassStoppingPowerValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c1ccfd01-9546-5785-a113-675dd635a8ca": 1
+  }
+ },
+ "d64936ad-2894-5f4e-b2e0-0c32b81279fe": {
+  "name": "ISQAtomicNuclear::VolumicCrossSectionValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d64936ad-2894-5f4e-b2e0-0c32b81279fe": 1
+  }
+ },
+ "dcc77a12-3d56-55b3-b89a-099d8a240f25": {
+  "name": "ISQAtomicNuclear::VolumicTotalCrossSectionValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "dcc77a12-3d56-55b3-b89a-099d8a240f25": 1
+  }
+ },
+ "6e3db3b0-df60-5915-b415-2f148674de00": {
+  "name": "ISQBase::AmountOfSubstanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "6e3db3b0-df60-5915-b415-2f148674de00": 1
+  }
+ },
+ "ec268d62-630b-5c2d-896d-4f87a46cc525": {
+  "name": "ISQBase::DurationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "ec268d62-630b-5c2d-896d-4f87a46cc525": 1
+  }
+ },
+ "c1ff9088-1c86-5095-bdcc-8bd2174a270f": {
+  "name": "ISQBase::ElectricCurrentValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c1ff9088-1c86-5095-bdcc-8bd2174a270f": 1
+  }
+ },
+ "2629cc80-60b9-59b3-a8d0-27b814028b75": {
+  "name": "ISQBase::LengthValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2629cc80-60b9-59b3-a8d0-27b814028b75": 1
+  }
+ },
+ "62b3f4c8-89a2-5321-9c16-15b71df78ce4": {
+  "name": "ISQBase::LuminousIntensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "62b3f4c8-89a2-5321-9c16-15b71df78ce4": 1
+  }
+ },
+ "7f30e215-7c19-5ccb-a303-2263ad1cb6b6": {
+  "name": "ISQBase::MassValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "7f30e215-7c19-5ccb-a303-2263ad1cb6b6": 1
+  }
+ },
+ "091b1a25-b2e9-5c94-ae67-73165906716f": {
+  "name": "ISQBase::ThermodynamicTemperatureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "091b1a25-b2e9-5c94-ae67-73165906716f": 1
+  }
+ },
+ "384f7bee-951c-50d6-9cbd-dbff70c5163e": {
+  "name": "ISQChemistryMolecular::AffinityOfAChemicalReactionValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "384f7bee-951c-50d6-9cbd-dbff70c5163e": 1
+  }
+ },
+ "a9694d19-7e76-52a9-a161-1de1bdbfb7be": {
+  "name": "ISQChemistryMolecular::AmountOfSubstanceConcentrationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a9694d19-7e76-52a9-a161-1de1bdbfb7be": 1
+  }
+ },
+ "3cf0f6cd-b5b6-5090-95ac-767cb24aa521": {
+  "name": "ISQChemistryMolecular::ChemicalPotentialValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "3cf0f6cd-b5b6-5090-95ac-767cb24aa521": 1
+  }
+ },
+ "f51987bc-ca23-5a4c-a374-ce454af34cd6": {
+  "name": "ISQChemistryMolecular::DiffusionCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f51987bc-ca23-5a4c-a374-ce454af34cd6": 1
+  }
+ },
+ "6138d1f8-90ff-5be5-8ad5-97dfac661ccd": {
+  "name": "ISQChemistryMolecular::ElectrolyticConductivityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "6138d1f8-90ff-5be5-8ad5-97dfac661ccd": 1
+  }
+ },
+ "f4bfa480-241d-584f-9b16-311f644a966f": {
+  "name": "ISQChemistryMolecular::EquilibriumConstantOnConcentrationBasisValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f4bfa480-241d-584f-9b16-311f644a966f": 1
+  }
+ },
+ "55495c75-4cb2-5a80-955f-62c6bc2b61a7": {
+  "name": "ISQChemistryMolecular::EquilibriumConstantOnPressureBasisValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "55495c75-4cb2-5a80-955f-62c6bc2b61a7": 1
+  }
+ },
+ "c5ec42df-0842-5153-9d36-81a84c08c0e1": {
+  "name": "ISQChemistryMolecular::FugacityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c5ec42df-0842-5153-9d36-81a84c08c0e1": 1
+  }
+ },
+ "af240e2b-d90c-5498-92f9-62bdf464dc38": {
+  "name": "ISQChemistryMolecular::IonicStrengthValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "af240e2b-d90c-5498-92f9-62bdf464dc38": 1
+  }
+ },
+ "552b1aed-9020-55da-83c6-881867a7ea81": {
+  "name": "ISQChemistryMolecular::MassConcentrationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "552b1aed-9020-55da-83c6-881867a7ea81": 1
+  }
+ },
+ "25470651-b4c8-57f8-829c-5da9b6993d23": {
+  "name": "ISQChemistryMolecular::MolalityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "25470651-b4c8-57f8-829c-5da9b6993d23": 1
+  }
+ },
+ "c44c8ea1-4d36-5a60-b245-9c92f777eb07": {
+  "name": "ISQChemistryMolecular::MolarConductivityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c44c8ea1-4d36-5a60-b245-9c92f777eb07": 1
+  }
+ },
+ "67d0aebe-31fa-5a7a-95ad-5cd725991ad6": {
+  "name": "ISQChemistryMolecular::MolarEnthalpyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "67d0aebe-31fa-5a7a-95ad-5cd725991ad6": 1
+  }
+ },
+ "48a9e3b9-d6ea-5575-8945-f5a440f758dd": {
+  "name": "ISQChemistryMolecular::MolarEntropyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "48a9e3b9-d6ea-5575-8945-f5a440f758dd": 1
+  }
+ },
+ "9dfd173a-aca6-5d51-99b7-bd735e2a07a9": {
+  "name": "ISQChemistryMolecular::MolarGasConstantValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "9dfd173a-aca6-5d51-99b7-bd735e2a07a9": 1
+  }
+ },
+ "34b6b0bb-4e10-5988-ae48-79963002bc41": {
+  "name": "ISQChemistryMolecular::MolarGibbsEnergyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "34b6b0bb-4e10-5988-ae48-79963002bc41": 1
+  }
+ },
+ "d9953529-bc33-5bd4-9182-15e255fe6e1c": {
+  "name": "ISQChemistryMolecular::MolarHeatCapacityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d9953529-bc33-5bd4-9182-15e255fe6e1c": 1
+  }
+ },
+ "6fc0cdda-a244-5a11-a313-295288ecd339": {
+  "name": "ISQChemistryMolecular::MolarHelmholtzEnergyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "6fc0cdda-a244-5a11-a313-295288ecd339": 1
+  }
+ },
+ "bf94967a-d87b-5750-9d8c-6001d8090041": {
+  "name": "ISQChemistryMolecular::MolarInternalEnergyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "bf94967a-d87b-5750-9d8c-6001d8090041": 1
+  }
+ },
+ "f0d36ba2-ca89-5f9d-9406-3da354724fe0": {
+  "name": "ISQChemistryMolecular::MolarMassValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f0d36ba2-ca89-5f9d-9406-3da354724fe0": 1
+  }
+ },
+ "4d88e8f1-be94-58df-bca1-948951669144": {
+  "name": "ISQChemistryMolecular::MolarOpticalRotatoryPowerValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4d88e8f1-be94-58df-bca1-948951669144": 1
+  }
+ },
+ "fba98891-f075-5550-a478-abf1307846a1": {
+  "name": "ISQChemistryMolecular::MolarVolumeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "fba98891-f075-5550-a478-abf1307846a1": 1
+  }
+ },
+ "7e7166a9-bec0-5253-95b5-bf171a2bcf03": {
+  "name": "ISQChemistryMolecular::OsmoticPressureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "7e7166a9-bec0-5253-95b5-bf171a2bcf03": 1
+  }
+ },
+ "b54d5b55-0848-5570-8a58-57e26b0611d8": {
+  "name": "ISQChemistryMolecular::PartialPressureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "b54d5b55-0848-5570-8a58-57e26b0611d8": 1
+  }
+ },
+ "9a2a1b8d-6556-534d-a5b7-0d2b7a1c3dd4": {
+  "name": "ISQChemistryMolecular::ParticleConcentrationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "9a2a1b8d-6556-534d-a5b7-0d2b7a1c3dd4": 1
+  }
+ },
+ "0bc33b95-7fc5-5fc5-a713-5da6b1f9e5dc": {
+  "name": "ISQChemistryMolecular::SpecificOpticalRotatoryPowerValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0bc33b95-7fc5-5fc5-a713-5da6b1f9e5dc": 1
+  }
+ },
+ "b25d5e41-e9ba-5ae5-8a2e-d1215052441a": {
+  "name": "ISQChemistryMolecular::StandardChemicalPotentialValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "b25d5e41-e9ba-5ae5-8a2e-d1215052441a": 1
+  }
+ },
+ "2b91bcfa-bbb1-5379-a01f-7a63fa925a8b": {
+  "name": "ISQChemistryMolecular::ThermalDiffusionCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2b91bcfa-bbb1-5379-a01f-7a63fa925a8b": 1
+  }
+ },
+ "adb3c8cd-d0b6-582e-8084-0633c420c3c1": {
+  "name": "ISQChemistryMolecular::VolumeFractionValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "28e3370f-9dad-5702-80e1-9d2232934239": {
+  "name": "ISQCondensedMatter::AcceptorDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "28e3370f-9dad-5702-80e1-9d2232934239": 1
+  }
+ },
+ "288a743c-9796-56bb-a741-f7982f79b52f": {
+  "name": "ISQCondensedMatter::AngularReciprocalLatticeVectorMagnitudeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "288a743c-9796-56bb-a741-f7982f79b52f": 1
+  }
+ },
+ "5c5b751d-9a42-56b3-affc-a97e3b11c20e": {
+  "name": "ISQCondensedMatter::CartesianAngularReciprocalLattice3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "5c5b751d-9a42-56b3-affc-a97e3b11c20e": 1
+  }
+ },
+ "9989803d-f2ad-5149-8a77-7563c40bf417": {
+  "name": "ISQCondensedMatter::CartesianFundamentalReciprocalLattice3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "9989803d-f2ad-5149-8a77-7563c40bf417": 1
+  }
+ },
+ "838d8d91-9618-5dfb-a63a-46cf7bae3f0c": {
+  "name": "ISQCondensedMatter::DensityOfVibrationalStatesValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "838d8d91-9618-5dfb-a63a-46cf7bae3f0c": 1
+  }
+ },
+ "de363378-553e-5d17-9b2d-b07018200d05": {
+  "name": "ISQCondensedMatter::DonorDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "de363378-553e-5d17-9b2d-b07018200d05": 1
+  }
+ },
+ "2a2edfe3-7e9b-5903-94c3-d78497883b8c": {
+  "name": "ISQCondensedMatter::ElectronDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2a2edfe3-7e9b-5903-94c3-d78497883b8c": 1
+  }
+ },
+ "f97d077a-ada8-506d-8312-292d46d01d3a": {
+  "name": "ISQCondensedMatter::EnergyDensityOfStatesValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f97d077a-ada8-506d-8312-292d46d01d3a": 1
+  }
+ },
+ "2f056bc7-faf3-58fe-929c-9246c36c7227": {
+  "name": "ISQCondensedMatter::FundamentalReciprocalLatticeVectorMagnitudeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2f056bc7-faf3-58fe-929c-9246c36c7227": 1
+  }
+ },
+ "32098fde-ca64-57d3-9e7a-ad0df1de5a04": {
+  "name": "ISQCondensedMatter::HallCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "32098fde-ca64-57d3-9e7a-ad0df1de5a04": 1
+  }
+ },
+ "4bc6a49d-28e1-5a24-89d0-ebd02a04b4ab": {
+  "name": "ISQCondensedMatter::HoleDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4bc6a49d-28e1-5a24-89d0-ebd02a04b4ab": 1
+  }
+ },
+ "09be85da-13fe-559c-a02a-9ceff5b7fe3a": {
+  "name": "ISQCondensedMatter::IntrinsicCarrierDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "09be85da-13fe-559c-a02a-9ceff5b7fe3a": 1
+  }
+ },
+ "e0edb66a-63d2-5831-9042-70ff8e906173": {
+  "name": "ISQCondensedMatter::LorenzCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "e0edb66a-63d2-5831-9042-70ff8e906173": 1
+  }
+ },
+ "80510ee8-6288-5d96-852a-b72948e14285": {
+  "name": "ISQCondensedMatter::RichardsonConstantValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "80510ee8-6288-5d96-852a-b72948e14285": 1
+  }
+ },
+ "be7441e4-c942-53cd-aff6-33743849b3c8": {
+  "name": "ISQCondensedMatter::SeebeckCoefficientForSubstancesAAndBValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "be7441e4-c942-53cd-aff6-33743849b3c8": 1
+  }
+ },
+ "9dbb51df-c0c7-5635-b094-73917cc8c83a": {
+  "name": "ISQCondensedMatter::ThomsonCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "9dbb51df-c0c7-5635-b094-73917cc8c83a": 1
+  }
+ },
+ "dbc4e7d6-cd82-5922-b9ea-9cf43ab11c63": {
+  "name": "ISQElectromagnetism::AdmittanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "dbc4e7d6-cd82-5922-b9ea-9cf43ab11c63": 1
+  }
+ },
+ "a23d0b95-d7cc-5970-8365-f84d4dd029b1": {
+  "name": "ISQElectromagnetism::CapacitanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a23d0b95-d7cc-5970-8365-f84d4dd029b1": 1
+  }
+ },
+ "599b1602-957a-5876-90ee-4930c1bc5524": {
+  "name": "ISQElectromagnetism::CartesianDisplacementCurrentDensity3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "599b1602-957a-5876-90ee-4930c1bc5524": 1
+  }
+ },
+ "ba38a8b6-3253-5e92-a53f-71cfaa244cf1": {
+  "name": "ISQElectromagnetism::CartesianElectricCurrentDensity3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "ba38a8b6-3253-5e92-a53f-71cfaa244cf1": 1
+  }
+ },
+ "0609f2e6-8c72-584d-9e00-d59d1acd1696": {
+  "name": "ISQElectromagnetism::CartesianElectricDipoleMoment3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "0609f2e6-8c72-584d-9e00-d59d1acd1696": 1
+  }
+ },
+ "0ac6800c-ef18-542e-95c4-5f08bc0e7779": {
+  "name": "ISQElectromagnetism::CartesianElectricFieldStrength3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "0ac6800c-ef18-542e-95c4-5f08bc0e7779": 1
+  }
+ },
+ "0ea8e7cf-6d0c-5de0-a36f-9fa444384a07": {
+  "name": "ISQElectromagnetism::CartesianElectricFluxDensity3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "0ea8e7cf-6d0c-5de0-a36f-9fa444384a07": 1
+  }
+ },
+ "94e67ffc-a6d8-5bde-973a-3155b612e8d5": {
+  "name": "ISQElectromagnetism::CartesianElectricPolarization3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "94e67ffc-a6d8-5bde-973a-3155b612e8d5": 1
+  }
+ },
+ "37fc4f14-6828-50a6-88f7-73bcd990882f": {
+  "name": "ISQElectromagnetism::CartesianLinearElectricCurrentDensity3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "37fc4f14-6828-50a6-88f7-73bcd990882f": 1
+  }
+ },
+ "3d25d4bc-5b51-5aa9-ad17-13aaa81e9599": {
+  "name": "ISQElectromagnetism::CartesianMagneticDipoleMoment3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "3d25d4bc-5b51-5aa9-ad17-13aaa81e9599": 1
+  }
+ },
+ "4776c09d-85a3-58a5-8f4a-b2af9fe40edb": {
+  "name": "ISQElectromagnetism::CartesianMagneticFieldStrength3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "4776c09d-85a3-58a5-8f4a-b2af9fe40edb": 1
+  }
+ },
+ "89540705-6b43-5e9a-b7f2-ef21185a4253": {
+  "name": "ISQElectromagnetism::CartesianMagneticFluxDensity3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "89540705-6b43-5e9a-b7f2-ef21185a4253": 1
+  }
+ },
+ "dbe04593-3e15-51c0-b422-af664cdfa1df": {
+  "name": "ISQElectromagnetism::CartesianMagneticMoment3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "dbe04593-3e15-51c0-b422-af664cdfa1df": 1
+  }
+ },
+ "8837f3ca-d4e9-5f41-9087-479aecec6601": {
+  "name": "ISQElectromagnetism::CartesianMagneticPolarization3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "8837f3ca-d4e9-5f41-9087-479aecec6601": 1
+  }
+ },
+ "145c4b74-123a-56a8-98b0-b7b4dea50393": {
+  "name": "ISQElectromagnetism::CartesianMagneticVectorPotential3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "145c4b74-123a-56a8-98b0-b7b4dea50393": 1
+  }
+ },
+ "95ae275e-f003-568c-b160-8a758ffad749": {
+  "name": "ISQElectromagnetism::CartesianMagnetization3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "95ae275e-f003-568c-b160-8a758ffad749": 1
+  }
+ },
+ "10e2373c-93d5-57d6-9665-4909a3b1d7d1": {
+  "name": "ISQElectromagnetism::CartesianPoynting3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "10e2373c-93d5-57d6-9665-4909a3b1d7d1": 1
+  }
+ },
+ "99054f03-f875-52c8-bf7b-02baaae668b1": {
+  "name": "ISQElectromagnetism::CartesianTotalCurrentDensity3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "99054f03-f875-52c8-bf7b-02baaae668b1": 1
+  }
+ },
+ "13797d00-c233-595f-8cb2-a894ccf69b9f": {
+  "name": "ISQElectromagnetism::CoercivityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "13797d00-c233-595f-8cb2-a894ccf69b9f": 1
+  }
+ },
+ "5e3a0f4d-75d8-51e9-85de-070a9da10090": {
+  "name": "ISQElectromagnetism::ConductanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "5e3a0f4d-75d8-51e9-85de-070a9da10090": 1
+  }
+ },
+ "98f62033-7752-5728-827a-595ecc387222": {
+  "name": "ISQElectromagnetism::ConductivityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "98f62033-7752-5728-827a-595ecc387222": 1
+  }
+ },
+ "82a05fa1-b312-5453-9868-38c1897b5e45": {
+  "name": "ISQElectromagnetism::DisplacementCurrentDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "82a05fa1-b312-5453-9868-38c1897b5e45": 1
+  }
+ },
+ "02018355-71b7-521f-90ac-0468844469e2": {
+  "name": "ISQElectromagnetism::ElectricChargeDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "02018355-71b7-521f-90ac-0468844469e2": 1
+  }
+ },
+ "72f890b5-0839-5064-a3b3-9e5cbd743f34": {
+  "name": "ISQElectromagnetism::ElectricChargeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "72f890b5-0839-5064-a3b3-9e5cbd743f34": 1
+  }
+ },
+ "0558ce81-ea17-5501-a3a4-1b5e333833c6": {
+  "name": "ISQElectromagnetism::ElectricConstantValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0558ce81-ea17-5501-a3a4-1b5e333833c6": 1
+  }
+ },
+ "ccad4fcd-5fd8-5445-ac37-98411e0350bf": {
+  "name": "ISQElectromagnetism::ElectricCurrentDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "ccad4fcd-5fd8-5445-ac37-98411e0350bf": 1
+  }
+ },
+ "f7b0fd62-6960-5e9a-9e48-af4e5dc0cbb3": {
+  "name": "ISQElectromagnetism::ElectricDipoleMomentValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f7b0fd62-6960-5e9a-9e48-af4e5dc0cbb3": 1
+  }
+ },
+ "dd16844d-c282-5d65-87d3-7e30b48e81ca": {
+  "name": "ISQElectromagnetism::ElectricFieldStrengthValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "dd16844d-c282-5d65-87d3-7e30b48e81ca": 1
+  }
+ },
+ "a47538e0-f457-5d0a-9223-57e73bc0277e": {
+  "name": "ISQElectromagnetism::ElectricFluxDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a47538e0-f457-5d0a-9223-57e73bc0277e": 1
+  }
+ },
+ "c806c797-e73d-5158-9b47-a36de696bd1a": {
+  "name": "ISQElectromagnetism::ElectricFluxValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c806c797-e73d-5158-9b47-a36de696bd1a": 1
+  }
+ },
+ "a4882ff3-bed7-5b96-8fc2-376149a55d30": {
+  "name": "ISQElectromagnetism::ElectricPolarizationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a4882ff3-bed7-5b96-8fc2-376149a55d30": 1
+  }
+ },
+ "9087b626-8b8a-5bf5-b471-bdbc74d0d563": {
+  "name": "ISQElectromagnetism::ElectricPotentialDifferenceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "9087b626-8b8a-5bf5-b471-bdbc74d0d563": 1
+  }
+ },
+ "595da1ab-1573-57de-9050-ba43c077a78c": {
+  "name": "ISQElectromagnetism::ElectricPotentialValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "595da1ab-1573-57de-9050-ba43c077a78c": 1
+  }
+ },
+ "8f8a3846-b3b4-5977-91bf-56296bd93792": {
+  "name": "ISQElectromagnetism::ElectromagneticEnergyDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "8f8a3846-b3b4-5977-91bf-56296bd93792": 1
+  }
+ },
+ "0a723b21-02cc-5893-bd0c-33001846adc4": {
+  "name": "ISQElectromagnetism::ImpedanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0a723b21-02cc-5893-bd0c-33001846adc4": 1
+  }
+ },
+ "191d6afa-7d5e-535f-905c-60b877816f3d": {
+  "name": "ISQElectromagnetism::InductanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "191d6afa-7d5e-535f-905c-60b877816f3d": 1
+  }
+ },
+ "8ea3d78e-43fa-5d53-b62d-2c51756c0a45": {
+  "name": "ISQElectromagnetism::LinearDensityOfElectricChargeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "8ea3d78e-43fa-5d53-b62d-2c51756c0a45": 1
+  }
+ },
+ "a579110a-5544-501c-9b8f-9bdbfe433e0f": {
+  "name": "ISQElectromagnetism::LinearElectricCurrentDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a579110a-5544-501c-9b8f-9bdbfe433e0f": 1
+  }
+ },
+ "30c847e2-37d1-52a5-a9f1-e0c5e5ec10c6": {
+  "name": "ISQElectromagnetism::LinkedFluxValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "30c847e2-37d1-52a5-a9f1-e0c5e5ec10c6": 1
+  }
+ },
+ "ab5bf629-5ac0-5196-a7ef-ded87e7aeda4": {
+  "name": "ISQElectromagnetism::MagneticConstantValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "ab5bf629-5ac0-5196-a7ef-ded87e7aeda4": 1
+  }
+ },
+ "317e6d28-6980-5931-a06f-e82c5f9a4a97": {
+  "name": "ISQElectromagnetism::MagneticDipoleMomentValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "317e6d28-6980-5931-a06f-e82c5f9a4a97": 1
+  }
+ },
+ "89f8d092-7e66-5856-b7a4-c05017ae42a0": {
+  "name": "ISQElectromagnetism::MagneticFieldStrengthValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "89f8d092-7e66-5856-b7a4-c05017ae42a0": 1
+  }
+ },
+ "6cacda0d-a5de-50fa-a77f-6b8f1073e9f3": {
+  "name": "ISQElectromagnetism::MagneticFluxDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "6cacda0d-a5de-50fa-a77f-6b8f1073e9f3": 1
+  }
+ },
+ "c8a8a417-7238-52f7-bed7-fd95ebf9a82a": {
+  "name": "ISQElectromagnetism::MagneticFluxValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c8a8a417-7238-52f7-bed7-fd95ebf9a82a": 1
+  }
+ },
+ "fdb97783-195d-5af8-bddd-c0af19e610ec": {
+  "name": "ISQElectromagnetism::MagneticMomentValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "fdb97783-195d-5af8-bddd-c0af19e610ec": 1
+  }
+ },
+ "2a394d38-7a20-5741-84d3-2da04235fc2d": {
+  "name": "ISQElectromagnetism::MagneticPolarizationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2a394d38-7a20-5741-84d3-2da04235fc2d": 1
+  }
+ },
+ "d9c9f33e-b97f-58c7-bf24-15facd9ee8de": {
+  "name": "ISQElectromagnetism::MagneticVectorPotentialValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d9c9f33e-b97f-58c7-bf24-15facd9ee8de": 1
+  }
+ },
+ "59bc35a9-8e3d-53e7-8297-e0f266a8b360": {
+  "name": "ISQElectromagnetism::MagnetizationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "59bc35a9-8e3d-53e7-8297-e0f266a8b360": 1
+  }
+ },
+ "02a988e6-d91b-57ab-b57e-25d81ec31725": {
+  "name": "ISQElectromagnetism::MagnetomotiveForceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "02a988e6-d91b-57ab-b57e-25d81ec31725": 1
+  }
+ },
+ "4be4cae5-58d9-5702-b5fc-ff1812b6f8ec": {
+  "name": "ISQElectromagnetism::ModulusOfAdmittanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4be4cae5-58d9-5702-b5fc-ff1812b6f8ec": 1
+  }
+ },
+ "a97fcde3-d07c-549b-88a8-d4ace29d5ee3": {
+  "name": "ISQElectromagnetism::ModulusOfImpedanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a97fcde3-d07c-549b-88a8-d4ace29d5ee3": 1
+  }
+ },
+ "1e19fc1e-e07b-5e54-a973-cbb54058705d": {
+  "name": "ISQElectromagnetism::PermeabilityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "1e19fc1e-e07b-5e54-a973-cbb54058705d": 1
+  }
+ },
+ "49948390-ad0a-56fc-8c90-b8d71fc5164a": {
+  "name": "ISQElectromagnetism::PermeanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "49948390-ad0a-56fc-8c90-b8d71fc5164a": 1
+  }
+ },
+ "8a0aa121-8156-5db8-b881-010530016f5e": {
+  "name": "ISQElectromagnetism::PermittivityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "8a0aa121-8156-5db8-b881-010530016f5e": 1
+  }
+ },
+ "4891507f-b66f-5e86-a1a1-1824544ac598": {
+  "name": "ISQElectromagnetism::PhaseDifferenceValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "e2f6c3bf-ab31-5379-946d-e6ee51962e9b": {
+  "name": "ISQElectromagnetism::PhaseSpeedOfElectromagneticWavesValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "e2f6c3bf-ab31-5379-946d-e6ee51962e9b": 1
+  }
+ },
+ "76b49fe3-531c-5314-9803-601aa26a97f9": {
+  "name": "ISQElectromagnetism::PoyntingVectorMagnitudeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "76b49fe3-531c-5314-9803-601aa26a97f9": 1
+  }
+ },
+ "2b143032-c235-5fe7-989b-fd7577b3b1d3": {
+  "name": "ISQElectromagnetism::ReactanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2b143032-c235-5fe7-989b-fd7577b3b1d3": 1
+  }
+ },
+ "c10d070c-7fbf-5164-a954-5ee3111d0243": {
+  "name": "ISQElectromagnetism::ReluctanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c10d070c-7fbf-5164-a954-5ee3111d0243": 1
+  }
+ },
+ "67169b63-83d0-5342-ace7-9d47366cdb36": {
+  "name": "ISQElectromagnetism::ResistanceToAlternatingCurrentValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "67169b63-83d0-5342-ace7-9d47366cdb36": 1
+  }
+ },
+ "d8a81dc3-088e-5dea-9103-4f893d937483": {
+  "name": "ISQElectromagnetism::ResistanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d8a81dc3-088e-5dea-9103-4f893d937483": 1
+  }
+ },
+ "1b41cdaa-2819-54c1-8fb6-6bac6ecd72bb": {
+  "name": "ISQElectromagnetism::ResistivityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "1b41cdaa-2819-54c1-8fb6-6bac6ecd72bb": 1
+  }
+ },
+ "2e02594f-e33e-5db1-844b-83e8241aa2e3": {
+  "name": "ISQElectromagnetism::SourceVoltageValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2e02594f-e33e-5db1-844b-83e8241aa2e3": 1
+  }
+ },
+ "488fe6ba-2e4a-52cd-bd83-4d2d62bac81a": {
+  "name": "ISQElectromagnetism::SpeedOfLightValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "488fe6ba-2e4a-52cd-bd83-4d2d62bac81a": 1
+  }
+ },
+ "37293d10-2dd5-573b-ae9b-b1190abcb5f4": {
+  "name": "ISQElectromagnetism::SurfaceDensityOfElectricChargeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "37293d10-2dd5-573b-ae9b-b1190abcb5f4": 1
+  }
+ },
+ "d5aa68af-586d-5296-92b5-a990776d0f09": {
+  "name": "ISQElectromagnetism::SusceptanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d5aa68af-586d-5296-92b5-a990776d0f09": 1
+  }
+ },
+ "2c90b586-9a83-5b4d-a71f-949163d5020b": {
+  "name": "ISQElectromagnetism::TotalCurrentDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2c90b586-9a83-5b4d-a71f-949163d5020b": 1
+  }
+ },
+ "c79c6d64-b6c1-5c17-ac7d-22ca6b3d3fb4": {
+  "name": "ISQInformation::AverageInformationRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c79c6d64-b6c1-5c17-ac7d-22ca6b3d3fb4": 1
+  }
+ },
+ "64a409f4-808a-5ce3-8cf7-2e1fb899487d": {
+  "name": "ISQInformation::AverageTransinformationRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "64a409f4-808a-5ce3-8cf7-2e1fb899487d": 1
+  }
+ },
+ "2bb38ed8-2b47-5ec0-957e-d0f9ed31c642": {
+  "name": "ISQInformation::BinaryDigitRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2bb38ed8-2b47-5ec0-957e-d0f9ed31c642": 1
+  }
+ },
+ "1f5f776f-7a6f-5244-b87e-cbd55c8bc554": {
+  "name": "ISQInformation::CallIntensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "1f5f776f-7a6f-5244-b87e-cbd55c8bc554": 1
+  }
+ },
+ "4caff4ed-3c2f-596b-96e7-b612f85da056": {
+  "name": "ISQInformation::ChannelCapacityPerCharacterValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "b1cb2748-dc6c-5154-8cc6-f68b5d5d02e4": {
+  "name": "ISQInformation::ChannelTimeCapacityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "b1cb2748-dc6c-5154-8cc6-f68b5d5d02e4": 1
+  }
+ },
+ "0e78bd38-5afb-5a83-8983-ce02448c8b8b": {
+  "name": "ISQInformation::CharacterMeanEntropyValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "2f627c88-a7a1-5424-8820-88ce8b6c93f7": {
+  "name": "ISQInformation::CharacterMeanTransinformationContentValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "93913ef9-caa1-58de-9efb-552a3c93a429": {
+  "name": "ISQInformation::CompletedCallIntensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "93913ef9-caa1-58de-9efb-552a3c93a429": 1
+  }
+ },
+ "da709ca4-435b-5527-ad2f-a4aa68674516": {
+  "name": "ISQInformation::ConditionalEntropyValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "76917e28-87a9-524c-af85-aad201df9cd7": {
+  "name": "ISQInformation::ConditionalInformationContentValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "3744a4a5-a87c-5bf0-91c8-fb0fb846db02": {
+  "name": "ISQInformation::EntropyForInformationScienceValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "24f60be6-2d9d-5cae-a87f-3035fcbd2e92": {
+  "name": "ISQInformation::EquivalentBinaryDigitRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "24f60be6-2d9d-5cae-a87f-3035fcbd2e92": 1
+  }
+ },
+ "d3d7ee47-4d2d-5719-97b9-84f662298827": {
+  "name": "ISQInformation::EquivalentBinaryStorageCapacityValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "8d278763-c8e3-56b3-a27b-9ca2d65aada3": {
+  "name": "ISQInformation::EquivocationValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "6a30645f-f7c4-5155-8d9c-a0d8df84307e": {
+  "name": "ISQInformation::InformationContentValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "156b9921-ebd0-5b7d-a49c-4e974e237553": {
+  "name": "ISQInformation::IrrelevanceValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "c2b74abb-15fd-56e4-a16f-380f6bd1b4ce": {
+  "name": "ISQInformation::JointInformationContentValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "7fa96ebb-ad50-53ef-9d0a-cf581eae40e7": {
+  "name": "ISQInformation::MaximumEntropyValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "de9fd4d1-6358-5078-9722-c868604531e1": {
+  "name": "ISQInformation::MeanTransinformationContentValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "5379931c-e276-57f6-a2b2-8b24b34f6ff4": {
+  "name": "ISQInformation::ModulationRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "5379931c-e276-57f6-a2b2-8b24b34f6ff4": 1
+  }
+ },
+ "082407c1-8112-563f-b444-5991d42145a4": {
+  "name": "ISQInformation::RedundancyValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "7d5ba5bb-ca58-571f-a4e8-f740f895cb5f": {
+  "name": "ISQInformation::StorageCapacityValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "00d2c7d2-9478-5bae-b0ed-72ddbc98704a": {
+  "name": "ISQInformation::TrafficCarriedIntensityValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "b4243d99-118a-50ee-9d78-202dfe49cb94": {
+  "name": "ISQInformation::TrafficIntensityValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "505a3ca8-a109-5252-a2d2-1dcab666fb9d": {
+  "name": "ISQInformation::TrafficOfferedIntensityValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "b134a2ed-9a88-5891-add1-8f8272bf4d2a": {
+  "name": "ISQInformation::TransferRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "b134a2ed-9a88-5891-add1-8f8272bf4d2a": 1
+  }
+ },
+ "6c333d17-e244-5b6d-ae61-4222e7fb2920": {
+  "name": "ISQInformation::TransinformationContentValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "a7000457-1ce2-51bd-9355-9da7b1532e2a": {
+  "name": "ISQLight::IlluminanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a7000457-1ce2-51bd-9355-9da7b1532e2a": 1
+  }
+ },
+ "b42d4b8d-83e4-5c5a-8817-c35f2e1a1cba": {
+  "name": "ISQLight::IrradianceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "b42d4b8d-83e4-5c5a-8817-c35f2e1a1cba": 1
+  }
+ },
+ "ae6335f1-c2b7-5c42-8c49-d4928e6f748c": {
+  "name": "ISQLight::LinearAbsorptionCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "ae6335f1-c2b7-5c42-8c49-d4928e6f748c": 1
+  }
+ },
+ "7afcef04-4a9b-5981-aefe-a08b01b4667b": {
+  "name": "ISQLight::LinearAttenuationCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "7afcef04-4a9b-5981-aefe-a08b01b4667b": 1
+  }
+ },
+ "4ac83f2d-01bd-586f-a709-e431364597a4": {
+  "name": "ISQLight::LuminanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4ac83f2d-01bd-586f-a709-e431364597a4": 1
+  }
+ },
+ "4d241bf0-4485-5882-8d85-0e34f389f91d": {
+  "name": "ISQLight::LuminousEfficacyOfASourceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4d241bf0-4485-5882-8d85-0e34f389f91d": 1
+  }
+ },
+ "7d0ab29b-51b7-51a9-8232-c9ebda19eaa0": {
+  "name": "ISQLight::LuminousEfficacyOfRadiationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "7d0ab29b-51b7-51a9-8232-c9ebda19eaa0": 1
+  }
+ },
+ "a81df45e-a8be-585d-87b0-89598c8d9657": {
+  "name": "ISQLight::LuminousEnergyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a81df45e-a8be-585d-87b0-89598c8d9657": 1
+  }
+ },
+ "9f93a86b-63e1-50ba-b427-d1fdef6d9cb5": {
+  "name": "ISQLight::LuminousExitanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "9f93a86b-63e1-50ba-b427-d1fdef6d9cb5": 1
+  }
+ },
+ "d9a21bfd-f199-5b9f-b3b4-55b190307d5f": {
+  "name": "ISQLight::LuminousExposureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d9a21bfd-f199-5b9f-b3b4-55b190307d5f": 1
+  }
+ },
+ "268cbff4-9d1c-5c54-8ae1-0088f866de6e": {
+  "name": "ISQLight::LuminousFluxValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "268cbff4-9d1c-5c54-8ae1-0088f866de6e": 1
+  }
+ },
+ "309d5845-8e34-5639-88c8-22cd2d97e5f0": {
+  "name": "ISQLight::MassAbsorptionCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "309d5845-8e34-5639-88c8-22cd2d97e5f0": 1
+  }
+ },
+ "add28fdb-b89a-585b-9e32-9a61fed15acd": {
+  "name": "ISQLight::MassAttenuationCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "add28fdb-b89a-585b-9e32-9a61fed15acd": 1
+  }
+ },
+ "631397e2-e0fa-5560-9919-3eb9a4410f65": {
+  "name": "ISQLight::MaximumLuminousEfficacyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "631397e2-e0fa-5560-9919-3eb9a4410f65": 1
+  }
+ },
+ "f28b0836-0e4f-5eb7-9561-9fe1e98b513e": {
+  "name": "ISQLight::MolarAbsorptionCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f28b0836-0e4f-5eb7-9561-9fe1e98b513e": 1
+  }
+ },
+ "5e2e489c-fbc1-51ff-8515-61fe70cf6a98": {
+  "name": "ISQLight::PhotonExitanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "5e2e489c-fbc1-51ff-8515-61fe70cf6a98": 1
+  }
+ },
+ "bc1606f9-67f7-5d40-81dd-13696742d113": {
+  "name": "ISQLight::PhotonExposureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "bc1606f9-67f7-5d40-81dd-13696742d113": 1
+  }
+ },
+ "d09e6d66-5aad-578e-a8ce-d2797c31633d": {
+  "name": "ISQLight::PhotonFluxValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d09e6d66-5aad-578e-a8ce-d2797c31633d": 1
+  }
+ },
+ "78c42a05-390a-51ba-ae3b-0818520dac8c": {
+  "name": "ISQLight::PhotonIntensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "78c42a05-390a-51ba-ae3b-0818520dac8c": 1
+  }
+ },
+ "27f78a11-ac79-5d87-ae66-670ff9d3139c": {
+  "name": "ISQLight::PhotonIrradianceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "27f78a11-ac79-5d87-ae66-670ff9d3139c": 1
+  }
+ },
+ "fcf1623f-2aa8-58c2-9dda-35d094d7cba6": {
+  "name": "ISQLight::PhotonRadianceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "fcf1623f-2aa8-58c2-9dda-35d094d7cba6": 1
+  }
+ },
+ "40aca1af-1e82-5b96-bb3b-f93afd98f3e9": {
+  "name": "ISQLight::RadianceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "40aca1af-1e82-5b96-bb3b-f93afd98f3e9": 1
+  }
+ },
+ "4547cfaa-075b-5a59-88bc-101dfeb53a1e": {
+  "name": "ISQLight::RadiantEnergyDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4547cfaa-075b-5a59-88bc-101dfeb53a1e": 1
+  }
+ },
+ "426a4c41-2302-548b-a02f-6dd62a03bf23": {
+  "name": "ISQLight::RadiantExitanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "426a4c41-2302-548b-a02f-6dd62a03bf23": 1
+  }
+ },
+ "cd7aba55-4cf8-5fa4-81a3-30764558d909": {
+  "name": "ISQLight::RadiantExposureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "cd7aba55-4cf8-5fa4-81a3-30764558d909": 1
+  }
+ },
+ "2dc5bc51-0173-5642-b83a-4d8eb24e5ccc": {
+  "name": "ISQLight::RadiantFluxValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2dc5bc51-0173-5642-b83a-4d8eb24e5ccc": 1
+  }
+ },
+ "521c9d3e-c07f-5a04-a4a9-c8ed4e3376ef": {
+  "name": "ISQLight::RadiantIntensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "521c9d3e-c07f-5a04-a4a9-c8ed4e3376ef": 1
+  }
+ },
+ "0e1cb85f-840c-5af0-ad95-e02c6d9842ff": {
+  "name": "ISQLight::SpectralIrradianceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0e1cb85f-840c-5af0-ad95-e02c6d9842ff": 1
+  }
+ },
+ "e2704204-f846-5551-b9af-25bbc9d141f3": {
+  "name": "ISQLight::SpectralLuminousEfficacyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "e2704204-f846-5551-b9af-25bbc9d141f3": 1
+  }
+ },
+ "844f93a8-2190-55a1-9526-881ef7cd5717": {
+  "name": "ISQLight::SpectralRadianceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "844f93a8-2190-55a1-9526-881ef7cd5717": 1
+  }
+ },
+ "9a4ed7bd-ab35-51cb-acd8-eb9cb3747de5": {
+  "name": "ISQLight::SpectralRadiantEnergyDensityInTermsOfWavelengthValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "9a4ed7bd-ab35-51cb-acd8-eb9cb3747de5": 1
+  }
+ },
+ "08b6695a-cbb7-5f54-a621-20b1d18f6755": {
+  "name": "ISQLight::SpectralRadiantEnergyDensityInTermsOfWavenumberValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "08b6695a-cbb7-5f54-a621-20b1d18f6755": 1
+  }
+ },
+ "0b2a5df4-19ed-51f6-a018-249f28242f28": {
+  "name": "ISQLight::SpectralRadiantEnergyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0b2a5df4-19ed-51f6-a018-249f28242f28": 1
+  }
+ },
+ "d23ad92d-5200-5401-a33b-acd2b784aa36": {
+  "name": "ISQLight::SpectralRadiantExitanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d23ad92d-5200-5401-a33b-acd2b784aa36": 1
+  }
+ },
+ "72f6a12e-d1ca-5751-8532-44d4ebcff22a": {
+  "name": "ISQLight::SpectralRadiantExposureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "72f6a12e-d1ca-5751-8532-44d4ebcff22a": 1
+  }
+ },
+ "bb5bac16-c11b-5f71-ba59-21ab32e5cd0b": {
+  "name": "ISQLight::SpectralRadiantFluxValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "bb5bac16-c11b-5f71-ba59-21ab32e5cd0b": 1
+  }
+ },
+ "5ea9d425-8f39-5fc9-9abb-9a386862c0e3": {
+  "name": "ISQLight::SpectralRadiantIntensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "5ea9d425-8f39-5fc9-9abb-9a386862c0e3": 1
+  }
+ },
+ "ae289215-481b-59ac-9548-814611c7f4ac": {
+  "name": "ISQLight::SpeedOfLightInAMediumValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "ae289215-481b-59ac-9548-814611c7f4ac": 1
+  }
+ },
+ "2e032b0b-208c-5687-89d1-26d6ed2e40f2": {
+  "name": "ISQLight::TristimulusValuesForTheCie1931StandardColorimetricObserverValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2e032b0b-208c-5687-89d1-26d6ed2e40f2": 1
+  }
+ },
+ "66d6900f-2f65-5b0e-b0f4-fde6e9787b2c": {
+  "name": "ISQLight::TristimulusValuesForTheCie1964StandardColorimetricObserverValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "66d6900f-2f65-5b0e-b0f4-fde6e9787b2c": 1
+  }
+ },
+ "2755d1b3-44d1-54a1-9e98-e709a4a4bc05": {
+  "name": "ISQMechanics::ActionQuantityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "2755d1b3-44d1-54a1-9e98-e709a4a4bc05": 1
+  }
+ },
+ "d0e34e6b-0098-5891-85b3-1a22cdf9243e": {
+  "name": "ISQMechanics::AngularImpulseValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d0e34e6b-0098-5891-85b3-1a22cdf9243e": 1
+  }
+ },
+ "710266d4-ebc7-5a72-86ce-6d6ad3f7e129": {
+  "name": "ISQMechanics::AngularMomentumValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "710266d4-ebc7-5a72-86ce-6d6ad3f7e129": 1
+  }
+ },
+ "035fc5db-dbd0-5ce5-bf94-706cbf359d39": {
+  "name": "ISQMechanics::Cartesian3dMomentOfInertiaMeasurementReference::mRefs",
+  "factor": 1.0,
+  "base": {
+   "035fc5db-dbd0-5ce5-bf94-706cbf359d39": 1
+  }
+ },
+ "d5f99106-8405-5b91-82ac-76f7ec3db6e2": {
+  "name": "ISQMechanics::Cartesian3dStrainMeasurementReference::mRefs",
+  "factor": 1.0,
+  "base": {}
+ },
+ "4ddf8263-50c8-512a-b850-393a2a41c74f": {
+  "name": "ISQMechanics::Cartesian3dStressMeasurementReference::mRefs",
+  "factor": 1.0,
+  "base": {
+   "4ddf8263-50c8-512a-b850-393a2a41c74f": 1
+  }
+ },
+ "7633453a-04a3-54f0-94f8-c965833ee6ad": {
+  "name": "ISQMechanics::CartesianAngularImpulse3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "7633453a-04a3-54f0-94f8-c965833ee6ad": 1
+  }
+ },
+ "e169c8aa-26db-5c8b-89b7-0c985c3eeeae": {
+  "name": "ISQMechanics::CartesianAngularMomentum3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "e169c8aa-26db-5c8b-89b7-0c985c3eeeae": 1
+  }
+ },
+ "ee85e59a-88d2-574d-aeb8-f3b06636d93f": {
+  "name": "ISQMechanics::CartesianForce3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "ee85e59a-88d2-574d-aeb8-f3b06636d93f": 1
+  }
+ },
+ "04ad4b4d-dbea-546d-9670-5b8e7124a993": {
+  "name": "ISQMechanics::CartesianImpulse3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "04ad4b4d-dbea-546d-9670-5b8e7124a993": 1
+  }
+ },
+ "b5552812-c584-50c3-a08d-13496b33fe1f": {
+  "name": "ISQMechanics::CartesianMassFlow3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "b5552812-c584-50c3-a08d-13496b33fe1f": 1
+  }
+ },
+ "bd5b7868-f545-5a6b-8f84-ffb7f0c9dfc1": {
+  "name": "ISQMechanics::CartesianMomentOfForce3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "bd5b7868-f545-5a6b-8f84-ffb7f0c9dfc1": 1
+  }
+ },
+ "80d16e42-63b6-5a2d-942a-543319352ac1": {
+  "name": "ISQMechanics::CartesianMomentum3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "80d16e42-63b6-5a2d-942a-543319352ac1": 1
+  }
+ },
+ "1e13ee1e-3a68-5ea2-9245-e0b0c4deb158": {
+  "name": "ISQMechanics::CompressibilityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "1e13ee1e-3a68-5ea2-9245-e0b0c4deb158": 1
+  }
+ },
+ "5a8ab49f-07dd-50d4-a260-98857eb8ee9f": {
+  "name": "ISQMechanics::DynamicViscosityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "5a8ab49f-07dd-50d4-a260-98857eb8ee9f": 1
+  }
+ },
+ "484f1f0f-91af-528d-b569-4f6e93cf720c": {
+  "name": "ISQMechanics::ForceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "484f1f0f-91af-528d-b569-4f6e93cf720c": 1
+  }
+ },
+ "f2c783c4-9bb4-542a-85aa-167deb740065": {
+  "name": "ISQMechanics::ImpulseValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f2c783c4-9bb4-542a-85aa-167deb740065": 1
+  }
+ },
+ "c2391dfc-dd43-5576-96ec-1ccc1fc5dc5f": {
+  "name": "ISQMechanics::KinematicViscosityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c2391dfc-dd43-5576-96ec-1ccc1fc5dc5f": 1
+  }
+ },
+ "0a449bda-2a3f-5f1a-a7cd-f82cbf35a559": {
+  "name": "ISQMechanics::LinearMassDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0a449bda-2a3f-5f1a-a7cd-f82cbf35a559": 1
+  }
+ },
+ "5c6a5cb5-5c33-5762-9a62-64a39d2940e4": {
+  "name": "ISQMechanics::MassChangeRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "5c6a5cb5-5c33-5762-9a62-64a39d2940e4": 1
+  }
+ },
+ "b46e8732-e3f7-5c17-9844-7a78d0e7f020": {
+  "name": "ISQMechanics::MassDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "b46e8732-e3f7-5c17-9844-7a78d0e7f020": 1
+  }
+ },
+ "20bda287-c55b-5f8d-b3ea-a79fbbc6afd6": {
+  "name": "ISQMechanics::MassFlowRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "20bda287-c55b-5f8d-b3ea-a79fbbc6afd6": 1
+  }
+ },
+ "8a8e7666-677c-5493-8042-f2c99980a507": {
+  "name": "ISQMechanics::MassFlowValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "8a8e7666-677c-5493-8042-f2c99980a507": 1
+  }
+ },
+ "50b17ac2-7211-5a22-afb4-ef3a9f329dbb": {
+  "name": "ISQMechanics::ModulusOfCompressionValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "50b17ac2-7211-5a22-afb4-ef3a9f329dbb": 1
+  }
+ },
+ "25e2868f-a645-551f-a16f-1a3e4b841b2c": {
+  "name": "ISQMechanics::ModulusOfElasticityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "25e2868f-a645-551f-a16f-1a3e4b841b2c": 1
+  }
+ },
+ "4f030fce-28c6-515b-b73b-ec3e8ac96dee": {
+  "name": "ISQMechanics::ModulusOfRigidityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4f030fce-28c6-515b-b73b-ec3e8ac96dee": 1
+  }
+ },
+ "0ecc1580-2974-50d0-86c9-a9a6d49627c3": {
+  "name": "ISQMechanics::MomentOfForceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0ecc1580-2974-50d0-86c9-a9a6d49627c3": 1
+  }
+ },
+ "663f8a60-ae77-5e36-90ab-51f218850ce9": {
+  "name": "ISQMechanics::MomentOfInertiaValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "663f8a60-ae77-5e36-90ab-51f218850ce9": 1
+  }
+ },
+ "d4a44c5e-9f35-5ca7-8491-2cefb41b29f6": {
+  "name": "ISQMechanics::MomentumValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d4a44c5e-9f35-5ca7-8491-2cefb41b29f6": 1
+  }
+ },
+ "e4c214d7-0516-5985-a9dc-201774d94435": {
+  "name": "ISQMechanics::NormalStressValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "e4c214d7-0516-5985-a9dc-201774d94435": 1
+  }
+ },
+ "e78d70ac-4fba-565c-9628-4c188a3b8c01": {
+  "name": "ISQMechanics::PowerValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "e78d70ac-4fba-565c-9628-4c188a3b8c01": 1
+  }
+ },
+ "43e79d2d-230e-5f39-8d27-c21335165d16": {
+  "name": "ISQMechanics::PressureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "43e79d2d-230e-5f39-8d27-c21335165d16": 1
+  }
+ },
+ "7a66812d-853c-52c9-a45e-a584b6edea4c": {
+  "name": "ISQMechanics::SecondAxialMomentOfAreaValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "7a66812d-853c-52c9-a45e-a584b6edea4c": 1
+  }
+ },
+ "0821190a-b691-51c7-8010-d51023f61fb0": {
+  "name": "ISQMechanics::SecondPolarMomentOfAreaValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0821190a-b691-51c7-8010-d51023f61fb0": 1
+  }
+ },
+ "e255b7d6-c94d-5c66-a638-6188da2cc87c": {
+  "name": "ISQMechanics::SectionModulusValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "e255b7d6-c94d-5c66-a638-6188da2cc87c": 1
+  }
+ },
+ "b06a3f49-6d4c-5585-8e9d-b4ea8eeeb8a4": {
+  "name": "ISQMechanics::ShearStressValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "b06a3f49-6d4c-5585-8e9d-b4ea8eeeb8a4": 1
+  }
+ },
+ "67edf043-8209-540a-b7f4-06ce0775c832": {
+  "name": "ISQMechanics::SpecificVolumeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "67edf043-8209-540a-b7f4-06ce0775c832": 1
+  }
+ },
+ "7addbc58-55a5-551e-aff1-8df8eb3f632b": {
+  "name": "ISQMechanics::StrainValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "5e4fcf59-a86a-5c71-93ee-f784f58cdc97": {
+  "name": "ISQMechanics::StressValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "5e4fcf59-a86a-5c71-93ee-f784f58cdc97": 1
+  }
+ },
+ "a755ead9-9cce-5639-8726-47f0d6b65927": {
+  "name": "ISQMechanics::SurfaceMassDensityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "a755ead9-9cce-5639-8726-47f0d6b65927": 1
+  }
+ },
+ "d9579cc2-45c8-5991-b382-3ca898a543d8": {
+  "name": "ISQMechanics::SurfaceTensionValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d9579cc2-45c8-5991-b382-3ca898a543d8": 1
+  }
+ },
+ "c860cbe4-b63f-554c-9363-69601e1b15f6": {
+  "name": "ISQMechanics::TorqueValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c860cbe4-b63f-554c-9363-69601e1b15f6": 1
+  }
+ },
+ "5ddf45e7-e6d6-5f82-bcc8-274d6bc0f5d4": {
+  "name": "ISQMechanics::VolumeFlowRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "5ddf45e7-e6d6-5f82-bcc8-274d6bc0f5d4": 1
+  }
+ },
+ "c64655b1-2054-5bf9-a59d-026b89b145b9": {
+  "name": "ISQSpaceTime::AccelerationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c64655b1-2054-5bf9-a59d-026b89b145b9": 1
+  }
+ },
+ "37b70e8d-9916-5835-96c9-7b9b4afd20be": {
+  "name": "ISQSpaceTime::AngularAccelerationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "37b70e8d-9916-5835-96c9-7b9b4afd20be": 1
+  }
+ },
+ "94dd7534-04c3-5930-9b12-ea7db8e82fe8": {
+  "name": "ISQSpaceTime::AngularFrequencyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "94dd7534-04c3-5930-9b12-ea7db8e82fe8": 1
+  }
+ },
+ "89de0f62-1e70-5ed9-ab7a-7faf85c4bdf5": {
+  "name": "ISQSpaceTime::AngularMeasureValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "53d6160d-190f-57c4-8d4f-054717aa359e": {
+  "name": "ISQSpaceTime::AngularRepetencyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "53d6160d-190f-57c4-8d4f-054717aa359e": 1
+  }
+ },
+ "d43b3230-2ccf-58bd-8b28-e9484928f33a": {
+  "name": "ISQSpaceTime::AngularVelocityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d43b3230-2ccf-58bd-8b28-e9484928f33a": 1
+  }
+ },
+ "3ffb9393-5a38-5920-a061-e71ef4fbd786": {
+  "name": "ISQSpaceTime::AreaValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "3ffb9393-5a38-5920-a061-e71ef4fbd786": 1
+  }
+ },
+ "011f535e-46c6-5ee7-8dd7-d9517b70fd93": {
+  "name": "ISQSpaceTime::AttenuationValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "011f535e-46c6-5ee7-8dd7-d9517b70fd93": 1
+  }
+ },
+ "86cf8611-d23f-54e3-bdba-c6ac9d2abf83": {
+  "name": "ISQSpaceTime::CartesianAcceleration3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "86cf8611-d23f-54e3-bdba-c6ac9d2abf83": 1
+  }
+ },
+ "f8a92dbc-b7d9-5450-849f-431624b02b97": {
+  "name": "ISQSpaceTime::CartesianAngularAcceleration3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "f8a92dbc-b7d9-5450-849f-431624b02b97": 1
+  }
+ },
+ "3e72bc71-b4d0-5b41-94ac-8176e01d7da0": {
+  "name": "ISQSpaceTime::CartesianAngularVelocity3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "3e72bc71-b4d0-5b41-94ac-8176e01d7da0": 1
+  }
+ },
+ "fe4deb8d-24fd-5858-92b0-650d186fdd49": {
+  "name": "ISQSpaceTime::CartesianSpatial3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "fe4deb8d-24fd-5858-92b0-650d186fdd49": 1
+  }
+ },
+ "02cf570d-1d8f-5fb7-9d9a-11745060926c": {
+  "name": "ISQSpaceTime::CartesianVelocity3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "02cf570d-1d8f-5fb7-9d9a-11745060926c": 1
+  }
+ },
+ "bc7748ca-b6ea-563d-a9ac-3438720c3a6b": {
+  "name": "ISQSpaceTime::CartesianWaveVector3dCoordinateFrame::mRefs",
+  "factor": 1.0,
+  "base": {
+   "bc7748ca-b6ea-563d-a9ac-3438720c3a6b": 1
+  }
+ },
+ "76c4d0e9-2803-5842-8b80-001eb5fd1f66": {
+  "name": "ISQSpaceTime::CurvatureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "76c4d0e9-2803-5842-8b80-001eb5fd1f66": 1
+  }
+ },
+ "0a9e34ca-0e18-5dea-9c7f-988301fe99a5": {
+  "name": "ISQSpaceTime::CylindricalDisplacement3dVector::azimuth",
+  "factor": 1.0,
+  "base": {}
+ },
+ "e0196f7b-24f9-51c5-b1d8-a570af752796": {
+  "name": "ISQSpaceTime::CylindricalPosition3dVector::azimuth",
+  "factor": 1.0,
+  "base": {}
+ },
+ "999d24ef-0520-5312-b67a-d0da590f2774": {
+  "name": "ISQSpaceTime::CylindricalSpatial3dCoordinateFrame::azimuthUnit",
+  "factor": 1.0,
+  "base": {}
+ },
+ "ccc9f72c-0145-5ed6-915e-6c5936a8f826": {
+  "name": "ISQSpaceTime::CylindricalSpatial3dCoordinateFrame::radialDistanceUnit",
+  "factor": 1.0,
+  "base": {
+   "ccc9f72c-0145-5ed6-915e-6c5936a8f826": 1
+  }
+ },
+ "4bb1873f-a4a8-5551-b005-f295133d300d": {
+  "name": "ISQSpaceTime::CylindricalSpatial3dCoordinateFrame::zUnit",
+  "factor": 1.0,
+  "base": {
+   "4bb1873f-a4a8-5551-b005-f295133d300d": 1
+  }
+ },
+ "558f9448-1ae3-56bc-b00d-7098daa3f7c6": {
+  "name": "ISQSpaceTime::DampingCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "558f9448-1ae3-56bc-b00d-7098daa3f7c6": 1
+  }
+ },
+ "f3b96a7c-4964-5b3f-b090-affb336774fc": {
+  "name": "ISQSpaceTime::FrequencyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f3b96a7c-4964-5b3f-b090-affb336774fc": 1
+  }
+ },
+ "f42363ca-8a74-55bb-82ff-85a59402870e": {
+  "name": "ISQSpaceTime::PhaseCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f42363ca-8a74-55bb-82ff-85a59402870e": 1
+  }
+ },
+ "4e8ab662-5dec-5bd5-8317-7d5e02149f02": {
+  "name": "ISQSpaceTime::PhaseVelocityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4e8ab662-5dec-5bd5-8317-7d5e02149f02": 1
+  }
+ },
+ "a8996c7c-8421-58dd-9eaf-6b433b062ee8": {
+  "name": "ISQSpaceTime::PlanetaryPosition3dVector::latitude",
+  "factor": 1.0,
+  "base": {}
+ },
+ "25d2a837-5a58-5a8e-b031-1ced114afc8b": {
+  "name": "ISQSpaceTime::PlanetaryPosition3dVector::longitude",
+  "factor": 1.0,
+  "base": {}
+ },
+ "a499fa33-b6e3-56d5-9a95-594e273fd11a": {
+  "name": "ISQSpaceTime::PlanetarySpatial3dCoordinateFrame::altitudeUnit",
+  "factor": 1.0,
+  "base": {
+   "a499fa33-b6e3-56d5-9a95-594e273fd11a": 1
+  }
+ },
+ "8a769156-2214-5db1-8030-9682c8aae3cf": {
+  "name": "ISQSpaceTime::PlanetarySpatial3dCoordinateFrame::latitudeUnit",
+  "factor": 1.0,
+  "base": {}
+ },
+ "ce09afab-8617-5eee-8d14-844d4539620f": {
+  "name": "ISQSpaceTime::PlanetarySpatial3dCoordinateFrame::longitudeUnit",
+  "factor": 1.0,
+  "base": {}
+ },
+ "26ef037e-e794-55cf-9664-de1200c70cbc": {
+  "name": "ISQSpaceTime::PropagationCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "26ef037e-e794-55cf-9664-de1200c70cbc": 1
+  }
+ },
+ "0c526b0c-e653-5abf-aad2-a21c4773ab79": {
+  "name": "ISQSpaceTime::RepetencyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0c526b0c-e653-5abf-aad2-a21c4773ab79": 1
+  }
+ },
+ "7da96ba2-4a95-5cc9-8961-31ee9a302287": {
+  "name": "ISQSpaceTime::SolidAngularMeasureValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "614fd67d-ee92-5c8c-9469-4fc3fd4aa27d": {
+  "name": "ISQSpaceTime::SpeedValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "614fd67d-ee92-5c8c-9469-4fc3fd4aa27d": 1
+  }
+ },
+ "e99146c4-0300-5b73-8de1-9d89e14aca1f": {
+  "name": "ISQSpaceTime::SphericalDisplacement3dVector::azimuth",
+  "factor": 1.0,
+  "base": {}
+ },
+ "030d0c3f-dc21-58d0-8994-ccb3ac529b0c": {
+  "name": "ISQSpaceTime::SphericalDisplacement3dVector::inclination",
+  "factor": 1.0,
+  "base": {}
+ },
+ "13bb1843-a465-5d9f-9173-a9ab01ed439b": {
+  "name": "ISQSpaceTime::SphericalPosition3dVector::azimuth",
+  "factor": 1.0,
+  "base": {}
+ },
+ "ae406668-6efa-58c5-b883-513b4164b5f3": {
+  "name": "ISQSpaceTime::SphericalPosition3dVector::inclination",
+  "factor": 1.0,
+  "base": {}
+ },
+ "ae5119ad-befb-5bb4-a5a3-68ce6c52ece2": {
+  "name": "ISQSpaceTime::SphericalSpatial3dCoordinateFrame::azimuthUnit",
+  "factor": 1.0,
+  "base": {}
+ },
+ "5afe0eea-5d1a-524b-a267-0e8f6a494282": {
+  "name": "ISQSpaceTime::SphericalSpatial3dCoordinateFrame::inclinationUnit",
+  "factor": 1.0,
+  "base": {}
+ },
+ "6a1e3beb-ca1f-5598-b325-9fed84832664": {
+  "name": "ISQSpaceTime::SphericalSpatial3dCoordinateFrame::radialDistanceUnit",
+  "factor": 1.0,
+  "base": {
+   "6a1e3beb-ca1f-5598-b325-9fed84832664": 1
+  }
+ },
+ "58071940-929f-59d2-94b0-1107c99bddcb": {
+  "name": "ISQSpaceTime::VolumeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "58071940-929f-59d2-94b0-1107c99bddcb": 1
+  }
+ },
+ "ec590f63-e584-5cb7-9559-2a14089ab37c": {
+  "name": "ISQThermodynamics::CelsiusTemperatureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "ec590f63-e584-5cb7-9559-2a14089ab37c": 1
+  }
+ },
+ "6ec16bb0-580a-5288-8d32-5e112dd1243a": {
+  "name": "ISQThermodynamics::CoefficientOfHeatTransferValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "6ec16bb0-580a-5288-8d32-5e112dd1243a": 1
+  }
+ },
+ "87d86ee3-1b3f-5de1-b55e-5b0ae056686b": {
+  "name": "ISQThermodynamics::CubicExpansionCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "87d86ee3-1b3f-5de1-b55e-5b0ae056686b": 1
+  }
+ },
+ "d5db4f52-04e7-5b87-aab3-1fdb8a5865ca": {
+  "name": "ISQThermodynamics::DensityOfHeatFlowRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "d5db4f52-04e7-5b87-aab3-1fdb8a5865ca": 1
+  }
+ },
+ "ab967f62-8f06-5739-a7a9-2ebfdaa85448": {
+  "name": "ISQThermodynamics::EnergyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "ab967f62-8f06-5739-a7a9-2ebfdaa85448": 1
+  }
+ },
+ "786281df-d6a9-5c5c-9f0f-3bce3e6d2a56": {
+  "name": "ISQThermodynamics::EntropyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "786281df-d6a9-5c5c-9f0f-3bce3e6d2a56": 1
+  }
+ },
+ "f614f9d1-c5c2-5e62-a52a-68353450386d": {
+  "name": "ISQThermodynamics::HeatCapacityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f614f9d1-c5c2-5e62-a52a-68353450386d": 1
+  }
+ },
+ "3a3a683a-4f3b-56bd-95e5-c8db9846d4a1": {
+  "name": "ISQThermodynamics::HeatFlowRateValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "3a3a683a-4f3b-56bd-95e5-c8db9846d4a1": 1
+  }
+ },
+ "68b3c106-1749-5349-b91b-38394b2fae10": {
+  "name": "ISQThermodynamics::IsentropicCompressibilityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "68b3c106-1749-5349-b91b-38394b2fae10": 1
+  }
+ },
+ "99c8739b-d6ae-5096-b3aa-09c55a297935": {
+  "name": "ISQThermodynamics::IsothermalCompressibilityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "99c8739b-d6ae-5096-b3aa-09c55a297935": 1
+  }
+ },
+ "4671cac5-4083-589b-8615-9b36e33e522c": {
+  "name": "ISQThermodynamics::JouleThomsonCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "4671cac5-4083-589b-8615-9b36e33e522c": 1
+  }
+ },
+ "db72fdae-1056-5527-8573-748e77d4872c": {
+  "name": "ISQThermodynamics::LinearExpansionCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "db72fdae-1056-5527-8573-748e77d4872c": 1
+  }
+ },
+ "98c5671b-db7b-52f6-a8da-bcca3e8f8e5a": {
+  "name": "ISQThermodynamics::MassConcentrationOfWaterValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "98c5671b-db7b-52f6-a8da-bcca3e8f8e5a": 1
+  }
+ },
+ "c3591316-6b3c-5516-b5fd-1425953f5682": {
+  "name": "ISQThermodynamics::MassConcentrationOfWaterVapourAbsoluteHumidityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c3591316-6b3c-5516-b5fd-1425953f5682": 1
+  }
+ },
+ "de8f77f2-803f-5887-a45a-ef65c5554999": {
+  "name": "ISQThermodynamics::MassieuFunctionValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "de8f77f2-803f-5887-a45a-ef65c5554999": 1
+  }
+ },
+ "1be2b769-d961-5a40-b6e1-49be82391656": {
+  "name": "ISQThermodynamics::PlanckFunctionValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "1be2b769-d961-5a40-b6e1-49be82391656": 1
+  }
+ },
+ "0572a0c1-4c23-567c-88a4-919734a784c4": {
+  "name": "ISQThermodynamics::PressureCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "0572a0c1-4c23-567c-88a4-919734a784c4": 1
+  }
+ },
+ "cda8de18-1fcc-5776-a49d-ccb62fada49e": {
+  "name": "ISQThermodynamics::RelativePressureCoefficientValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "cda8de18-1fcc-5776-a49d-ccb62fada49e": 1
+  }
+ },
+ "3fb0cd59-d2bc-5ec8-9ee8-4c03cc07ed3c": {
+  "name": "ISQThermodynamics::SpecificEnergyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "3fb0cd59-d2bc-5ec8-9ee8-4c03cc07ed3c": 1
+  }
+ },
+ "f06c9532-3b12-57d7-a3a8-8be0d69e9fe0": {
+  "name": "ISQThermodynamics::SpecificEnthalpyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "f06c9532-3b12-57d7-a3a8-8be0d69e9fe0": 1
+  }
+ },
+ "8cfa7f96-b85c-57f6-9eab-6d0a142c644c": {
+  "name": "ISQThermodynamics::SpecificEntropyValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "8cfa7f96-b85c-57f6-9eab-6d0a142c644c": 1
+  }
+ },
+ "c98da91a-b448-5f22-9c70-9f89622594e9": {
+  "name": "ISQThermodynamics::SpecificGasConstantValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "c98da91a-b448-5f22-9c70-9f89622594e9": 1
+  }
+ },
+ "9bf543d6-0592-5b6b-81e6-df371a6781d4": {
+  "name": "ISQThermodynamics::SpecificHeatCapacityAtConstantPressureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "9bf543d6-0592-5b6b-81e6-df371a6781d4": 1
+  }
+ },
+ "56abbe28-26db-529f-95fe-3785885c4aee": {
+  "name": "ISQThermodynamics::SpecificHeatCapacityAtConstantVolumeValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "56abbe28-26db-529f-95fe-3785885c4aee": 1
+  }
+ },
+ "efe1d53a-740f-5716-8b4c-b98f7c1cfe97": {
+  "name": "ISQThermodynamics::SpecificHeatCapacityAtSaturatedVapourPressureValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "efe1d53a-740f-5716-8b4c-b98f7c1cfe97": 1
+  }
+ },
+ "5dbde5e5-1847-5f4e-b918-528ba6682732": {
+  "name": "ISQThermodynamics::SpecificHeatCapacityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "5dbde5e5-1847-5f4e-b918-528ba6682732": 1
+  }
+ },
+ "eefa7c79-7720-5c4b-a05a-807613b8d17f": {
+  "name": "ISQThermodynamics::SurfaceCoefficientOfHeatTransferValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "eefa7c79-7720-5c4b-a05a-807613b8d17f": 1
+  }
+ },
+ "313ab09d-5ddf-50e2-b393-cf4c908c5697": {
+  "name": "ISQThermodynamics::ThermalConductanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "313ab09d-5ddf-50e2-b393-cf4c908c5697": 1
+  }
+ },
+ "92dd7a59-367d-5494-a27b-573113bcde75": {
+  "name": "ISQThermodynamics::ThermalConductivityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "92dd7a59-367d-5494-a27b-573113bcde75": 1
+  }
+ },
+ "e861d616-7419-5f91-b6f2-147d25e62d20": {
+  "name": "ISQThermodynamics::ThermalDiffusivityValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "e861d616-7419-5f91-b6f2-147d25e62d20": 1
+  }
+ },
+ "73a3dde9-5114-5009-a280-0c204ab140f5": {
+  "name": "ISQThermodynamics::ThermalInsulanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "73a3dde9-5114-5009-a280-0c204ab140f5": 1
+  }
+ },
+ "8797b345-9980-5ef3-bfc6-08ecbe61048b": {
+  "name": "ISQThermodynamics::ThermalResistanceValue::mRef",
+  "factor": 1.0,
+  "base": {
+   "8797b345-9980-5ef3-bfc6-08ecbe61048b": 1
+  }
+ },
+ "24228474-6094-5ee0-addb-428f5771cec4": {
+  "name": "MeasurementReferences::DimensionOneValue::mRef",
+  "factor": 1.0,
+  "base": {}
+ },
+ "5b5f71bb-4fbe-52d9-9f50-73daeed485ad": {
+  "name": "MeasurementReferences::MeasurementScale::unit",
+  "factor": 1.0,
+  "base": {
+   "5b5f71bb-4fbe-52d9-9f50-73daeed485ad": 1
+  }
+ },
+ "00a6596e-2eed-5d40-8c5a-923658cefbce": {
+  "name": "MeasurementReferences::SimpleUnit::simpleUnitSelf",
+  "factor": 1.0,
+  "base": {
+   "6b7bd7d8-ef9e-5174-94d0-e3e35ea1993f": 1
+  }
+ },
+ "c19f1525-71e2-5687-8e15-ddbbd5a4678d": {
+  "name": "MeasurementReferences::SimpleUnit::unitPowerFactors::unit",
+  "factor": 1.0,
+  "base": {
+   "6b7bd7d8-ef9e-5174-94d0-e3e35ea1993f": 1
+  }
+ },
+ "ab09fffe-84f7-506d-9d84-b12e590eff39": {
+  "name": "MeasurementReferences::SystemOfUnits::baseUnits",
+  "factor": 1.0,
+  "base": {
+   "ab09fffe-84f7-506d-9d84-b12e590eff39": 1
+  }
+ },
+ "6d1d8ae2-c96a-5400-81b7-8ca1dbb23b25": {
+  "name": "MeasurementReferences::UnitConversion::referenceUnit",
+  "factor": 1.0,
+  "base": {
+   "6d1d8ae2-c96a-5400-81b7-8ca1dbb23b25": 1
+  }
+ },
+ "9f3b67c5-ce74-5955-bfe9-867a0e350fe9": {
+  "name": "MeasurementReferences::UnitPowerFactor::unit",
+  "factor": 1.0,
+  "base": {
+   "9f3b67c5-ce74-5955-bfe9-867a0e350fe9": 1
+  }
+ },
+ "066e01a6-d0de-5c30-8f3d-0a1ae758fac3": {
+  "name": "MeasurementReferences::one",
+  "factor": 1.0,
+  "base": {}
+ },
+ "238c08a8-1000-5de6-96f8-727875d12c4e": {
+  "name": "SI::'ampere metre squared joule to the power minus 1 second to the power minus 1'",
+  "factor": 0.001,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1.0
+  }
+ },
+ "6026e9be-e194-53f8-92e7-57c7e31fc7a9": {
+  "name": "SI::'ampere metre squared'",
+  "factor": 1.0,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "91f53294-8079-5bf1-ba44-047ca55dbaec": {
+  "name": "SI::'ampere metre to the power minus 2 kelvin to the power minus 2'",
+  "factor": 1.0,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -2.0
+  }
+ },
+ "757e3bfb-5a7e-5581-a5ca-0d6df024094f": {
+  "name": "SI::'ampere per metre'",
+  "factor": 1.0,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1
+  }
+ },
+ "47293331-85d3-5f85-a402-c415a291360e": {
+  "name": "SI::'ampere per square metre'",
+  "factor": 1.0,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "343b9aa2-cbb5-5d29-aa33-b03b6b070bdb": {
+  "name": "SI::'ampere second per kilogram'",
+  "factor": 0.001,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1
+  }
+ },
+ "32861c1c-7a71-53ee-ac04-d3f975fa84dd": {
+  "name": "SI::'astronomical unit'",
+  "factor": 1.49597870691e+22,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "d0398084-b0a0-5879-b491-9813d471f326": {
+  "name": "SI::'atomic mass unit'",
+  "factor": 1.6605390666e-24,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "91a579a1-5b3c-501e-86bf-1bbad19c8da3": {
+  "name": "SI::'becquerel per cubic metre'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "67bb9ce7-cdbe-5708-a32f-112b5535f23c": {
+  "name": "SI::'becquerel per kilogram'",
+  "factor": 0.001,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1
+  }
+ },
+ "e2869e63-7164-5e9c-b843-91a6a0f48120": {
+  "name": "SI::'becquerel per square metre'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "e1734b0d-5efa-5d11-853e-00d34ade56d6": {
+  "name": "SI::'bit per second'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "0330381a-6012-5120-acaf-2853c255d0b0": {
+  "name": "SI::'byte per second'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "37deebf5-f6e7-5e24-9cac-3d38845afd92": {
+  "name": "SI::'candela metre to the power minus 2'",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "6da3a0ca-d967-5443-9b3f-fde85308eaf3": {
+  "name": "SI::'candela steradian kilogram to the power minus 1 metre to the power minus 2 second to the power 3'",
+  "factor": 0.001,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0
+  }
+ },
+ "9bc8fc4a-4f34-5138-9606-2803de18eeca": {
+  "name": "SI::'candela steradian metre to the power minus 2 second'",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "a1e2666f-7362-5f56-b7c2-3ef4f510b122": {
+  "name": "SI::'candela steradian metre to the power minus 2'",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "61f74561-7dd0-5a2f-919f-17966d4bb756": {
+  "name": "SI::'candela steradian second'",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "2ad70337-6557-596d-9ffd-c4cde07d4100": {
+  "name": "SI::'candela steradian'",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1
+  }
+ },
+ "0840b525-384e-587a-8033-7578bad89bc0": {
+  "name": "SI::'coulomb metre'",
+  "factor": 1.0,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "71399b3b-fc67-57fb-8163-9564332c9b3a": {
+  "name": "SI::'coulomb per cubic metre'",
+  "factor": 1.0,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "22c72c23-0127-5d37-8bd6-e4b02d3958c8": {
+  "name": "SI::'coulomb per kilogram second'",
+  "factor": 0.001,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1
+  }
+ },
+ "df07d3bd-c2d3-5d8d-9853-5a2c2b7859e2": {
+  "name": "SI::'coulomb per kilogram'",
+  "factor": 0.001,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1
+  }
+ },
+ "1c390b6d-5d46-51e8-928f-638e8afaed12": {
+  "name": "SI::'coulomb per metre'",
+  "factor": 1.0,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1
+  }
+ },
+ "0469ad34-763f-5a37-992a-4666c34ee793": {
+  "name": "SI::'coulomb per square metre'",
+  "factor": 1.0,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "33a10bf2-43b6-54de-99b4-da234ce80ebc": {
+  "name": "SI::'degree celsius (absolute temperature scale)'::unit",
+  "factor": 1.0,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1
+  }
+ },
+ "725aebb8-b19f-5375-bd74-eac6c1ed971c": {
+  "name": "SI::'degree celsius (temperature difference)'",
+  "factor": 1.0,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1
+  }
+ },
+ "62ae7a4c-6d33-5178-8dfd-dd64b3ddf1d1": {
+  "name": "SI::'electronvolt joule kilogram metre squared second to the power minus 2'",
+  "factor": 1.602176487e-10,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 3,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 6.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -6.0
+  }
+ },
+ "232921df-fdcf-5410-baa1-cac3c786c572": {
+  "name": "SI::'electronvolt metre to the power minus 2 per kilogram'",
+  "factor": 1.602176487e-19,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "12cf21ce-c847-5bd1-bae4-eca4e6352814": {
+  "name": "SI::'electronvolt per metre'",
+  "factor": 1.602176487e-16,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "d51f6003-852e-5514-ad23-f0eac16cf792": {
+  "name": "SI::'electronvolt per square metre'",
+  "factor": 1.602176487e-16,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "90a9d6a2-0d61-571b-be2a-1de3d5b9cfcf": {
+  "name": "SI::'farad per metre'",
+  "factor": 0.001,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 4.0,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3
+  }
+ },
+ "7155329a-fce8-5a7a-9927-3d5d41ff0d02": {
+  "name": "SI::'g per l'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "f5dabf59-2b9c-5f01-a41c-ff6e308c0b21": {
+  "name": "SI::'g per mole'",
+  "factor": 1.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1
+  }
+ },
+ "a20f6591-9c22-5c9f-93eb-d543aebb0738": {
+  "name": "SI::'gray per second'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "2b6dccfd-9466-52cb-b028-23f78f100c8e": {
+  "name": "SI::'hartley per second'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "a0c1edd8-d9a8-5d65-b64b-2830a1d9e41e": {
+  "name": "SI::'henry per metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -2
+  }
+ },
+ "107f30e4-3bfc-510b-8a29-51960f74b666": {
+  "name": "SI::'henry to the power minus 1'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": 2.0
+  }
+ },
+ "7aee257e-4521-501f-b09c-ae206a1896fa": {
+  "name": "SI::'joule metre squared per kilogram'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 4.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "b714dbde-9f68-5496-8e12-584a5876ea4f": {
+  "name": "SI::'joule per cubic metre nm'",
+  "factor": 999999999999.9999,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "ef718762-bba1-5de6-8bda-e44239be0bd0": {
+  "name": "SI::'joule per cubic metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "bad14c08-86bc-5d33-acef-6fc31c88c528": {
+  "name": "SI::'joule per kelvin'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "48f83311-b5d3-5811-8c0d-bc3d4046a742": {
+  "name": "SI::'joule per kilogram kelvin'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "4a800a3e-8ca7-5f38-b565-fa732ae1ea59": {
+  "name": "SI::'joule per kilogram'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "bd30c1bd-dd2f-5e54-968f-f880b6bc9ce1": {
+  "name": "SI::'joule per metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "f943e059-2da0-5dd7-8a9e-e6244181f8f1": {
+  "name": "SI::'joule per mole kelvin'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "fd96b565-cff9-5f47-ab07-eb8708d9ddef": {
+  "name": "SI::'joule per mole'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1
+  }
+ },
+ "95b8ffa3-4d52-51ec-b105-cdef1c5d8bdb": {
+  "name": "SI::'joule per nm'",
+  "factor": 999999999999.9999,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "a87c2863-feee-55d4-a1b4-420a922ac500": {
+  "name": "SI::'joule per second'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "8e6c0c73-32f1-5a5a-ae52-dc5f7b43a7fd": {
+  "name": "SI::'joule per square metre nm'",
+  "factor": 999999999999.9999,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "473868d2-0a78-59d4-9755-1830b30520a2": {
+  "name": "SI::'joule per square metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "057229e6-c53a-5e69-bdab-96b110159258": {
+  "name": "SI::'joule second electronvolt second'",
+  "factor": 1.602176487e-13,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 2,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 4,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "ebc87a04-f7ed-5176-820e-4ca465e31baf": {
+  "name": "SI::'joule second to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "6db1466b-7d67-5fcb-8696-791824647672": {
+  "name": "SI::'joule second'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "255abc6f-30d7-5a65-bac7-33bac9178ec5": {
+  "name": "SI::'joule to the power minus 1 metre to the power minus 3 electronvolt to the power minus 1 metre to the power minus 3'",
+  "factor": 6241509647120.418,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -2.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -10.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 4.0
+  }
+ },
+ "68f84afc-8b6f-5dd2-931a-f2d462bb0161": {
+  "name": "SI::'kelvin per pascal'",
+  "factor": 0.001,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0
+  }
+ },
+ "3dfaf27e-3b52-58c5-adc7-74ac38375afc": {
+  "name": "SI::'kelvin per watt'",
+  "factor": 0.001,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0
+  }
+ },
+ "5a574dde-8cc4-5ca4-b86b-9bc5a0ecdbc5": {
+  "name": "SI::'kelvin to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1.0
+  }
+ },
+ "d0bc2b8a-8693-555f-a383-b4f6fef1231a": {
+  "name": "SI::'kilogram metre cubed second to the power minus 3 ampere to the power minus 2'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -2.0
+  }
+ },
+ "ea3f4dea-ef8d-548e-931a-35a8e5597697": {
+  "name": "SI::'kilogram metre second to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "9308bd9e-b8dd-5044-b6fd-07345b0153ae": {
+  "name": "SI::'kilogram metre second to the power minus 2'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "a62220da-d12b-5a5b-8d32-b32857be29f3": {
+  "name": "SI::'kilogram metre second to the power minus 3 kelvin to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1.0
+  }
+ },
+ "51292c43-168f-5c56-b733-e6f0fa7d380c": {
+  "name": "SI::'kilogram metre second to the power minus 3 steradian to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "6c3759c9-b8ed-5533-92d9-ee44ea5ba420": {
+  "name": "SI::'kilogram metre second to the power minus 3'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "49e118fb-65bf-58b2-a7c6-b9632cb37db6": {
+  "name": "SI::'kilogram metre squared second to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "f061afb0-4b87-5a49-afa4-3d19b9f41aa9": {
+  "name": "SI::'kilogram metre squared second to the power minus 2 kelvin to the power minus 1 mole to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1.0,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1.0
+  }
+ },
+ "bd443dff-f032-52fa-ad66-7b883e6c5510": {
+  "name": "SI::'kilogram metre squared second to the power minus 2 kelvin to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1.0
+  }
+ },
+ "b7fb00ea-f15b-5156-87c0-8e9d6eb7b206": {
+  "name": "SI::'kilogram metre squared second to the power minus 2 mole to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1.0
+  }
+ },
+ "bcc9fa73-beb6-5767-a3bf-f161f2d1bfcf": {
+  "name": "SI::'kilogram metre squared second to the power minus 2'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "22f19495-601f-5c85-ae3c-46698b98233b": {
+  "name": "SI::'kilogram metre squared second to the power minus 3 ampere to the power minus 1 kelvin to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1.0
+  }
+ },
+ "0ea5fa7f-da73-5d14-8d75-28b74106eb1d": {
+  "name": "SI::'kilogram metre squared second to the power minus 3 ampere to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1.0
+  }
+ },
+ "65dd4f2d-a62f-575d-9782-798aeeb2a688": {
+  "name": "SI::'kilogram metre squared second to the power minus 3 kelvin to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1.0
+  }
+ },
+ "e58f1613-d91f-5d54-868d-4d6f5146685a": {
+  "name": "SI::'kilogram metre squared second to the power minus 3 steradian to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "61aec601-f385-5586-90c9-d07afad95f28": {
+  "name": "SI::'kilogram metre squared second to the power minus 3'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "6ab34a53-2282-56d5-a0a0-c60c5d344919": {
+  "name": "SI::'kilogram metre squared'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "6f092662-01a3-5252-b911-d1a3cf144b52": {
+  "name": "SI::'kilogram metre to the power minus 1 second to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "84efcd99-af06-5f70-b779-f3346ed246b0": {
+  "name": "SI::'kilogram metre to the power minus 1 second to the power minus 2 kelvin to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1.0
+  }
+ },
+ "3f48be5e-7a06-5faa-a5f4-8994d538c8c7": {
+  "name": "SI::'kilogram metre to the power minus 1 second to the power minus 2'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "b76158eb-aa6c-5f97-bc9d-7d952ace0bfa": {
+  "name": "SI::'kilogram metre to the power minus 1 second to the power minus 3 steradian to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "561b14f0-9720-5498-96a5-fffd24e2a16d": {
+  "name": "SI::'kilogram metre to the power minus 1 second to the power minus 3'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "f4f71303-d11c-58c7-a7f0-f2cff542f7d1": {
+  "name": "SI::'kilogram metre to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0
+  }
+ },
+ "177b93b5-b074-5e8d-af0e-97cfdd811362": {
+  "name": "SI::'kilogram metre to the power minus 2 second to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "0a895f53-ad0f-506e-8985-cc989ad5bce0": {
+  "name": "SI::'kilogram metre to the power minus 2 second to the power minus 2'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "116912c6-dd78-59a5-9006-db21052879c2": {
+  "name": "SI::'kilogram metre to the power minus 2'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "5bf7c0ce-2cc5-5766-ad7a-d260c7cbd4fc": {
+  "name": "SI::'kilogram metre to the power minus 3'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "27469a73-8d56-57f8-913a-f038658a7250": {
+  "name": "SI::'kilogram metre to the power minus 4 second to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -4.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "74d7e496-fe1b-5da0-aa86-601becfab9db": {
+  "name": "SI::'kilogram mole to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1.0
+  }
+ },
+ "c9eef5cf-0960-5833-a760-29b811d1f0b6": {
+  "name": "SI::'kilogram second to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "8bb9cb2f-e872-5597-b8f7-4fba15313d16": {
+  "name": "SI::'kilogram second to the power minus 2 ampere to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1.0
+  }
+ },
+ "f750b00a-79d6-589a-91d0-d77937b8f5d5": {
+  "name": "SI::'kilogram second to the power minus 2'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "e445ffd4-e6d3-5d79-8d50-95ea12dd9ce4": {
+  "name": "SI::'kilogram second to the power minus 3 kelvin to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1.0
+  }
+ },
+ "f9c51368-a56f-5db5-91e0-e16a29cedf37": {
+  "name": "SI::'kilogram second to the power minus 3 steradian to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "237d7b2f-7fd7-58ad-9e98-52c1d5d51484": {
+  "name": "SI::'kilogram second to the power minus 3'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "cb25ed2a-875d-5a10-9ce8-82edad0c2c17": {
+  "name": "SI::'kilogram to the power 2 metre to the power 4 second to the power minus 6 ampere to the power minus 2 kelvin to the power minus 2'",
+  "factor": 1000000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 2.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 4.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -6.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -2.0
+  }
+ },
+ "7d2e14f4-c981-5220-b3c8-fda121ea1afd": {
+  "name": "SI::'kilogram to the power 2 metre to the power minus 2 second to the power minus 3'",
+  "factor": 1000000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 2.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "43df4306-297d-54c0-9cf3-42e7bb2a809b": {
+  "name": "SI::'kilogram to the power minus 1 ampere'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": 1
+  }
+ },
+ "70f1fd6c-c369-5971-af83-8768d45c3932": {
+  "name": "SI::'kilogram to the power minus 1 metre cubed'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0
+  }
+ },
+ "6e2fabbc-3557-5925-bfd3-f4798d7e075b": {
+  "name": "SI::'kilogram to the power minus 1 metre second to the power 2 kelvin'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1
+  }
+ },
+ "83e2a2c1-a58b-525a-ba79-a94d6d3d84d8": {
+  "name": "SI::'kilogram to the power minus 1 metre second to the power 2'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0
+  }
+ },
+ "ec41c6e7-9a30-5b9c-b1f3-e9f16dbc6483": {
+  "name": "SI::'kilogram to the power minus 1 metre squared'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "c7d77709-5aee-5911-82d6-3cb407f1941e": {
+  "name": "SI::'kilogram to the power minus 1 metre to the power minus 2 second to the power 3 kelvin'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1
+  }
+ },
+ "b355bad3-d798-5899-ba64-011d5f4ae637": {
+  "name": "SI::'kilogram to the power minus 1 metre to the power minus 3 second to the power 3 ampere to the power 2'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": 2.0
+  }
+ },
+ "b636905b-1d09-501d-8bb2-6a0c827a5aca": {
+  "name": "SI::'kilogram to the power minus 1 metre to the power minus 5 second to the power 2'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -5.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0
+  }
+ },
+ "6705ecb6-86ed-512d-8ead-30f4a172b917": {
+  "name": "SI::'kilogram to the power minus 1 second ampere'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1,
+   "06adb072-715e-5571-88cf-865a33b484f9": 1
+  }
+ },
+ "cfa31746-91ba-59b3-b6de-9725ee55e401": {
+  "name": "SI::'kilogram to the power minus 1 second to the power 2 ampere'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": 1
+  }
+ },
+ "67d5a260-9903-52e9-a221-38c0e06c195b": {
+  "name": "SI::'kilogram to the power minus 1 second to the power 2'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0
+  }
+ },
+ "9ac5abb8-5377-54ef-98dc-192c766ad53e": {
+  "name": "SI::'kilogram to the power minus 1 second to the power 3 ampere to the power 2 mole to the power minus 1'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": 2.0,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1.0
+  }
+ },
+ "a7eb7309-d2aa-57d5-9d23-8c402e4c47a4": {
+  "name": "SI::'kilogram to the power minus 1 second to the power 3 kelvin'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1
+  }
+ },
+ "a2c19dff-b380-5c75-9bab-0b46a4101970": {
+  "name": "SI::'kilogram to the power minus 1 second to the power minus 1'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "6cb1c49f-9bc6-57dd-a0c4-34ebddcea19f": {
+  "name": "SI::'kilometre per hour'",
+  "factor": 0.2777777777777778,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "b4d0d1c0-9baa-5b08-beaa-e3e221e63bec": {
+  "name": "SI::'lumen per square metre'",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "d02f8ef6-7c14-5f96-b516-213df4aca673": {
+  "name": "SI::'lumen per watt'",
+  "factor": 0.001,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0
+  }
+ },
+ "3914eb5d-5c9d-5e92-b477-dee16839dc62": {
+  "name": "SI::'lumen second'",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "886b0b4d-52da-53ac-b344-d60ccbcaafcf": {
+  "name": "SI::'lux second'",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "e63fb944-789e-5fba-aafd-72bc445f7601": {
+  "name": "SI::'metre cubed mole to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1.0
+  }
+ },
+ "ab2001f1-73a7-52cf-b401-f7a56fdd412f": {
+  "name": "SI::'metre cubed per coulomb cubic metre second to the power minus 1 ampere to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 6.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "fe8cbec2-ca6e-5226-a33c-71dc59629394": {
+  "name": "SI::'metre cubed second to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "582391c2-1058-5718-8821-bf710aa87988": {
+  "name": "SI::'metre cubed'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0
+  }
+ },
+ "2de7426d-9200-5c50-9c88-30b036e73b48": {
+  "name": "SI::'metre per second'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "bf94e779-500f-53a2-8e62-21fbcbe76aeb": {
+  "name": "SI::'metre second to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "f5b20fd3-2cbd-565a-9dda-76231360ceda": {
+  "name": "SI::'metre second to the power minus 2'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "2fde5856-a8de-57da-91b0-a1a81c0e6813": {
+  "name": "SI::'metre squared ampere'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": 1
+  }
+ },
+ "713348ca-b398-5681-999b-0c3d922117b8": {
+  "name": "SI::'metre squared kelvin per watt'",
+  "factor": 0.001,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0
+  }
+ },
+ "451186ad-7834-52dc-8906-e5073f990ee5": {
+  "name": "SI::'metre squared mole to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1.0
+  }
+ },
+ "212e3cf8-e623-5ac7-8e51-89fbcb368a45": {
+  "name": "SI::'metre squared per joule steradian'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0
+  }
+ },
+ "a32f7fa7-6bf8-5b77-ad8a-c2041cc2c12c": {
+  "name": "SI::'metre squared per joule'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0
+  }
+ },
+ "557b6be4-895a-567f-b7d8-0ddd03be7c54": {
+  "name": "SI::'metre squared per volt second'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": 1
+  }
+ },
+ "a37b8763-974b-57d5-acbd-152f63e761b6": {
+  "name": "SI::'metre squared second to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "60807048-9944-5256-8226-3edd2bca327b": {
+  "name": "SI::'metre squared second to the power minus 2 kelvin to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1.0
+  }
+ },
+ "21d58d43-b880-5429-9d55-761994cb0c6d": {
+  "name": "SI::'metre squared second to the power minus 2'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "01a614e2-cd67-5458-9607-6e59a46fea92": {
+  "name": "SI::'metre squared second to the power minus 3'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "68e2b107-85c6-5976-90da-45fc67ee829e": {
+  "name": "SI::'metre squared steradian to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "8c54db5b-f7d0-548f-b3e0-0495c16b6763": {
+  "name": "SI::'metre squared'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "2e18b12a-5cbd-5195-adf2-5c549c38433c": {
+  "name": "SI::'metre to the power 4 second to the power minus 2'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 4.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "e37fca74-fbff-5bcb-96f0-e118e4db41e5": {
+  "name": "SI::'metre to the power 4'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 4.0
+  }
+ },
+ "a8292c01-fe8a-5994-a11f-b3c0a9231bbb": {
+  "name": "SI::'metre to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0
+  }
+ },
+ "6781bcd4-4fc7-5d44-9aaf-af8cf0632c4f": {
+  "name": "SI::'metre to the power minus 2 second to the power minus 1 steradian to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "8103be49-f512-5e0a-9efd-1b7c1d5609ec": {
+  "name": "SI::'metre to the power minus 2 second to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "ef4d176b-a57f-5238-84bc-d0d6cbdb115b": {
+  "name": "SI::'metre to the power minus 2'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "b7416b5a-c9d7-5fd3-8607-cd0123e5b874": {
+  "name": "SI::'metre to the power minus 3 second to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "4d6ef1ce-5ad4-5b0f-9cd0-e748cc32182e": {
+  "name": "SI::'metre to the power minus 3 second'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "992b364e-8aa4-5d66-8b50-cddd82d198f9": {
+  "name": "SI::'metre to the power minus 3'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "9f3c2c93-88f7-5f1a-967f-0bbc3bca779f": {
+  "name": "SI::'minute (angle)'",
+  "factor": 1.0,
+  "base": {}
+ },
+ "91362040-2413-594c-b434-0e1e454d28e2": {
+  "name": "SI::'ml per l'",
+  "factor": 1.0,
+  "base": {}
+ },
+ "fe721248-2207-571e-92a6-9f6cfebbb145": {
+  "name": "SI::'mole kilogram to the power minus 1'",
+  "factor": 0.001,
+  "base": {
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0
+  }
+ },
+ "4052117e-65e5-5e73-9356-0cf630183a2c": {
+  "name": "SI::'mole metre to the power minus 3'",
+  "factor": 1.0,
+  "base": {
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "6f43c3f1-31b1-55d4-bda6-0e347a2ca44a": {
+  "name": "SI::'mole per cubic metre'",
+  "factor": 1.0,
+  "base": {
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "74b16f43-c9a7-5cbd-b2a6-970e24e06863": {
+  "name": "SI::'mole per kilogram'",
+  "factor": 0.001,
+  "base": {
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": 1,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1
+  }
+ },
+ "73bd8d2a-f323-5065-91c6-9ae51f2aa6e3": {
+  "name": "SI::'mole per l'",
+  "factor": 1000.0,
+  "base": {
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "1fffcbb1-c9ff-565c-9db5-96a559882ad0": {
+  "name": "SI::'natural unit of information per second'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "7bf11096-20e2-55f5-8d8e-4a2da933253c": {
+  "name": "SI::'natural unit of information'",
+  "factor": 1.0,
+  "base": {}
+ },
+ "fbcb2206-ba6e-505f-9366-35e9d07df64d": {
+  "name": "SI::'newton metre second to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "93e98ca6-dcf0-581b-b97b-bc9fd9ac1722": {
+  "name": "SI::'newton metre second'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "6a4f5d9b-7be6-5666-b36f-a89265e34762": {
+  "name": "SI::'newton metre to the power minus 1'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "58f402ec-1040-5a03-a9ef-7b4cd5aecfad": {
+  "name": "SI::'newton metre to the power minus 2'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "2d8c95ea-449f-51ec-af03-a7c1c1610de7": {
+  "name": "SI::'newton metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "fd2cb084-becd-5d3e-b002-1afaa0d771b1": {
+  "name": "SI::'newton second'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "82e58f3b-6368-5a80-ae25-fc814acb6d9b": {
+  "name": "SI::'octet per second'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "05badddd-8514-59ec-af44-0a0d1c90d3da": {
+  "name": "SI::'ohm metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -2
+  }
+ },
+ "a991e281-5dd5-552d-ab77-3e3b7bb7fdab": {
+  "name": "SI::'pascal per kelvin'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "7e7a5059-1fed-5e9f-a460-b61ee3364984": {
+  "name": "SI::'pascal second per cubic metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -4.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "063d0559-fdb0-5e61-8e50-4219452eb946": {
+  "name": "SI::'pascal second per metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "16106983-d577-5caa-b4a3-390e025d790a": {
+  "name": "SI::'pascal second'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "604f932e-db55-5d9f-b20d-fd6400e11d76": {
+  "name": "SI::'pascal to the power 2 second'",
+  "factor": 1000000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 2.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "58c41082-42ec-518b-a669-24e070c415d9": {
+  "name": "SI::'pascal to the power minus 1'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 2.0
+  }
+ },
+ "4305961d-f6f0-5637-be43-7af0117ab228": {
+  "name": "SI::'radian metre squared per kilogram to the power 1'",
+  "factor": 0.001,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0
+  }
+ },
+ "a2302c91-6731-549c-b351-06a77cb49f98": {
+  "name": "SI::'radian metre squared per mole'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1
+  }
+ },
+ "2360a884-5a80-59f1-802c-3c2c93c67a7f": {
+  "name": "SI::'radian per metre'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1
+  }
+ },
+ "84d79928-3ad4-5282-8ec3-962ace6dcf71": {
+  "name": "SI::'radian second to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "a2184af0-a549-5744-9a64-969688ab13bb": {
+  "name": "SI::'radian second to the power minus 2'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "d186c719-bab2-557e-bbbb-d8f0d871b946": {
+  "name": "SI::'second (angle)'",
+  "factor": 1.0,
+  "base": {}
+ },
+ "d72ac154-4dc4-5aac-a3a9-0f2f95c5829e": {
+  "name": "SI::'second ampere'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1,
+   "06adb072-715e-5571-88cf-865a33b484f9": 1
+  }
+ },
+ "5fbbef39-2b2b-5654-a5fb-ca1f8cf98894": {
+  "name": "SI::'second to the power minus 1 steradian to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "86cba750-bb7d-5dba-abca-d5b664241508": {
+  "name": "SI::'second to the power minus 1'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "4eff2df8-d201-5993-885f-67688b2bc38c": {
+  "name": "SI::'second to the power minus 2'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "a095cf1b-986f-5867-b7d5-09e5bc2a5475": {
+  "name": "SI::'shannon per second'",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "3c9aa983-935c-5654-91c6-336d8521116c": {
+  "name": "SI::'siemens metre squared per mole'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": 2.0,
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": -1
+  }
+ },
+ "31b8709f-8ec6-5a13-aca7-83bd6b4c68b2": {
+  "name": "SI::'siemens per metre'",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": 2.0
+  }
+ },
+ "0fb3b4c1-a50f-5232-9c27-7bd7fca25965": {
+  "name": "SI::'sievert per second'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "1b77d295-c0c1-593c-bacd-a076c5fb71ed": {
+  "name": "SI::'volt ampere reactive'",
+  "factor": 1.0,
+  "base": {
+   "1b77d295-c0c1-593c-bacd-a076c5fb71ed": 1
+  }
+ },
+ "51a64ee2-97e0-5843-b8dd-9fe59d11728c": {
+  "name": "SI::'volt ampere'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "e88d8888-8427-5ece-b51a-af7d757d09f4": {
+  "name": "SI::'volt per kelvin'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "dc9e0f4c-7d14-55fc-82d9-cd249ac9d2ac": {
+  "name": "SI::'volt per metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1
+  }
+ },
+ "2957ccda-290c-5b24-899a-7b70f623672d": {
+  "name": "SI::'volt to the power 2 per kelvin to the power 2'",
+  "factor": 1000000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 2.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 4.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -6.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -2.0
+  }
+ },
+ "7c944a6e-bb0c-5a7c-9f19-b277fc6ddb62": {
+  "name": "SI::'watt hour'",
+  "factor": 3600000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "329a8143-a784-57b9-8e05-17c629ac42b9": {
+  "name": "SI::'watt per kelvin'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "4016ccd4-1d6e-5db2-ac31-f44b9515af3b": {
+  "name": "SI::'watt per kilogram'",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "53b60a9a-b742-557a-931d-f4fcc103d7b2": {
+  "name": "SI::'watt per metre kelvin'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "8da249b3-aba0-53d9-b131-be768fcb22a0": {
+  "name": "SI::'watt per nm'",
+  "factor": 999999999999.9999,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "7b693b2d-37e9-594c-a5f3-d1e9444e0b19": {
+  "name": "SI::'watt per square metre kelvin'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "be2afad1-e355-5b74-b3d5-219fc59fc399": {
+  "name": "SI::'watt per square metre nm'",
+  "factor": 999999999999.9999,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "771fb04f-6f3e-568a-b23d-4b2af433f4a9": {
+  "name": "SI::'watt per square metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "eee05036-9dd0-576e-aab6-645dcea9e7cc": {
+  "name": "SI::'watt per steradian nm'",
+  "factor": 999999999999.9999,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "ed4f8804-3a71-5941-b08d-dd774879f2bc": {
+  "name": "SI::'watt per steradian square metre nm'",
+  "factor": 999999999999.9999,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "70a43320-2be7-53ad-83ba-06ad3610c396": {
+  "name": "SI::'watt per steradian square metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "453a21c9-5b86-500f-a705-c5fb5fc4001b": {
+  "name": "SI::'watt per steradian'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "ab29d4a3-c49d-5b16-981e-2b1c1f69df8c": {
+  "name": "SI::'weber metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1
+  }
+ },
+ "b26eae04-aca2-5388-9822-7d31495c1f0b": {
+  "name": "SI::'weber per metre'",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1
+  }
+ },
+ "d35dbdb9-bf6e-5410-a148-73c916ede185": {
+  "name": "SI::'ångström'",
+  "factor": 1e-10,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "06adb072-715e-5571-88cf-865a33b484f9": {
+  "name": "SI::ampere",
+  "factor": 1.0,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1
+  }
+ },
+ "fa4a8879-c1eb-57bd-928c-566a751c5f78": {
+  "name": "SI::barn",
+  "factor": 1e-28,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "b8e66013-6bef-50ea-8a54-767a2fae732a": {
+  "name": "SI::baud",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "f6db2fb7-529d-59a7-b555-8a80fd70b025": {
+  "name": "SI::becquerel",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "b10fa852-5b76-5d07-a016-008f0489374f": {
+  "name": "SI::bit",
+  "factor": 1.0,
+  "base": {}
+ },
+ "e4abf406-0429-558f-8b96-eebeee033f50": {
+  "name": "SI::byte",
+  "factor": 1.0,
+  "base": {}
+ },
+ "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": {
+  "name": "SI::candela",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1
+  }
+ },
+ "a4f93cf8-d2d0-5d51-ae28-a2ab71de53f7": {
+  "name": "SI::centimetre",
+  "factor": 0.01,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "03fb27bb-5be6-5e03-9440-6fb4f5e9042d": {
+  "name": "SI::coulomb",
+  "factor": 1.0,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "7ee9a40b-86e8-5605-9b9c-aaef990940f9": {
+  "name": "SI::dalton",
+  "factor": 1.6605390666e-24,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "d798f25b-f7aa-5ef8-a143-985718df5b11": {
+  "name": "SI::day",
+  "factor": 86400.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "c64bb1f1-f3ed-590f-a1be-3321210d7dbb": {
+  "name": "SI::decade",
+  "factor": 1.0,
+  "base": {}
+ },
+ "f2417ead-06a9-5a0a-8d53-b65da26ff538": {
+  "name": "SI::decibel",
+  "factor": 1.0,
+  "base": {}
+ },
+ "7c2eb5cb-efa5-5db7-a7a2-8bf3ba9500c3": {
+  "name": "SI::degree",
+  "factor": 1.0,
+  "base": {}
+ },
+ "f40aba43-c482-5183-a731-5ef561e1ce25": {
+  "name": "SI::electronvolt",
+  "factor": 1.602176487e-16,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "6b547522-c1cf-51dd-bb88-85acb55f4cfb": {
+  "name": "SI::erlang",
+  "factor": 1.0,
+  "base": {}
+ },
+ "73e47d99-6a71-5ecd-86e1-45a6bcd69420": {
+  "name": "SI::farad",
+  "factor": 0.001,
+  "base": {
+   "06adb072-715e-5571-88cf-865a33b484f9": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 4.0,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2
+  }
+ },
+ "66ac902e-52fa-5bdc-a76e-1f4f137f093b": {
+  "name": "SI::gigajoule",
+  "factor": 1000000000000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": {
+  "name": "SI::gram",
+  "factor": 1.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "c0254dc2-b49d-5fc0-ad8b-480814949b79": {
+  "name": "SI::gray",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "81793ab1-5d36-561b-8fd1-a486aa3e4962": {
+  "name": "SI::hartley",
+  "factor": 1.0,
+  "base": {}
+ },
+ "4c10b9c1-d847-59b6-b0dd-8ef214676f13": {
+  "name": "SI::henry",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -2
+  }
+ },
+ "1939b7b0-eed2-5771-aeb5-52e698f8d9eb": {
+  "name": "SI::hertz",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "74c24ec8-1676-52a7-bf7b-9105e3b1a9ac": {
+  "name": "SI::hour",
+  "factor": 3600.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "6553248d-60f6-5e86-a40d-ef1f34427506": {
+  "name": "SI::joule",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": {
+  "name": "SI::kelvin",
+  "factor": 1.0,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1
+  }
+ },
+ "504dde25-e4e8-58ea-8d47-c489dca67305": {
+  "name": "SI::kilogram",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "48ec9417-e1af-54c6-b07b-27caa8dd3d5f": {
+  "name": "SI::kilojoule",
+  "factor": 1000000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "5ce9ecec-0a00-5be3-930a-0784f06fb3b2": {
+  "name": "SI::kilometre",
+  "factor": 1000.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "87cec616-cbf8-55f0-bc43-d6646a3584b0": {
+  "name": "SI::kilowatt",
+  "factor": 1000000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "877d3cbc-c219-57df-a67e-b5698a965c42": {
+  "name": "SI::litre",
+  "factor": 0.001,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0
+  }
+ },
+ "0dc86993-558d-54ec-97c7-091152dbcf98": {
+  "name": "SI::lumen",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1
+  }
+ },
+ "e441e939-97df-5848-bfeb-a2a388026836": {
+  "name": "SI::lux",
+  "factor": 1.0,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "0a4a7049-f81e-5b21-855d-5db8142e67ba": {
+  "name": "SI::megajoule",
+  "factor": 1000000000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": {
+  "name": "SI::metre",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "ca1c1d17-923c-5982-b5f1-bf18d86725e9": {
+  "name": "SI::millilitre",
+  "factor": 1e-06,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0
+  }
+ },
+ "df5d8b8a-6d4d-5344-87f5-12f1efcac8d4": {
+  "name": "SI::millimetre",
+  "factor": 0.001,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "fbca5222-a1f0-5a29-9896-2e7592d6cd51": {
+  "name": "SI::millinewton",
+  "factor": 1.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "a2a7a7e3-280e-5669-84a6-98c4e5ac2309": {
+  "name": "SI::minute",
+  "factor": 60.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "62b9585b-2c27-5e80-8264-4752e3f40a8f": {
+  "name": "SI::mole",
+  "factor": 1.0,
+  "base": {
+   "62b9585b-2c27-5e80-8264-4752e3f40a8f": 1
+  }
+ },
+ "b44382b8-8021-598f-93da-2d9bd091381d": {
+  "name": "SI::nanometre",
+  "factor": 1e-09,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "ce9ed8d2-9c16-5ce6-a8f3-6d363c6f8cb2": {
+  "name": "SI::newton",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "c7e4bbb4-31fa-5dd3-91b2-da3a108da204": {
+  "name": "SI::octave",
+  "factor": 1.0,
+  "base": {}
+ },
+ "560b886f-7748-5ecf-95aa-7e51cc3b61fe": {
+  "name": "SI::octet",
+  "factor": 1.0,
+  "base": {}
+ },
+ "7467897b-661f-518e-8e83-4e6cdcf0184c": {
+  "name": "SI::ohm",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -2
+  }
+ },
+ "ca7dc7f2-bed4-5377-8738-ecec9e55fe64": {
+  "name": "SI::pascal",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "f6c9837e-8e9c-508e-b0c3-ffd7e96e77ed": {
+  "name": "SI::radian",
+  "factor": 1.0,
+  "base": {}
+ },
+ "0c636dab-938a-5842-8b67-b00e667a2687": {
+  "name": "SI::second",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "744fca2f-07f4-5dee-bb2f-5bfa79f8a43f": {
+  "name": "SI::shannon",
+  "factor": 1.0,
+  "base": {}
+ },
+ "03b5d852-9cbb-5796-9dfa-736783a313aa": {
+  "name": "SI::siemens",
+  "factor": 0.001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1.0,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": 2.0
+  }
+ },
+ "f462f806-fcfb-52a8-b74e-5ed01a06b709": {
+  "name": "SI::sievert",
+  "factor": 1.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "fd0ac370-ee83-55e5-a91a-19ba6cc1995f": {
+  "name": "SI::steradian",
+  "factor": 1.0,
+  "base": {}
+ },
+ "04bfe510-8267-59fb-a594-b73bc5533941": {
+  "name": "SI::tesla",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1
+  }
+ },
+ "c4b365bd-2f8f-5463-ba3d-bd458c3a6ce6": {
+  "name": "SI::tonne",
+  "factor": 1.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "25f99be7-ee5b-5310-85a8-f0914de69e7d": {
+  "name": "SI::volt",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1
+  }
+ },
+ "83da4181-40bf-5aba-9c2d-a825de00de19": {
+  "name": "SI::watt",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "2c7d4fb4-a281-51bb-9c35-0ad08b964efd": {
+  "name": "SI::weber",
+  "factor": 1000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1
+  }
+ },
+ "58f02503-bccb-5dea-8ea8-3ff6f5c5516b": {
+  "name": "Time::'Coordinated Universal Time'::unit",
+  "factor": 1.0,
+  "base": {
+   "0c636dab-938a-5842-8b67-b00e667a2687": 1
+  }
+ },
+ "a1802abf-68c5-5b78-9c33-0ba35974aa9f": {
+  "name": "Time::TimeScale::unit",
+  "factor": 1.0,
+  "base": {
+   "a1802abf-68c5-5b78-9c33-0ba35974aa9f": 1
+  }
+ },
+ "d7bf0232-c1c9-504b-b456-8f9dbcf6862e": {
+  "name": "USCustomaryUnits::'British thermal unit (39 °F)'",
+  "factor": 1059670.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "4030cdbe-c7c4-54a4-880c-fa04090ec10f": {
+  "name": "USCustomaryUnits::'British thermal unit (59 °F)'",
+  "factor": 1054800.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "089eae6f-232d-537b-946d-4ab937a114ef": {
+  "name": "USCustomaryUnits::'British thermal unit (60 °F)'",
+  "factor": 1054680.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "bbc0d12f-4789-501a-b737-5efacfb45a20": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) foot per hour square foot degree Fahrenheit'",
+  "factor": 1730.7349081364828,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "9793fbc3-ffe3-5257-93f0-6592cfe23b60": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) inch per hour square foot degree Fahrenheit'",
+  "factor": 144.22790901137355,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "37e6721d-b14f-5dbf-916e-a17a9ff92ee5": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) inch per second square foot degree Fahrenheit'",
+  "factor": 519220.4724409448,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "dbe3bad8-3e19-5ce8-a4f4-9454be642ab4": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per degree Fahrenheit'",
+  "factor": 1899100.7999999998,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "9156f8ac-a29a-5cc2-9a01-80c6e1f1a034": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per degree Rankine'",
+  "factor": 1899100.7999999998,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "1a223536-5a19-5aa8-b6fa-0b081f1c6f63": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per hour square foot degree Fahrenheit'",
+  "factor": 5678.264134306045,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "fc7596c6-ac36-5b58-86b4-172a0ec27f22": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per hour'",
+  "factor": 293.0711111111111,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "91e7856c-0bb7-5435-b98a-24d389e0e975": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per pound degree Fahrenheit'",
+  "factor": 4186.800307941667,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "3b4f6613-b453-58f7-b38b-52319eb805a7": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per pound degree Rankine'",
+  "factor": 4186.800307941667,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "2c925cd3-97fb-5761-9c90-9a0ec86c2e65": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per pound'",
+  "factor": 2326.000171078704,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "93fc1009-42a0-5994-86dc-b349b83b5205": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per second square foot degree Fahrenheit'",
+  "factor": 20441750.883501764,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "c25b7c02-3f88-5a3d-a6fb-23177820d008": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per second'",
+  "factor": 1055056.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "261344d1-7a2b-5f1f-906c-ed495a444e5b": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per square foot hour'",
+  "factor": 3154.591185725581,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "598571fa-c069-5d5b-be15-007ee2f3e84b": {
+  "name": "USCustomaryUnits::'British thermal unit (IT) per square foot second'",
+  "factor": 11356528.268612092,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "669ade9a-672a-5b48-87e3-9bc82b2c4a38": {
+  "name": "USCustomaryUnits::'British thermal unit (IT)'",
+  "factor": 1055056.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "97ace65a-4329-5e6b-a3da-2b20ce090907": {
+  "name": "USCustomaryUnits::'British thermal unit (mean)'",
+  "factor": 1055870.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "591f4285-b33b-5c02-a9bb-e763a3e1f12c": {
+  "name": "USCustomaryUnits::'British thermal unit (th) foot per hour square foot degree Fahrenheit'",
+  "factor": 1729.5767716535431,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "815726cc-8b09-5495-80d8-6107d701d355": {
+  "name": "USCustomaryUnits::'British thermal unit (th) inch per hour square foot degree Fahrenheit'",
+  "factor": 144.13139763779523,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "058c46ac-6acf-55e6-b262-7f2858fc1575": {
+  "name": "USCustomaryUnits::'British thermal unit (th) inch per second square foot degree Fahrenheit'",
+  "factor": 518873.0314960629,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "5c3d7196-9967-50ac-8465-ea5e1c1168da": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per degree Fahrenheit'",
+  "factor": 1897829.9999999998,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "ec2e6afb-8230-5497-9a50-a77de2f6b665": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per degree Rankine'",
+  "factor": 1897829.9999999998,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "f14affb3-4f79-51e5-a1f3-e4468b2ae8ce": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per hour square foot degree Fahrenheit'",
+  "factor": 5674.464473928947,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "bff520d6-f52e-54fc-b6e4-1379c18a10d0": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per hour'",
+  "factor": 292.875,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "52a2db61-a86c-5956-938c-f90970108087": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per minute'",
+  "factor": 17572.5,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "81a45d70-e9d7-5860-bdc9-f22060ef0011": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per pound degree Fahrenheit'",
+  "factor": 4183.998673699118,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "b441d289-ef25-524f-b057-af196a511e51": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per pound degree Rankine'",
+  "factor": 4183.998673699118,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "23cc41b2-4dea-54d2-a790-ea656afa9188": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per pound'",
+  "factor": 2324.4437076106215,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "55ea8b34-cabf-5015-9eec-425f8cd1b380": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per second square foot degree Fahrenheit'",
+  "factor": 20428072.10614421,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0,
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": -1
+  }
+ },
+ "34e159f0-a6cc-58b5-8960-0682d997919c": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per second'",
+  "factor": 1054350.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "37c97fce-96e9-5a7c-b8a8-e6cff2e65988": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per square foot hour'",
+  "factor": 3152.4802632938595,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "447069e1-3468-559c-b55b-92d7f2022cad": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per square foot minute'",
+  "factor": 189148.81579763157,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "0195dfc7-013d-5467-86d5-3ce77e9e3664": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per square foot second'",
+  "factor": 11348928.947857896,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "405e8536-37b4-53c4-95df-72773d1708ed": {
+  "name": "USCustomaryUnits::'British thermal unit (th) per square inch second'",
+  "factor": 1634245768.491537,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "2ec1f64c-1281-52bc-8626-ea2dd3b599e5": {
+  "name": "USCustomaryUnits::'British thermal unit (th)'",
+  "factor": 1054350.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "79ed0a16-5c2f-594a-8d2a-ed0145eae86a": {
+  "name": "USCustomaryUnits::'acre (based on US survey foot)'",
+  "factor": 1.0,
+  "base": {
+   "79ed0a16-5c2f-594a-8d2a-ed0145eae86a": 1
+  }
+ },
+ "ec83444b-e6b2-535b-acaf-ef2cd446e6d6": {
+  "name": "USCustomaryUnits::'acre foot (based on US survey foot)'",
+  "factor": 1.0,
+  "base": {
+   "ec83444b-e6b2-535b-acaf-ef2cd446e6d6": 1
+  }
+ },
+ "cf296c98-8e70-5728-aa55-0c07cbae90a2": {
+  "name": "USCustomaryUnits::'barrel (for petroleum, 42 gallons (US))'",
+  "factor": 1.0,
+  "base": {
+   "cf296c98-8e70-5728-aa55-0c07cbae90a2": 1
+  }
+ },
+ "8be0a923-5a55-5d5c-9ccb-28352c5a1ab0": {
+  "name": "USCustomaryUnits::'bushel (US)'",
+  "factor": 1.0,
+  "base": {
+   "8be0a923-5a55-5d5c-9ccb-28352c5a1ab0": 1
+  }
+ },
+ "162682a0-bc2d-53e9-ae46-36566bc49dea": {
+  "name": "USCustomaryUnits::'candela per square inch'",
+  "factor": 1550.0031000062002,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "a961c5eb-f4fd-5d99-afdb-9a67f0450daf": {
+  "name": "USCustomaryUnits::'chain (based on US survey foot)'",
+  "factor": 20.11684,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "be6ab9a1-a532-5a46-a7c9-3b1f9fe5d0bc": {
+  "name": "USCustomaryUnits::'circular mil'",
+  "factor": 1.0,
+  "base": {
+   "be6ab9a1-a532-5a46-a7c9-3b1f9fe5d0bc": 1
+  }
+ },
+ "cac9d56f-c6d9-5b78-a19e-65a2e8e53e16": {
+  "name": "USCustomaryUnits::'cord (128 ft^3)'",
+  "factor": 1.0,
+  "base": {
+   "cac9d56f-c6d9-5b78-a19e-65a2e8e53e16": 1
+  }
+ },
+ "cabe71b9-4fcd-5467-a731-9646f51ad911": {
+  "name": "USCustomaryUnits::'cubic foot per minute'",
+  "factor": 0.00047194744320000004,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "f3dc41ec-df72-59f2-8ba7-d0d7991f7f60": {
+  "name": "USCustomaryUnits::'cubic foot per second'",
+  "factor": 0.028316846592000004,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "02164b14-79b1-5b9a-b359-e3ccbe619401": {
+  "name": "USCustomaryUnits::'cubic foot'",
+  "factor": 0.028316846592000004,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0
+  }
+ },
+ "58c1c57d-61c9-5be5-b9e2-7b7e7d848002": {
+  "name": "USCustomaryUnits::'cubic inch per minute'",
+  "factor": 2.7311773333333333e-07,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "0122175c-e768-54dc-95e1-4e945c2537cb": {
+  "name": "USCustomaryUnits::'cubic inch'",
+  "factor": 1.6387064e-05,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0
+  }
+ },
+ "eabc1785-f78d-5bba-8a48-c6976733b5e1": {
+  "name": "USCustomaryUnits::'cubic mile'",
+  "factor": 4168181825.44058,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0
+  }
+ },
+ "f4a7449d-dfe4-5ee7-ae20-eca05b5a6136": {
+  "name": "USCustomaryUnits::'cubic yard per minute'",
+  "factor": 0.0127425809664,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "4a2eec87-8179-5a47-8a1b-1cac118af838": {
+  "name": "USCustomaryUnits::'cubic yard'",
+  "factor": 0.764554857984,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 3.0
+  }
+ },
+ "3a123fe8-07b2-5304-a9d3-7e6648f7c840": {
+  "name": "USCustomaryUnits::'cup (US)'",
+  "factor": 1.0,
+  "base": {
+   "3a123fe8-07b2-5304-a9d3-7e6648f7c840": 1
+  }
+ },
+ "a648d0a1-450d-5648-8414-a29b6d37d4c8": {
+  "name": "USCustomaryUnits::'degree Fahrenheit (temperature difference)'",
+  "factor": 0.5555555555555556,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1
+  }
+ },
+ "60be62fc-1dff-5788-ac77-3425681b7d7b": {
+  "name": "USCustomaryUnits::'degree Fahrenheit hour per British thermal unit (IT)'",
+  "factor": 0.0018956339758268756,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2
+  }
+ },
+ "581df88b-b312-5221-81a3-43fc2cb08bac": {
+  "name": "USCustomaryUnits::'degree Fahrenheit hour per British thermal unit (th)'",
+  "factor": 0.0018969033053540096,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2
+  }
+ },
+ "88e55349-5b5c-5d59-93b8-b7aa79ec5eef": {
+  "name": "USCustomaryUnits::'degree Fahrenheit hour square foot per British thermal unit (IT)'",
+  "factor": 0.00017611015908160324,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1
+  }
+ },
+ "53daa811-f9b1-5c03-bca6-7b949272fc56": {
+  "name": "USCustomaryUnits::'degree Fahrenheit hour square foot per British thermal unit (th)'",
+  "factor": 0.00017622808365343578,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1
+  }
+ },
+ "c401b60a-2e54-568b-8c2a-0998f2a2dc33": {
+  "name": "USCustomaryUnits::'degree Fahrenheit second per British thermal unit (IT)'",
+  "factor": 5.265649932852432e-07,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2
+  }
+ },
+ "0e55083d-d339-5f06-8576-5c6ce894db13": {
+  "name": "USCustomaryUnits::'degree Fahrenheit second per British thermal unit (th)'",
+  "factor": 5.269175848205582e-07,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": 3.0,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": -1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2
+  }
+ },
+ "943bfadf-fed7-5d21-b52a-1be09c1bc8a0": {
+  "name": "USCustomaryUnits::'degree Rankine'",
+  "factor": 0.5555555555555556,
+  "base": {
+   "5fdfc9c9-b0a5-52c4-bd5b-61a7151c9317": 1
+  }
+ },
+ "8f61cee0-f851-5d25-9d09-c9756d8039c4": {
+  "name": "USCustomaryUnits::'fathom (based on US survey foot)'",
+  "factor": 1.828804,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "9583bac8-d035-5eec-a7b0-f275e8b8f59c": {
+  "name": "USCustomaryUnits::'fluid ounce (US)'",
+  "factor": 1.0,
+  "base": {
+   "9583bac8-d035-5eec-a7b0-f275e8b8f59c": 1
+  }
+ },
+ "620a36c1-bb10-5e1b-a72b-f3d120120ff6": {
+  "name": "USCustomaryUnits::'foot (US survey)'",
+  "factor": 0.3048006,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "ca5135b7-7baa-5293-8801-3174d762cd74": {
+  "name": "USCustomaryUnits::'foot of mercury, conventional'",
+  "factor": 40636660.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "a1f66d1e-3da6-533b-bb14-4af8ac10bdaf": {
+  "name": "USCustomaryUnits::'foot of water (39.2 °F)'",
+  "factor": 2988980.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "686b95cf-4e6e-535e-85b3-fbce81d8d597": {
+  "name": "USCustomaryUnits::'foot of water, conventional'",
+  "factor": 2989067.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "98287e96-bd50-5e51-b55f-1faf32d8e2dd": {
+  "name": "USCustomaryUnits::'foot per hour'",
+  "factor": 8.466666666666667e-05,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "90d58e03-4e4a-5f08-8208-a4acc772eaba": {
+  "name": "USCustomaryUnits::'foot per minute'",
+  "factor": 0.00508,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "2773d313-b262-5146-9a97-fa3bc93df871": {
+  "name": "USCustomaryUnits::'foot per second squared'",
+  "factor": 0.3048,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "bf7b73f8-5d3d-55b5-84e5-77c331e9ebee": {
+  "name": "USCustomaryUnits::'foot per second'",
+  "factor": 0.3048,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "4b2947e2-d41d-54e8-b9db-84118c6d6f4e": {
+  "name": "USCustomaryUnits::'foot pound-force per hour'",
+  "factor": 0.3766161293333334,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "481a3b79-95a8-5769-ba3f-08befed8079a": {
+  "name": "USCustomaryUnits::'foot pound-force per minute'",
+  "factor": 22.596967760000002,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "da94ec06-5d1d-527b-b1e6-91e9ae954b6b": {
+  "name": "USCustomaryUnits::'foot pound-force per second'",
+  "factor": 1355.8180656000002,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "82c9310d-f60c-5dd9-a0e5-6c1c64164ecf": {
+  "name": "USCustomaryUnits::'foot pound-force'",
+  "factor": 1355.8180656000002,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "cd588078-6460-5fd4-8fa0-8651964ac97b": {
+  "name": "USCustomaryUnits::'foot poundal'",
+  "factor": 42.14011,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "5ad9970d-5f2a-54f2-af8d-5e9d6038734d": {
+  "name": "USCustomaryUnits::'foot to the fourth power'",
+  "factor": 0.008630974841241602,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 4.0
+  }
+ },
+ "0c514c41-0f93-558d-898f-8dc00ea04e4c": {
+  "name": "USCustomaryUnits::'gallon (US) per day'",
+  "factor": 1.1574074074074073e-05,
+  "base": {
+   "660408c7-0673-521d-81d5-3750389fc466": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "e1fcccf3-211c-55f2-87ab-20c610bfda58": {
+  "name": "USCustomaryUnits::'gallon (US) per minute (gpm)'",
+  "factor": 0.016666666666666666,
+  "base": {
+   "660408c7-0673-521d-81d5-3750389fc466": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "660408c7-0673-521d-81d5-3750389fc466": {
+  "name": "USCustomaryUnits::'gallon (US)'",
+  "factor": 1.0,
+  "base": {
+   "660408c7-0673-521d-81d5-3750389fc466": 1
+  }
+ },
+ "967a750f-4ddd-5e4f-bf68-25b226b46baf": {
+  "name": "USCustomaryUnits::'gill (US)'",
+  "factor": 1.0,
+  "base": {
+   "967a750f-4ddd-5e4f-bf68-25b226b46baf": 1
+  }
+ },
+ "39b49c72-9718-5118-99d7-8e0d4ce26817": {
+  "name": "USCustomaryUnits::'grain per gallon (US)'",
+  "factor": 0.06479891,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "660408c7-0673-521d-81d5-3750389fc466": -1
+  }
+ },
+ "c165bf6d-81aa-50f7-ba91-1f28ef4d364d": {
+  "name": "USCustomaryUnits::'horsepower (550 ft*lbf/s)'",
+  "factor": 745699.8999999999,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "e465ac08-a88a-5297-ad30-4c6b00ad3628": {
+  "name": "USCustomaryUnits::'horsepower (boiler)'",
+  "factor": 9809500.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "2b5285eb-ad96-5b0f-8cc8-30e72d096fa0": {
+  "name": "USCustomaryUnits::'horsepower (electric)'",
+  "factor": 746000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "c9b789e2-6871-5c03-b318-1a83c79630f2": {
+  "name": "USCustomaryUnits::'horsepower (water)'",
+  "factor": 746043.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "9093de4b-f9d7-51c8-ac70-453c8536e1f1": {
+  "name": "USCustomaryUnits::'hundredweight (long, 112 lb)'",
+  "factor": 50802.35,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "2e42bfd5-8fd4-581f-bf1d-7776ba7b5b02": {
+  "name": "USCustomaryUnits::'hundredweight (short, 100 lb)'",
+  "factor": 45359.24,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "ad5d2b9c-0bd6-535d-9fbf-ef49c1ad41b9": {
+  "name": "USCustomaryUnits::'inch of mercury (32 °F)'",
+  "factor": 3386380.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "aa8fc738-3c91-5dfd-8f8b-821141dae5ba": {
+  "name": "USCustomaryUnits::'inch of mercury (60 °F)'",
+  "factor": 3376850.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "a76b8eaa-50ec-5b9a-b52d-7a56351526c2": {
+  "name": "USCustomaryUnits::'inch of mercury, conventional'",
+  "factor": 3386389.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "23e72376-43a8-5bc2-a3cf-f7ff159f621b": {
+  "name": "USCustomaryUnits::'inch of water (39.2 °F)'",
+  "factor": 249082.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "af7ec413-7515-5f37-afb0-1771085f4f87": {
+  "name": "USCustomaryUnits::'inch of water (60 °F)'",
+  "factor": 248840.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "84b5a04c-d1b0-56ad-b428-0a0e3b83d41f": {
+  "name": "USCustomaryUnits::'inch of water, conventional'",
+  "factor": 249088.9,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "87d35ba7-6994-5658-86d0-132ec8b0cc32": {
+  "name": "USCustomaryUnits::'inch per second squared'",
+  "factor": 0.0254,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "1c1eafa6-8fcb-5c02-a0ed-f17ba254866c": {
+  "name": "USCustomaryUnits::'inch per second'",
+  "factor": 0.0254,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "ea77e1e2-347e-5cd1-8c3d-b29cfb4ee697": {
+  "name": "USCustomaryUnits::'inch to the fourth power'",
+  "factor": 4.162314255999999e-07,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 4.0
+  }
+ },
+ "d533497c-985f-5e3d-b7ee-bbdb4a31ab3b": {
+  "name": "USCustomaryUnits::'kip (1 kip = 1000 lbf)'",
+  "factor": 4448222.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "584cb854-b540-5834-918c-e6b82fcf7320": {
+  "name": "USCustomaryUnits::'kip per square inch (ksi)'",
+  "factor": 6894757889.5157795,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "e02773ee-bd46-5ab3-8fa9-460eb524c558": {
+  "name": "USCustomaryUnits::'knot (nautical mile per hour)'",
+  "factor": 1.0,
+  "base": {
+   "e02773ee-bd46-5ab3-8fa9-460eb524c558": 1
+  }
+ },
+ "0a4d330d-07cd-57cc-8074-5adb66e6a1cf": {
+  "name": "USCustomaryUnits::'lumen per square foot'",
+  "factor": 10.763910416709722,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "8c3493e5-0bd6-53f9-9baf-bfbf78a906d2": {
+  "name": "USCustomaryUnits::'mil (0.001 in)'",
+  "factor": 2.54e-05,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "a609ce39-c998-5fb8-a319-55e2459d9a9f": {
+  "name": "USCustomaryUnits::'mile (based on US survey foot)'",
+  "factor": 1609.347,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "afcdc40c-676d-5f5d-893b-7fc78d087d1f": {
+  "name": "USCustomaryUnits::'mile per hour'",
+  "factor": 0.44704,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "8383d9f5-9a05-5549-bb27-4ca99a33c752": {
+  "name": "USCustomaryUnits::'mile per minute'",
+  "factor": 26.822400000000002,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "e9766d71-c7cf-53a0-9655-9c90f5ef9874": {
+  "name": "USCustomaryUnits::'mile per second'",
+  "factor": 1609.344,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "69077ab7-53d1-52bc-81af-35444deb2dd8": {
+  "name": "USCustomaryUnits::'mile, nautical'",
+  "factor": 1852.0,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "ba831e71-8859-5154-9fb3-10e87d1f38f2": {
+  "name": "USCustomaryUnits::'ohm circular-mil per foot'",
+  "factor": 1.0,
+  "base": {
+   "ba831e71-8859-5154-9fb3-10e87d1f38f2": 1
+  }
+ },
+ "13c177e7-e022-5ffa-99be-b67ea4fcb891": {
+  "name": "USCustomaryUnits::'ounce (US fluid)'",
+  "factor": 1.0,
+  "base": {
+   "13c177e7-e022-5ffa-99be-b67ea4fcb891": 1
+  }
+ },
+ "bfc0a142-1ce4-58aa-84d3-7e85e4011070": {
+  "name": "USCustomaryUnits::'ounce (avoirdupois) per cubic inch'",
+  "factor": 1729993.8536884948,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "1c7a7e7f-9d8d-573a-95c1-858778a0d13d": {
+  "name": "USCustomaryUnits::'ounce (avoirdupois) per gallon (US)'",
+  "factor": 28.34952,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "660408c7-0673-521d-81d5-3750389fc466": -1
+  }
+ },
+ "f770fd87-4467-5bfb-b139-538f4c110e8e": {
+  "name": "USCustomaryUnits::'ounce (avoirdupois) per square foot'",
+  "factor": 305.15169363672055,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "8e8f4a31-81d3-57a9-93a4-cf3fc4206200": {
+  "name": "USCustomaryUnits::'ounce (avoirdupois) per square inch'",
+  "factor": 43941.84388368777,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "3d322edb-1070-572f-b438-070edc5d43d6": {
+  "name": "USCustomaryUnits::'ounce (avoirdupois) per square yard'",
+  "factor": 33.905743737413395,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "8638b882-7579-5f82-b331-fe37191730e5": {
+  "name": "USCustomaryUnits::'ounce (avoirdupois)'",
+  "factor": 28.34952,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "daa17038-e1d7-5e2c-94a1-176afb4526c3": {
+  "name": "USCustomaryUnits::'ounce (avoirdupois)-force inch'",
+  "factor": 7.06155306,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "7e482343-78de-5fbc-b58d-8a51a552f2a3": {
+  "name": "USCustomaryUnits::'ounce (avoirdupois)-force'",
+  "factor": 278.0139,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "9c19bd8e-ecf5-50c4-8da4-a4ab6a74cfc6": {
+  "name": "USCustomaryUnits::'peck (US)'",
+  "factor": 1.0,
+  "base": {
+   "9c19bd8e-ecf5-50c4-8da4-a4ab6a74cfc6": 1
+  }
+ },
+ "3f8e8f20-0196-5628-bf71-fb8ce446c80c": {
+  "name": "USCustomaryUnits::'pica (computer) (1/6 in)'",
+  "factor": 0.004233333,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "cda8ec27-4709-5c66-babd-e792b3480b10": {
+  "name": "USCustomaryUnits::'pica (printer′s)'",
+  "factor": 0.004217518,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "9c16934a-f97c-52f6-b475-10cc960db0f9": {
+  "name": "USCustomaryUnits::'pint (US dry)'",
+  "factor": 1.0,
+  "base": {
+   "9c16934a-f97c-52f6-b475-10cc960db0f9": 1
+  }
+ },
+ "56caa001-911c-5cf7-bdee-4a65a6afc276": {
+  "name": "USCustomaryUnits::'pint (US liquid)'",
+  "factor": 1.0,
+  "base": {
+   "56caa001-911c-5cf7-bdee-4a65a6afc276": 1
+  }
+ },
+ "b22ee98d-c6ad-55d4-aada-c4bd499160d9": {
+  "name": "USCustomaryUnits::'point (computer) (1/72 in)'",
+  "factor": 0.0003527778,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "f51ab9ba-ef00-58e2-a270-8381e4b10d3f": {
+  "name": "USCustomaryUnits::'point (printer′s)'",
+  "factor": 0.0003514598,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "f7a0a681-9e2d-5694-82bf-cc5f04b10cd1": {
+  "name": "USCustomaryUnits::'pound (avoirdupois)'",
+  "factor": 453.5924,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "689456c7-51b8-5c53-ab65-8c1ab645135e": {
+  "name": "USCustomaryUnits::'pound foot squared'",
+  "factor": 42.140112880896005,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "15326c8c-0c2b-555f-8f7b-09a9dbb2aa4e": {
+  "name": "USCustomaryUnits::'pound inch squared'",
+  "factor": 0.292639672784,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "cbc802b6-8c5e-524f-a3b1-20e3b66ea6c6": {
+  "name": "USCustomaryUnits::'pound per cubic foot'",
+  "factor": 16018.464433400139,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "88475014-748d-5441-8117-a3803a00691a": {
+  "name": "USCustomaryUnits::'pound per cubic inch'",
+  "factor": 27679906.54091545,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "4735faf1-a3d6-5acb-b905-9b03a25d1068": {
+  "name": "USCustomaryUnits::'pound per cubic yard'",
+  "factor": 593.2764604963015,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "5917b176-e05f-55d0-bfbc-c82c53e175e6": {
+  "name": "USCustomaryUnits::'pound per foot hour'",
+  "factor": 0.41337890055409743,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "d248fcdc-0052-5789-b1dd-43435e0494a5": {
+  "name": "USCustomaryUnits::'pound per foot second'",
+  "factor": 1488.1640419947505,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "03532f91-aff3-5d6a-b36b-52f3bdc982fb": {
+  "name": "USCustomaryUnits::'pound per foot'",
+  "factor": 1488.1640419947505,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1
+  }
+ },
+ "ebff1d7f-d68b-532e-8086-9c1489703dd9": {
+  "name": "USCustomaryUnits::'pound per gallon (US)'",
+  "factor": 453.5924,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "660408c7-0673-521d-81d5-3750389fc466": -1
+  }
+ },
+ "21f48106-47dd-562e-a7c5-25205788dc40": {
+  "name": "USCustomaryUnits::'pound per hour'",
+  "factor": 0.12599788888888888,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "092ca704-190c-5eff-904e-37502b7f167e": {
+  "name": "USCustomaryUnits::'pound per inch'",
+  "factor": 17857.96850393701,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1
+  }
+ },
+ "d7280ff4-7986-526d-921d-01a4ec22c675": {
+  "name": "USCustomaryUnits::'pound per minute'",
+  "factor": 7.559873333333333,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "d03d1b0c-0c0c-5c35-92be-58dea0b9f253": {
+  "name": "USCustomaryUnits::'pound per second'",
+  "factor": 453.5924,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "ed3c36bd-54eb-5763-9c4d-585ea9f59436": {
+  "name": "USCustomaryUnits::'pound per square foot'",
+  "factor": 4882.427959300363,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "889dae4a-1bae-5831-bce1-3a22a3bedecb": {
+  "name": "USCustomaryUnits::'pound per square inch (not pound-force)'",
+  "factor": 703069.6261392523,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "3449cf85-e50a-5110-984d-daf6531d261c": {
+  "name": "USCustomaryUnits::'pound per yard'",
+  "factor": 496.0546806649169,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1
+  }
+ },
+ "bfa24abd-face-5ea7-8d89-406857d9c399": {
+  "name": "USCustomaryUnits::'pound-force foot per inch'",
+  "factor": 53378.66400000001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "06264068-63d5-5091-8fb5-b82c26eb6ad4": {
+  "name": "USCustomaryUnits::'pound-force foot'",
+  "factor": 1355.8180656000002,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "7ac79952-5e9e-5349-b500-93ab9db2f638": {
+  "name": "USCustomaryUnits::'pound-force inch per inch'",
+  "factor": 4448.222000000001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "1a86f6e1-5835-5c20-a889-4c1d1bba4330": {
+  "name": "USCustomaryUnits::'pound-force inch'",
+  "factor": 112.9848388,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "011774b0-fc42-5601-8271-9884e156f7e5": {
+  "name": "USCustomaryUnits::'pound-force per foot'",
+  "factor": 14593.904199475066,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "15f430dc-c0d6-5653-807f-bae158c2effd": {
+  "name": "USCustomaryUnits::'pound-force per inch'",
+  "factor": 175126.85039370082,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "e8f08382-0591-57cd-a52d-298f9716a1e0": {
+  "name": "USCustomaryUnits::'pound-force per square foot'",
+  "factor": 47880.26312163736,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "76536f72-ab6b-5197-8fef-1ce6d477b217": {
+  "name": "USCustomaryUnits::'pound-force per square inch (psi)'",
+  "factor": 6894757.889515781,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "f4a558cb-0a0e-5440-8bba-40633dbe1f13": {
+  "name": "USCustomaryUnits::'pound-force per square inch'",
+  "factor": 6894757.889515781,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "feddd172-7de8-521f-9f0f-6db7e349fd53": {
+  "name": "USCustomaryUnits::'pound-force second per square foot'",
+  "factor": 47880.26312163736,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "0e4f0b09-9dc6-57b4-bc99-fc3b21c7ba5f": {
+  "name": "USCustomaryUnits::'pound-force second per square inch'",
+  "factor": 6894757.889515781,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1.0
+  }
+ },
+ "7d26ef02-dcd7-5cf2-81ca-d45ace63555f": {
+  "name": "USCustomaryUnits::'pound-force'",
+  "factor": 4448.222000000001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "5808f455-d278-534e-91e9-585a11eb211f": {
+  "name": "USCustomaryUnits::'quad (10^15 Btu_IT)'",
+  "factor": 1.055056e+21,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "619de802-cc64-548c-bf12-a9f52604cdb1": {
+  "name": "USCustomaryUnits::'quart (US dry)'",
+  "factor": 1.0,
+  "base": {
+   "619de802-cc64-548c-bf12-a9f52604cdb1": 1
+  }
+ },
+ "ad048538-0801-532b-8704-9d82f821c292": {
+  "name": "USCustomaryUnits::'quart (US liquid)'",
+  "factor": 1.0,
+  "base": {
+   "ad048538-0801-532b-8704-9d82f821c292": 1
+  }
+ },
+ "2109727d-72c9-587a-a23c-4fd95b00f566": {
+  "name": "USCustomaryUnits::'rod (based on US survey foot)'",
+  "factor": 5.02921,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "7c9dee03-260c-5811-8d02-79ff0dbd9882": {
+  "name": "USCustomaryUnits::'slug per cubic foot'",
+  "factor": 515378.71466673224,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -3.0
+  }
+ },
+ "2484f447-2476-572c-93b5-fe9f96e5b48d": {
+  "name": "USCustomaryUnits::'slug per foot second'",
+  "factor": 47880.249343832016,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "6255e94e-f020-5af5-849e-0cd372a4c5ab": {
+  "name": "USCustomaryUnits::'square foot per hour'",
+  "factor": 2.58064e-05,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "d4a19960-37ff-5ddd-993b-677a074b9790": {
+  "name": "USCustomaryUnits::'square foot per second'",
+  "factor": 0.09290304,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -1
+  }
+ },
+ "71e3a3bc-28ac-5e56-bc18-d80dfceb2bae": {
+  "name": "USCustomaryUnits::'square foot'",
+  "factor": 0.09290304,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "eebf8074-d4eb-5d79-b346-4bc42bfa8e3f": {
+  "name": "USCustomaryUnits::'square inch'",
+  "factor": 0.00064516,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "10e920d6-5b76-5d3f-be7f-6ded2f7acc7a": {
+  "name": "USCustomaryUnits::'square mile (based on US survey foot)'",
+  "factor": 1.0,
+  "base": {
+   "10e920d6-5b76-5d3f-be7f-6ded2f7acc7a": 1
+  }
+ },
+ "e83b71a3-750c-54a8-b3dc-5ae68dd70746": {
+  "name": "USCustomaryUnits::'square mile'",
+  "factor": 2589988.110336,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "c1c0cabb-6e33-500a-b436-93f1774c6006": {
+  "name": "USCustomaryUnits::'square yard'",
+  "factor": 0.83612736,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2.0
+  }
+ },
+ "61e17298-8bef-5fa9-9446-e6482f048eb3": {
+  "name": "USCustomaryUnits::'therm (EC)'",
+  "factor": 105506000000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "08e00a4e-9f97-552e-8119-71fa2bf6fcca": {
+  "name": "USCustomaryUnits::'therm (US)'",
+  "factor": 105480400000.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "a5c9e940-140f-590f-94ed-6a2d18e52dd2": {
+  "name": "USCustomaryUnits::'ton of refrigeration (12 000 Btu_IT/h)'",
+  "factor": 3516853.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "fd1f7107-d6eb-5f44-b675-e3c2e5193bc5": {
+  "name": "USCustomaryUnits::'ton, assay'",
+  "factor": 29.16667,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "de01bcbb-a1ea-5197-8247-259a4a2f6fed": {
+  "name": "USCustomaryUnits::'ton, long (2240 lb)'",
+  "factor": 1016047.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "f1015ce8-4a41-5fcc-b966-86f13edb9c6b": {
+  "name": "USCustomaryUnits::'ton, long, per cubic yard'",
+  "factor": 1.0,
+  "base": {
+   "f1015ce8-4a41-5fcc-b966-86f13edb9c6b": 1
+  }
+ },
+ "c8541220-3a70-527d-a745-032d6580b46e": {
+  "name": "USCustomaryUnits::'ton, register'",
+  "factor": 1.0,
+  "base": {
+   "c8541220-3a70-527d-a745-032d6580b46e": 1
+  }
+ },
+ "cb1747e8-bb14-57dd-9d37-a8c1473c9e2e": {
+  "name": "USCustomaryUnits::'ton, short (2000 lb)'",
+  "factor": 907184.7000000001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "6110330c-6453-57e7-a24c-e81025382ae4": {
+  "name": "USCustomaryUnits::'ton, short, per cubic yard'",
+  "factor": 1.0,
+  "base": {
+   "6110330c-6453-57e7-a24c-e81025382ae4": 1
+  }
+ },
+ "938465eb-7836-5102-ba57-79f83ac51aec": {
+  "name": "USCustomaryUnits::'ton, short, per hour'",
+  "factor": 1.0,
+  "base": {
+   "938465eb-7836-5102-ba57-79f83ac51aec": 1
+  }
+ },
+ "1553cd66-5bc3-5da7-a635-1cf7aa3f83f3": {
+  "name": "USCustomaryUnits::'ton-force (2000 lbf)'",
+  "factor": 8896443.0,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0
+  }
+ },
+ "7c72df6c-039a-5ea2-83c5-97fe3b81ca06": {
+  "name": "USCustomaryUnits::'unit pole'",
+  "factor": 0.0001256637,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 2,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -2.0,
+   "06adb072-715e-5571-88cf-865a33b484f9": -1
+  }
+ },
+ "b7595978-89cd-51e6-be9e-a8e492e84454": {
+  "name": "USCustomaryUnits::'watt per square inch'",
+  "factor": 1550003.1000062001,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1,
+   "0c636dab-938a-5842-8b67-b00e667a2687": -3.0
+  }
+ },
+ "4f115869-36cd-5330-9956-00981b0f1a07": {
+  "name": "USCustomaryUnits::clo",
+  "factor": 1.0,
+  "base": {
+   "4f115869-36cd-5330-9956-00981b0f1a07": 1
+  }
+ },
+ "a8899acb-a29f-5c54-b954-386a9458e405": {
+  "name": "USCustomaryUnits::foot",
+  "factor": 0.3048,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "693272c7-6f07-57d3-a5a1-16ac77bb9fcf": {
+  "name": "USCustomaryUnits::footcandle",
+  "factor": 10.76391,
+  "base": {
+   "7fe9861a-c44d-5f36-84ce-ea07626ac8d1": 1,
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": -2.0
+  }
+ },
+ "21845365-a893-5faa-91df-4419e6547934": {
+  "name": "USCustomaryUnits::footlambert",
+  "factor": 1.0,
+  "base": {
+   "21845365-a893-5faa-91df-4419e6547934": 1
+  }
+ },
+ "a364c976-4b65-57da-be4e-5e93bda6fbf4": {
+  "name": "USCustomaryUnits::grain",
+  "factor": 0.06479891,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "f7114c5d-fe05-5169-8871-9ab40616455a": {
+  "name": "USCustomaryUnits::inch",
+  "factor": 0.0254,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "aca131a7-1c43-5c21-bab1-1452d256748d": {
+  "name": "USCustomaryUnits::microinch",
+  "factor": 2.54e-08,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "ae1ec1f5-e4c6-5e5f-9264-5053c1134e8f": {
+  "name": "USCustomaryUnits::mile",
+  "factor": 1609.344,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ },
+ "cef531d8-ee78-5083-82aa-8bea354cbb94": {
+  "name": "USCustomaryUnits::slug",
+  "factor": 14593.9,
+  "base": {
+   "f73ef676-3b1b-573d-876a-0eb0ef4bdbac": 1
+  }
+ },
+ "8358e3c9-9bb4-59e6-a7d6-11c1769e3d52": {
+  "name": "USCustomaryUnits::tablespoon",
+  "factor": 1.0,
+  "base": {
+   "8358e3c9-9bb4-59e6-a7d6-11c1769e3d52": 1
+  }
+ },
+ "639c1d38-3b6b-5b14-a274-ca4f706b8d14": {
+  "name": "USCustomaryUnits::teaspoon",
+  "factor": 1.0,
+  "base": {
+   "639c1d38-3b6b-5b14-a274-ca4f706b8d14": 1
+  }
+ },
+ "56cf08c0-ad4f-500b-87fb-3cd0158e6a89": {
+  "name": "USCustomaryUnits::yard",
+  "factor": 0.9144,
+  "base": {
+   "162f488b-aaa7-5c0a-9e1b-3a2d986bfbd8": 1
+  }
+ }
+}

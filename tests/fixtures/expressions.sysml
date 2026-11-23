@@ -12,6 +12,7 @@ package Expressions {
         attribute ip : String = "IP5K4";
         attribute cycles : Integer = 200000;
         attribute lum = 20 [cd / m^2];
+        attribute length : LengthValue = 500 [m];
         attribute ok : Boolean = true;
         attribute unset : Integer;
         part a { attribute nad : Integer = 33; }
@@ -31,7 +32,13 @@ package Expressions {
         constraint failsCycles { cycles >= 300000 }
         constraint failsIp { ip == "IP6K9K" }
 
-        constraint unitsDiffer { mass <= 0.06 [kg] }
+        constraint convertsMass { mass <= 0.06 [kg] }
+        constraint convertsDerived { force >= 4 [kg*m/s^2] }
+        constraint convertsLength { length <= 1 [km] }
+        constraint convertsBoundary { mass >= 0.048 [kg] }
+        constraint failsConverted { mass >= 0.05 [kg] }
+        constraint dimensionsDiffer { mass <= 1 [m] }
+        constraint temperatureOffset { minTemp <= 233.15 [K] }
         constraint noValue { a.nad != unset }
         constraint arithmetic { cycles * 2 >= 1 }
     }
