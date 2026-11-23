@@ -66,3 +66,18 @@ jobs:
         with: { name: sysml, path: bin }
       - run: chmod +x bin/sysml && echo "$PWD/bin" >> "$GITHUB_PATH"
       - run: python tests/omg_corpus.py
+
+  # conformance: the examples and the authoring patterns must validate clean in the OMG Pilot Implementation
+  pilot:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/pilot
+          key: pilot-${{ hashFiles('tests/pilot.py') }}
+      - run: python tests/pilot.py ~/pilot

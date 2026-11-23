@@ -18,7 +18,7 @@ SysML v2 was adopted in 2025, so a language model asked to write it produces som
 
 The method is fixed and documented, and built for a supplier answering a customer RFQ: customer requirements (CRS, Markdown) → use cases and system requirements (UC/SR) → features and functions (FEAT/F) → logical components and interfaces (LC/LI) → physical components and interfaces in mechanical, electrical or software (PC/PI) → system and acceptance tests (STC/ATC) → test results. The supplier's platform (reusable features, components and variants) is a separate project that an RFQ project imports and reuses by subsetting. The docs show per customer requirement which feature meets it, how much comes from the platform (derived from the model, never claimed), and whether the match is partial; requirements no component can meet are answered by compliance statements (CST). Every customer requirement carries a class (functional, non-functional, constraint, information): plain values become constraints (CON) in the model, and the customer's own tests (CTR) are implemented by the supplier's system and acceptance tests. Each layer has its own agent, an interview skill asks the user only what the inputs leave open, and the workflow stops for your approval between layers. Terms and abbreviations are in the [glossary](glossary.md).
 
-It is not a modeling GUI and it does not simulate. Software components keep linking to code and tests in sphinx-needs. The toolchain is Python and Rust only, with no Java or Eclipse.
+It is not a modeling GUI and it does not simulate. Software components keep linking to code and tests in sphinx-needs. The toolchain is Python and Rust only, with no Java or Eclipse; CI alone runs the OMG Pilot Implementation (Java) as a conformance check.
 
 ## What you get
 
@@ -138,7 +138,7 @@ The pipeline was chosen by an evaluation on 2026-11-07, Python or Rust only, aga
 | sysmlpy 0.105.0 (Python) | 249/252 | 36 of 54 validation files with false errors; ~53 s/file with library | grammar parse tree | PlantUML (needs Java) |
 | sysml-v2-parser (Rust) | not tested | parser only | – | – |
 
-There is no OMG Pilot Implementation gate (Java/Eclipse is out); the corpus run is the substitute.
+On top of the corpus run, CI checks the examples and the authoring patterns with the OMG Pilot Implementation, the reference implementation (`tests/pilot.py`, kernel 0.63.1 of release 2026-09.1): they must parse, resolve and validate clean there as well. It runs only in CI, so a project needs no Java. It has caught what `sysml` accepts: `frame` used as a name (a keyword), `#Electrical variation part` (the standard order is `variation #Electrical part`), and a nested feature named with `::` in a subsetting (`a::b::c` where the standard wants `a::b.c`).
 
 ## Known limits
 
@@ -158,6 +158,7 @@ There is no OMG Pilot Implementation gate (Java/Eclipse is out); the corpus run 
 PYTHONPATH=src python -m unittest discover -s tests        # bridge and renderers
 python tests/acceptance.py                                  # example build + mutations (needs the tools)
 python tests/omg_corpus.py                                  # OMG release corpus through the pipeline
+python tests/pilot.py                                       # examples and patterns in the OMG Pilot Implementation (JDK 21+)
 claude plugin validate .                                    # marketplace and plugin manifests
 ruff check . && ruff format --check .                      # lint and format (CI pins ruff 0.17.4)
 ```

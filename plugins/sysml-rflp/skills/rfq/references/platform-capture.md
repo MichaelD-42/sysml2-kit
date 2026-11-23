@@ -7,7 +7,7 @@ Use when the project is the platform itself (same layout as an RFQ project, no `
 Inputs: a BOM or parts list, the code repository, layouts, datasheets. For each item that is built or bought, create a PC with `physical-architect` conventions:
 
 - `#Mechanical`, `#Electrical` or `#Software part <'WSW-PC-nnn'> name`, exactly one domain; the `doc` names the BOM item or code module. Mechanical and electrical items come from the BOM, software from the code repository.
-- Variants of one part (left- and right-hand housing) are `#Mechanical variation part` with `variant #Mechanical part` members, each with its own id.
+- Variants of one part (left- and right-hand housing) are `variation #Mechanical part` with `variant #Mechanical part` members, each with its own id.
 - The product as built is an `#Assembly part <'WSW-PC-nnn'>` (no domain) typed by a part definition that states the rated values; the platform's constraints sit on it or its definition. The logical switch is not typed by it.
 - Physical interfaces (`port <'WSW-PI-nnn'>`: connector, flange, bus message) where another part attaches.
 - Software PCs get `swreq` needs in `docs/software/*.md` (`:allocated_to:` the SW component or unit) and links to code and tests.

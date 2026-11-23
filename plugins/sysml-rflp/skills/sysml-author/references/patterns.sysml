@@ -121,7 +121,7 @@ package PumpPatterns {
     allocate pumpSystem.pump to pumpFirmware.motorControl;   // LC => SW component, not to its units
 
     // --- P: variation (platform side): variants are members; ids on variants need the kit's sysml fork ---
-    #Electrical variation part <'PC-103'> controller {
+    variation #Electrical part <'PC-103'> controller {
         doc /* Pump controller family. */
         variant #Electrical part <'PC-104'> controllerBasic { doc /* Fixed speed. */ }
         variant #Electrical part <'PC-105'> controllerPwm { doc /* Speed control by PWM. */ }

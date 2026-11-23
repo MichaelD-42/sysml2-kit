@@ -31,7 +31,7 @@ package WindowSwitchItems {
     port def KeyPort { doc /* Delivers key states. */ out item keyState : KeyState; }
     port def LinPort {
         doc /* The single-wire LIN bus, referenced to KL31. */
-        inout item frame : LinFrame;
+        inout item linFrame : LinFrame;
         inout item wakeUp : WakeUpPulse;
     }
     port def UartPort { doc /* TxD and RxD between the LIN transceiver and the microcontroller UART. */ }

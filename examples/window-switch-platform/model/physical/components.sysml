@@ -90,7 +90,7 @@ package WindowSwitchPhysical {
     }
 
     // the key contacts sit on the PCB; the key module decides which are fitted, an RFQ selects one per door
-    #Electrical variation part <'WSW-PC-004'> keyModule : KeyModule {
+    variation #Electrical part <'WSW-PC-004'> keyModule : KeyModule {
         doc /* Key contact population of the PCB, two-stage tact switches per window key, BOM WSW-KEY-400. */
         variant #Electrical part <'WSW-PC-005'> fourKey {
             doc /* Driver door: four window keys and the child-lock key, BOM WSW-KEY-410. */
@@ -103,7 +103,7 @@ package WindowSwitchPhysical {
             attribute :>> childLockKey = false;
         }
     }
-    #Electrical variation part <'WSW-PC-007'> backlight : Backlight {
+    variation #Electrical part <'WSW-PC-007'> backlight : Backlight {
         doc /* Symbol backlight LEDs, BOM WSW-LED-500. */
         variant #Electrical part <'WSW-PC-008'> whiteLeds {
             doc /* White symbol LEDs, BOM WSW-LED-510. */
