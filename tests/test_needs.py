@@ -365,6 +365,37 @@ class ConnectsMappingTest(unittest.TestCase):
             self.assertEqual(n["LI-2"]["type"], "interface")
             self.assertEqual(n["LI-2"]["connects"], ["LI-1", "LC-3"], kind)
 
+    def test_perform_in_a_feature_realizes_it(self):
+        n = needs_of(
+            model(
+                feat=el("feat", "ActionUsage", "FEAT-9", "drive", owner="pkg"),
+                kw=el(
+                    "kw",
+                    "MetadataUsage",
+                    owner="feat",
+                    type=ids("featdef"),
+                    annotatedElement=ids("feat"),
+                ),
+                featdef={
+                    **el("featdef", "MetadataDefinition", name="Feature"),
+                    "qualifiedName": "Trace::Feature",
+                },
+                pf=el(
+                    "pf",
+                    "PerformActionUsage",
+                    owner="feat",
+                    ownedReferenceSubsetting=ids("rs2"),
+                ),
+                rs2={
+                    "@id": "rs2",
+                    "@type": "ReferenceSubsetting",
+                    "referencedFeature": {"@id": "f1"},
+                },
+            )
+        )
+        self.assertEqual(n["FEAT-9"]["type"], "feature")
+        self.assertEqual(n["F-1"]["realizes"], ["FEAT-9"])
+
     def test_mapping(self):
         mapping = {
             "keywords": {"Arch::External": "external"},

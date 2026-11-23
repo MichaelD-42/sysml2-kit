@@ -34,6 +34,25 @@ class MystTest(unittest.TestCase):
         self.assertNotIn(":satisfies:", text)
         self.assertNotIn(":medium:", text)
 
+    def test_links_merge_and_fields_rename(self):
+        need = {
+            "id": "F_2",
+            "type": "function",
+            "title": "t",
+            "content": "",
+            "owned_by": ["F_1"],
+            "part_of": ["P_1", "F_1"],
+            "v": "both",
+        }
+        text = to_myst(
+            {"F_2": need},
+            {
+                "links": {"owned_by": "part_of", "part_of": "part_of"},
+                "fields": {"v": "variant"},
+            },
+        )
+        self.assertIn(":id: F_2\n:variant: both\n:part_of: F_1,P_1\n:::", text)
+
     def test_mapping_renames_and_selects(self):
         mapping = {
             "types": {"component": "lcomp"},

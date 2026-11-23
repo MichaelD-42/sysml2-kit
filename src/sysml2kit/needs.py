@@ -359,9 +359,9 @@ def convert(elements, locations, platform_files=(), warnings=None, mapping=None)
                 target = end if end in need_of else owning_need(end)
                 link("connects", e["@id"], target or end, need_of[e["@id"]])
         elif t == "PerformActionUsage":
-            # `perform f;` inside a use case: the function realizes the use case
+            # `perform f;` inside a use case or a feature: f realizes it
             use_case = owning_need(e["@id"])
-            if use_case and needs[need_of[use_case]]["type"] == "usecase":
+            if use_case and needs[need_of[use_case]]["type"] in ("usecase", "feature"):
                 for sub in refs(e, "ownedReferenceSubsetting"):
                     link(
                         "realizes",
