@@ -171,7 +171,8 @@ class Model:
 
     def __init__(self, elements):
         self.by_id = {e["@id"]: e for e in elements}
-        self.children, self.generals, self.text, self.results = {}, {}, {}, {}
+        self.children, self.generals, self.specifics = {}, {}, {}
+        self.text, self.results = {}, {}
         for e in elements:
             owner = (e.get("owner") or {}).get("@id")
             if owner and e.get("name") and not e["@type"].endswith("Membership"):
@@ -181,6 +182,7 @@ class Model:
                 general = (e.get("general") or {}).get("@id")
                 if specific and general:
                     self.generals.setdefault(specific, []).append(general)
+                    self.specifics.setdefault(general, []).append(specific)
             if e["@type"] == "ResultExpressionMembership":
                 # a relationship's owner is its owningRelatedElement; sysml 0.1.4 also wrote `owner`
                 constraint = (
@@ -191,11 +193,11 @@ class Model:
             if e["@type"] == "TextualRepresentation" and e.get("representedElement"):
                 self.text[e["representedElement"]["@id"]] = e.get("body", "")
 
-    def closure(self, start):
-        """start, then what it specializes, nearest first."""
+    def closure(self, start, edges=None):
+        """start, then what it specializes (or, given `self.specifics`, what specializes it), nearest first."""
         seen, order = {start}, [start]
         for element in order:
-            for g in self.generals.get(element, []):
+            for g in (self.generals if edges is None else edges).get(element, []):
                 if g not in seen:
                     seen.add(g)
                     order.append(g)
@@ -238,14 +240,25 @@ class Model:
                 return self.text[owned["@id"]]
         raise Unevaluable("no body")
 
-    def check(self, constraint):
-        """(holds, text, {chain: value text}) for a constraint in the context of its owner."""
-        text = self.body(constraint)
+    def contexts(self, constraint):
+        """Where the constraint applies: its owner and everything that specializes the owner, as a
+        specialization inherits its general's features; not where a nearer constraint redefines it."""
         owner = self.by_id[constraint]["owner"]["@id"]
+        name = self.by_id[constraint].get("name")
+        return [
+            c
+            for c in self.closure(owner, self.specifics)
+            if not name or self.feature(c, name) == constraint
+        ]
+
+    def check(self, constraint, context=None):
+        """(holds, text, {chain: value text}) for a constraint in a context, by default its owner."""
+        text = self.body(constraint)
+        start = context or self.by_id[constraint]["owner"]["@id"]
         values = {}
 
         def lookup(chain):
-            context = owner
+            context = start
             for name in chain:
                 context = self.feature(context, name)
             values[".".join(chain)] = self.value(context)

@@ -145,7 +145,7 @@ There is no OMG Pilot Implementation gate (Java/Eclipse is out); the corpus run 
 - `sysml` accepts `satisfy`/`allocate` ends that are definitions; the spec types them as features. Model traced elements as usages (the authoring skill says so); the tool will not stop you.
 - Its built-in standard library is 2026-05, not the 2026-09.1 release.
 - No derive/refine mapping: SysML v2 has no `refine` keyword.
-- The constraint evaluator covers `and`, `or`, `not`, comparisons, numbers with a unit in brackets, strings, booleans and feature chains, and compares quantities only in the same unit (no `[kg]` against `[g]`). Anything else, or a value nobody states, is a `not evaluated` warning. A constraint is evaluated in its owner's context only, not again in every part that inherits it.
+- The constraint evaluator covers `and`, `or`, `not`, comparisons, numbers with a unit in brackets, strings, booleans and feature chains, and compares quantities only in the same unit (no `[kg]` against `[g]`). Anything else, or a value nobody states, is a `not evaluated` warning. A constraint is evaluated in its owner and again in every part that specializes the owner, with that part's own (redefined) values, unless the part redefines the constraint; an RFQ build skips the platform's own parts.
 - ubCode support for `network_back` schema rules is untested here.
 - The platform is pulled in as a git submodule, or as a checkout the Makefile's `PLATFORM` names, only; sysand packages are not supported. The realization degree follows allocations and `specializes` links into the platform, so reuse written any other way (copying a platform part) counts as new.
 - Reuse is about platform components, not whether a requirement's value is met (that is `partial`).

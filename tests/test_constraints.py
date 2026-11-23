@@ -1,6 +1,9 @@
+import json
 import unittest
+from pathlib import Path
 
-from sysml2kit.constraints import Unevaluable, evaluate
+from sysml2kit.constraints import Model, Unevaluable, evaluate
+from sysml2kit.needs import normalize
 
 VALUES = {
     ("mass",): "48 [g]",
@@ -61,3 +64,26 @@ class EvaluateTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class InheritedTest(unittest.TestCase):
+    """A constraint holds for every part that inherits it, with that part's own values."""
+
+    def setUp(self):
+        path = Path(__file__).parent / "fixtures" / "inherited_constraint.json"
+        self.model = Model(normalize(json.loads(path.read_text())))
+
+    def results(self):
+        constraint = next(
+            e["@id"]
+            for e in self.model.by_id.values()
+            if e.get("declaredShortName") == "CON-1"
+        )
+        return {
+            self.model.by_id[c].get("name"): self.model.check(constraint, c)[0]
+            for c in self.model.contexts(constraint)
+        }
+
+    def test_checked_in_every_inheriting_part(self):
+        # `own` redefines the constraint, so the inherited one does not apply there
+        self.assertEqual(self.results(), {"Rated": True, "weak": False, "fine": True})

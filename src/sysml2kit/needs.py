@@ -481,21 +481,33 @@ def convert(elements, locations, platform_files=(), warnings=None, mapping=None)
                 f"{need['id']}: #Modified needs a platform part to modify; a part of its own is new"
             )
 
+    def is_platform(element_id, default):
+        """Whether the nearest need owning the element (or the element) is the platform's."""
+        nearest = element_id if element_id in need_of else owning_need(element_id)
+        return needs[need_of[nearest]]["platform"] if nearest else default
+
     model = Model(elements)
     for element_id, short in need_of.items():
-        if needs[short]["type"] != "constraint" or (
-            platform_files and needs[short]["platform"]
-        ):
-            continue  # the platform's own build evaluates its constraints
-        try:
-            holds, text, values = model.check(element_id)
-        except Unevaluable as err:
-            if warnings is not None:
-                warnings.append(f"{short}: not evaluated: {err}")
+        if needs[short]["type"] != "constraint":
             continue
-        if not holds:
-            stated = ", ".join(f"{k} = {v}" for k, v in values.items())
-            errors.append(f"{short}: does not hold: {text} ({stated})")
+        owner = ref(by_id[element_id], "owner")
+        for context in model.contexts(element_id):
+            if platform_files and is_platform(context, needs[short]["platform"]):
+                continue  # the platform's own build evaluates its parts
+            where = (
+                ""
+                if context == owner
+                else f" in {need_of.get(context) or name_of(context)}"
+            )
+            try:
+                holds, text, values = model.check(element_id, context)
+            except Unevaluable as err:
+                if warnings is not None:
+                    warnings.append(f"{short}{where}: not evaluated: {err}")
+                continue
+            if not holds:
+                stated = ", ".join(f"{k} = {v}" for k, v in values.items())
+                errors.append(f"{short}{where}: does not hold: {text} ({stated})")
 
     status = reuse(needs)
     for need in needs.values():

@@ -265,6 +265,17 @@ MUTATIONS = [
         r"CON-108: does not hold: mass <= 40 \[g\] \(mass = 42 \[g\]\)",
     ),
     (
+        "an RFQ value that breaks a constraint it inherits from the platform fails the bridge",
+        "all",
+        replace(
+            "model/physical/components.sysml",
+            "the platform switch assembly within this RFQ's limits. */\n",
+            "the platform switch assembly within this RFQ's limits. */\n"
+            "        attribute redefines actuationForce = 7.2 [N];\n",
+        ),
+        r"WSW-CON-001 in PC-100: does not hold: .* \(actuationForce = 7\.2 \[N\]\)",
+    ),
+    (
         "two door positions coded to one node address break the vehicle's constraint",
         "all",
         replace("model/physical/components.sysml", "nad = 43;", "nad = 42;"),
