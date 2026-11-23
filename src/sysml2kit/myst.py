@@ -1,6 +1,11 @@
 """Bridge needs (`sysml2kit needs` output) -> MyST need directives, for a project that keeps its
 needs in Markdown files rather than importing a needs.json."""
 
+import re
+
+# the bridge escapes doc text for reStructuredText (needs.RST_INLINE); Markdown gets the text as written
+RST_ESCAPE = re.compile(r"\\([\\*`_|])")
+
 # shortcut: a doc text holding a line of only `:::` would end the directive early; fence longer if that happens
 
 
@@ -30,6 +35,6 @@ def to_myst(needs, mapping=None, source=""):
             if need.get(link):
                 out.append(f":{name}: {','.join(need[link])}")
         if need.get("content"):
-            out += ["", need["content"]]
+            out += ["", RST_ESCAPE.sub(r"\1", need["content"])]
         out += [":::", ""]
     return "\n".join(out)

@@ -94,6 +94,21 @@ LINK_TYPES = (
     "partial_satisfies",
     "connects",
 )
+# need keys the bridge sets itself; metadata may not overwrite them (`domain` it may)
+RESERVED_FIELDS = {
+    "id",
+    "type",
+    "title",
+    "content",
+    "qualified_name",
+    "sysml_kind",
+    "source",
+    "platform",
+    "variant",
+    "modified",
+    "reuse",
+    "leaf",
+}
 # connector usages whose two ends become a `connects` link to the needs that own them
 CONNECTORS = ("InterfaceUsage", "ConnectionUsage")
 # relationships whose `specific` end specializes the `general` end
@@ -368,7 +383,7 @@ def convert(elements, locations, platform_files=(), warnings=None, mapping=None)
                     errors.append(
                         f"@{types[0]}: needs a short-named element and one string"
                     )
-                elif field in needs[src] and field not in field_metadata.values():
+                elif field in RESERVED_FIELDS or field in link_types:
                     errors.append(f"{src}: field {field} is the bridge's own")
                 else:
                     needs[src][field] = values[0]

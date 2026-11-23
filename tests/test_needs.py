@@ -386,6 +386,13 @@ class ConnectsMappingTest(unittest.TestCase):
         self.assertEqual(n["LI-1"]["medium"], "data")
         self.assertEqual(n["LC_2"]["owned_by"], ["LC_1"])
         with self.assertRaises(BridgeError) as caught:
+            convert(
+                model(**meta("m4", "Arch::Medium", "li", "x")),
+                {},
+                mapping={"metadata_fields": {"Arch::Medium": "title"}},
+            )
+        self.assertIn("LI-1: field title is the bridge's own", str(caught.exception))
+        with self.assertRaises(BridgeError) as caught:
             convert(model(), {}, mapping=mapping)
         self.assertIn(r"LC-1: a component id matches LC_\d+", str(caught.exception))
 

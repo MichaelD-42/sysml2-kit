@@ -7,7 +7,7 @@ NEEDS = {
         "id": "LI-2",
         "type": "interface",
         "title": "drive",
-        "content": "Torque.",
+        "content": "Torque for F\\_1.",
         "medium": "data",
         "connects": ["LC-2", "LC-3"],
         "owned_by": ["LC-1"],
@@ -28,7 +28,7 @@ class MystTest(unittest.TestCase):
     def test_default_writes_every_link(self):
         text = to_myst(NEEDS)
         self.assertIn(
-            ":::{interface} drive\n:id: LI-2\n:connects: LC-2,LC-3\n:owned_by: LC-1\n\nTorque.\n:::",
+            ":::{interface} drive\n:id: LI-2\n:connects: LC-2,LC-3\n:owned_by: LC-1\n\nTorque for F_1.\n:::",
             text,
         )
         self.assertNotIn(":satisfies:", text)
