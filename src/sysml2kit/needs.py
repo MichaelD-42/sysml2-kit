@@ -271,10 +271,12 @@ def convert(elements, locations, platform_files=(), warnings=None, mapping=None)
                 f"duplicate id {short}: {needs[short]['qualified_name']} and {e.get('qualifiedName')}"
             )
             continue
-        docs = [by_id[d]["body"] for d in refs(e, "documentation") if d in by_id]
+        docs = [
+            by_id[d]["body"].rstrip() for d in refs(e, "documentation") if d in by_id
+        ]
         # a use case's `objective { doc /* The driver wants to ... */ }` is its title
         objective = [
-            by_id[d]["body"]
+            by_id[d]["body"].rstrip()
             for m in refs(e, "ownedRelationship")
             if kind == "usecase"
             and by_id.get(m, {}).get("@type") == "ObjectiveMembership"
@@ -309,8 +311,20 @@ def convert(elements, locations, platform_files=(), warnings=None, mapping=None)
             owner = ref(by_id[owner], "owner")
         return None
 
+    def end_of(element_id):
+        """A feature chain (`a.b.c`) ends at its last feature, itself maybe a chain; anything else is itself."""
+        seen = set()
+        while element_id not in seen:
+            seen.add(element_id)
+            chain = refs(by_id.get(element_id, {}), "chainingFeature")
+            if not chain:
+                break
+            element_id = chain[-1]
+        return element_id
+
     def link(link_type, src_id, dst_id, via):
         # Traceability must be visible in the docs: both ends need short names.
+        src_id, dst_id = end_of(src_id), end_of(dst_id)
         src, dst = need_of.get(src_id), need_of.get(dst_id)
         if src and dst:
             needs[src][link_type].append(dst)
@@ -355,7 +369,7 @@ def convert(elements, locations, platform_files=(), warnings=None, mapping=None)
                 link("allocated_to", ends[0], ends[1], "allocate")
         elif t in CONNECTORS and e["@id"] in need_of:
             # each end is a port or part; the need is the end itself or its nearest owning need
-            for end in refs(e, "relatedFeature"):
+            for end in map(end_of, refs(e, "relatedFeature")):
                 target = end if end in need_of else owning_need(end)
                 link("connects", e["@id"], target or end, need_of[e["@id"]])
         elif t == "PerformActionUsage":

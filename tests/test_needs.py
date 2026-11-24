@@ -311,6 +311,11 @@ class ConvertTest(unittest.TestCase):
             r"See note\_ and \*all \| \`x\` \\ y.",
         )
 
+    def test_doc_text_drops_the_trailing_newline(self):
+        # the OMG Pilot keeps it in Documentation.body; sysml export strips it
+        doc = {"@id": "doc", "@type": "Documentation", "body": "Light.\n"}
+        self.assertEqual(needs_of(model(doc=doc))["SR-1"]["content"], "Light.")
+
 
 def keyword(id_, meta, target):
     """`#Meta` on `target`: a MetadataUsage typed by Trace::<meta>."""
@@ -395,6 +400,49 @@ class ConnectsMappingTest(unittest.TestCase):
         )
         self.assertEqual(n["FEAT-9"]["type"], "feature")
         self.assertEqual(n["F-1"]["realizes"], ["FEAT-9"])
+
+    def test_feature_chain_ends_at_its_last_feature(self):
+        # `perform operate.propel;`: the export references a nameless chain feature
+        chain = el("chain", "Feature", owner="perform", chainingFeature=ids("f1", "f2"))
+        rs = {
+            "@id": "rs",
+            "@type": "ReferenceSubsetting",
+            "referencedFeature": {"@id": "chain"},
+        }
+        self.assertEqual(
+            needs_of(model(chain=chain, rs=rs))["F-2"]["realizes"], ["UC-1"]
+        )
+
+    def test_connector_end_through_a_chain(self):
+        chain = el("chain", "Feature", owner="ci", chainingFeature=ids("lc2", "li"))
+        n = needs_of(
+            model(
+                chain=chain,
+                ci=el(
+                    "ci",
+                    "InterfaceUsage",
+                    "LI-2",
+                    "drive",
+                    owner="lc1",
+                    relatedFeature=ids("chain", "lc2"),
+                ),
+            )
+        )
+        self.assertEqual(n["LI-2"]["connects"], ["LI-1", "LC-2"])
+
+    def test_chain_whose_last_link_is_a_chain(self):
+        # the OMG Pilot exports chains as written, so a chain may end in another chain
+        inner = el("inner", "Feature", owner="perform", chainingFeature=ids("f1", "f2"))
+        outer = el(
+            "outer", "Feature", owner="perform", chainingFeature=ids("f1", "inner")
+        )
+        rs = {
+            "@id": "rs",
+            "@type": "ReferenceSubsetting",
+            "referencedFeature": {"@id": "outer"},
+        }
+        n = needs_of(model(inner=inner, outer=outer, rs=rs))
+        self.assertEqual(n["F-2"]["realizes"], ["UC-1"])
 
     def test_mapping(self):
         mapping = {
